@@ -142,8 +142,7 @@ class Packer():
 
         self.terminal_width = get_terminal_size().columns
         self.last_log_time = datetime.now() # init the logger
-        self.log_dir = user_log_dir('packer', 'EMILIO', ensure_exists=True)
-        self.log_path = Path(self.log_dir + f'{datetime.date(datetime.now())}.log')
+        self.log_path = Path(f'{user_log_dir('packer', 'EMILIO', ensure_exists=True)}/{datetime.date(datetime.now())}.log')
         self.data_dir = user_data_dir('packer', 'EMILIO', ensure_exists=True)
         self.cache_dir = user_cache_dir('packer', 'EMILIO', ensure_exists=True)
         self.chosen_description_path = Path(f'{self.data_dir}/chosen description.txt')
@@ -431,8 +430,9 @@ class Packer():
 
         hide_cursor()
         for text in process.stdout:
+            text = text.rstrip('\n')
             self.log_action(text, 'SUBPROCESS')
-            print_bg_colored_text(text.rstrip('\n'), 255, 192, 203, self.terminal_width)
+            print_bg_colored_text(text, 255, 192, 203, self.terminal_width)
         show_cursor()
 
         process.wait()
