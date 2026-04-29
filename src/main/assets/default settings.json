@@ -1,0 +1,15 @@
+{
+    "exclusions": null,
+    "gofile user token": null,
+    "gofile folder id": null,
+    "github repo token": null,
+    "program name": null,
+    "github repo url": null,
+    "compile command": null,
+
+    "git directory": "git",
+    "model": "mistral",
+
+    "full project path as name": false,
+    "default project": 0
+}

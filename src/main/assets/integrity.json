@@ -1,0 +1,1 @@
+{"CWD": {"files": [".gitignore", "CHANGELOG.md", "README.md", "main.spec", "requirements.txt"], "docs": {"files": ["ROADMAP.md"]}, "src": {"files": ["__init__.py"], "main": {"files": ["__init__.py", "main.py"], "assets": {"files": ["default settings.json", "integrity.json", "version.json"]}, "custom_modules": {"files": ["et.py"]}}}}}
