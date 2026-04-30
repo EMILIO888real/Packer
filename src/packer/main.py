@@ -17,7 +17,7 @@ from platformdirs import user_config_dir, user_log_dir, user_data_dir, user_cach
 from importlib import resources
 from requests import get, post
 
-from src.main.custom_modules.et import copy_with_exceptions, hide_cursor, merge_settings, print_bg_colored_text, print_colored_text, read_json, show_cursor, tree, delete_upload, log_action as _log_action, create_log_message
+from src.packer.custom_modules.et import copy_with_exceptions, hide_cursor, merge_settings, print_bg_colored_text, print_colored_text, read_json, show_cursor, tree, delete_upload, log_action as _log_action, create_log_message
 
 def prompt_user(question: str, default: str = 'y') -> bool:
     '''
@@ -457,7 +457,7 @@ def user_input(text: str) -> str:
     return stripped_input(capitalize(text))
 
 # Needs it regardless how you use the script
-root_dir = resources.files('src.main')
+root_dir = resources.files('src.packer')
 assets_dir = root_dir.joinpath('assets')
 
 if __name__ == '__main__':

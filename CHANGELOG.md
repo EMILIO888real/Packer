@@ -5,6 +5,7 @@
 
 ### Changed
 - Logic for detecting a successful commit is more robust.
+- Changed to correct src layout, by having the project name
 
 ### Fixed
 - Log file name.
