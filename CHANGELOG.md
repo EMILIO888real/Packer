@@ -1,7 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
-- 
+- A safety check for uncommit git directory.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.

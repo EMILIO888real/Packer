@@ -549,6 +549,10 @@ if __name__ == '__main__':
         print('Changing working directory...')
         chdir(project)
 
+    if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
+        print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
+        exit()
+
     version = read_json(f'{assets_dir}/version.json')
     old_version = version.copy()
     input_version = stripped_input('New version(M, m, P): ')
