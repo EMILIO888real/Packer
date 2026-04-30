@@ -1,7 +1,11 @@
+# Virtual Environments
 .venv
 .vscode
+
+# Developer related stuff
 tests
 dev
-src/__pycache__
-src/packer/__pycache__
-src/packer/custom_modules/__pycache__
+__pycache__/
+
+# Distribution / Packaging
+packer.egg-info/
