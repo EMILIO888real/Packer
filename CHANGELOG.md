@@ -4,11 +4,12 @@
 - 
 
 ### Changed
-- 
+- Logic for detecting a successful commit is more robust.
 
 ### Fixed
-- Log file name
-- Streamed command output to log, no extra new lines
+- Log file name.
+- Streamed command output to log, no extra new lines.
+- Some minor documentation inaccuracy's and other various changes that don't affect code.
 
 ---
 

@@ -8,7 +8,7 @@ This is a very early release, and while it has been tested on multiple projects,
 
 ## Features
 
-- **Archive Creation**: Automatically packages your game with customizable exclusion rules
+- **Archive Creation**: Automatically packages your program with customizable exclusion rules
 - **Cloud Upload**: Uploads archives to Gofile with automatic folder management
 - **Git Integration**: Handles repository updates and version control
 - **GitHub Releases**: Publishes releases directly to GitHub with AI-generated descriptions
@@ -33,7 +33,7 @@ Set up a python virtual environment and install the required dependencies:
 
 ```bash
 python -m venv .venv
-source .venv/bin/activate  # On Windows: venv\Scripts\activate
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
