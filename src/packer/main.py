@@ -510,9 +510,18 @@ if __name__ == '__main__':
         else:
             compile_command_input = compile_command_input.split(' ')
 
+        exclusions = []
+        if prompt_user('5. Would you like to copy .gitignore exclusions to the packer exclusions'):
+            with open(f'{project_directory}/.gitignore') as f:
+                exclusions = f.read().splitlines()
+
+        inputted_exclusions = user_input(f'5. items to exclude (separate with a comma, {'will be combined with .gitignore' if 'gitignore' != [] else ''}): ')
+        if inputted_exclusions != '':
+            exclusions.extend([item.strip() for item in inputted_exclusions.split(',')])
+
         new_project_settings = {
             project_directory: {
-                'exclusions': [item.strip() for item in user_input('5. items to exclude (separate with a comma): ').split(',')],
+                'exclusions': exclusions,
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
                 'github repo url': user_input('6. github repo url (username/repo): '),
