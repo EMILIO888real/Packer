@@ -11,5 +11,7 @@
     "model": "mistral",
 
     "full project path as name": false,
-    "default project": 0
+    "default project": 0,
+
+    "text editor": "code"
 }
