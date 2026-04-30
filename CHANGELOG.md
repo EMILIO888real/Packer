@@ -2,6 +2,7 @@
 
 ### Added
 - A safety check for uncommit git directory.
+- option to add .gitignore exclusions to packer\'s exclusions.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.

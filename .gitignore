@@ -3,5 +3,5 @@
 tests
 dev
 src/__pycache__
-src/main/__pycache__
-src/main/custom_modules/__pycache__
+src/packer/__pycache__
+src/packer/custom_modules/__pycache__
