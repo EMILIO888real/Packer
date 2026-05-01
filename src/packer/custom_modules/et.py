@@ -67,6 +67,7 @@ from json import dump, load
 from datetime import datetime
 from shutil import ignore_patterns, which, copy2, copytree
 from subprocess import Popen
+import logging
 
 def hide_cursor() -> None:
     '''Hides the cursor
@@ -1077,7 +1078,7 @@ def copy_with_exceptions(source: str | Path, destination: str | Path, exceptions
         else:
             copytree(item, Path(f'{destination}/{item.name}'), ignore=ignore_patterns(*directory_exceptions))
 
-def log_action(text: str, file_name: str | Path = Path('.log.log'), end: str = '\n') -> None:
+def log_action(text: str, file_name: str | Path, end: str = '\n') -> None:
     '''
     Logs an action by appending the specified text to a log file.
     
@@ -1318,6 +1319,61 @@ def print_bg_colored_text(text: str, red: int, green: int, blue: int, terminal_w
     set_background_color(red, green, blue)
     print(text)
     clear_lines(lines_used(text, terminal_width), clear_formatting=True)
+
+import logging
+from datetime import datetime, timedelta
+from platformdirs import user_log_dir
+
+class RelativeTimeFormatter(logging.Formatter):
+    '''A logging formatter that formats log messages with the relative time since the logger was initialized.
+    
+    :param fmt: The format string for the log messages. Default is '[%(levelname)s] %(asctime)s %(message)s'.
+    :type fmt: str, optional
+    '''
+
+    def formatTime(self, record, datefmt=None):
+        delta = timedelta(milliseconds=record.relativeCreated)
+        s = str(delta)
+        if '.' not in s: s += '.000000' # Ensure micros are always shown
+        return s.zfill(15)
+
+
+def log_file_path(program: str, author: str) -> str:
+    '''Returns the file path for a log file in the user's log directory. The log file is named with the current date and has a .log extension.
+    
+    :param program: The name of the program for which the log file is being created.
+    :type program: str
+    :param author: The name of the author of the program.
+    :type author: str
+    :return: The file path for the log file.
+    :rtype: str
+    '''
+
+    return f'{user_log_dir(program, author, ensure_exists=True)}/{datetime.date(datetime.now())}.log'
+
+def init_logger(program: str, author: str, log_format: str = '[%(levelname)s] %(asctime)s %(message)s') -> logging.Logger:
+    '''Initializes a logger that writes to a file in the user's log directory. The log file is named with the current date. Each log message includes the relative time since the logger was initialized.
+    
+    :param program: The name of the program for which the logger is being initialized.
+    :type program: str
+    :param author: The name of the author of the program.
+    :type author: str
+    :param log_format: The format string for the log messages. Default is '[%(levelname)s] %(asctime)s %(message)s'.
+    :type log_format: str, optional
+    :return: A logger instance that writes to the specified log file.
+    :rtype: logging.Logger
+    '''
+
+    log_file_name = log_file_path(program, author)
+    with open(log_file_name, 'w') as f:
+        f.write(f'______Start of the log {datetime.now()}______\n')
+    logger = logging.getLogger(log_file_name)
+    logger.setLevel(logging.DEBUG)
+    handler = logging.FileHandler(log_file_name, 'a')
+    handler.setFormatter(RelativeTimeFormatter(log_format))
+    logger.addHandler(handler)
+    logger.info('Initializing logger...')
+    return logger
 
 if __name__ == '__main__':
     # print('This module is not meant to be run directly')
