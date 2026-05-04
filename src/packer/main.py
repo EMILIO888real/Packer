@@ -156,32 +156,32 @@ class Packer():
 
         self.print_and_log('Generating a version description...')
 
-        user_answer = 'n'
+        generate_description = True
         if self.chosen_description_path.exists() and prompt_user('Use the previously generated version description'):
-            user_answer = 'y'
+            generate_description = False
             with open(self.chosen_description_path) as f:
                 description = f.read()
 
-        while user_answer == 'n':
+        while generate_description:
             description = chat(model=self.model, messages=[{'role': 'user', 'content': f'Generate a short version description based on the changelog for this version. Generate it in markdown paragraph format. Generate only 1 paragraph of text. Use only the provided changelog to base your response. Changelog: {latest_changelog}'}])['message']['content'].replace('\n', ' ').strip().replace('  ', ' ')
             self.print_and_log(description)
-            user_answer = prompt_user('Is the description all good', default='n')
+            generate_description = not prompt_user('Is the description all good', default='n')
         
         with open(self.chosen_description_path, 'w') as f:
             f.write(description)
 
         self.print_and_log('Generating a version title...')
 
-        user_answer = 'n'
+        generate_title = True
         if self.chosen_title_path.exists() and prompt_user('Use the previously generated version title'):
-            user_answer = 'y'
+            generate_title = False
             with open(self.chosen_title_path) as f:
                 version_title = f.read()
 
-        while user_answer == 'n':
+        while generate_title:
             version_title = chat(model=self.model, messages=[{'role': 'system', 'content': 'Answer using only 2 words.'}, {'role': 'user', 'content': f'Generate a version name based on the the changelog for this version and don\'t include the version tag itself in the name. Don\'t put the text in quotes or leave trailing whitespaces. Also make the it a little puzzling, make it with an indirect message. Changelog: {latest_changelog}'}])['message']['content'].replace('\n', '').strip()
             self.print_and_log(version_title)
-            user_answer = prompt_user('Is the Version title all good', default='n')
+            generate_title = not prompt_user('Is the Version title all good', default='n')
     
         with open(self.chosen_title_path, 'w') as f:
             f.write(version_title)
