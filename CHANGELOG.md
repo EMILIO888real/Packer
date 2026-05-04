@@ -6,6 +6,7 @@
 - change.py to be able to quickly and easily add changes to your project.
 - paths.py to be able to easily get paths to important packer files and directories cleanly and easily.
 - A new way to log using the python's built-in logging module.
+- A clean format version text function as per my preferred standart.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.

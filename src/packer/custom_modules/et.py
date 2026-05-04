@@ -1375,6 +1375,18 @@ def init_logger(program: str, author: str, log_format: str = '[%(levelname)s] %(
     logger.info('Initializing logger...')
     return logger
 
+def format_version_text(version: dict) -> str:
+    '''Formats a version dictionary into a human-readable string format.
+    
+    :param version: A dictionary containing version information, with keys 'major', 'minor', and 'patch'.
+    :type version: dict
+    :return: A formatted string representing the version in the format "major.minor.patch".
+    :rtype: str
+    '''
+
+    return f'{version["major"]}.{version["minor"]}.{version["patch"]}'
+
+
 if __name__ == '__main__':
     # print('This module is not meant to be run directly')
     # print('Import it in your program and use the functions from there')
