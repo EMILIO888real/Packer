@@ -203,14 +203,14 @@ class Packer():
         self.old_integrity = read_json(f'{assets_dir}/integrity.json')
 
         self.print_and_log('Generating the integrity file...')
-        new_cwd = tree(f'{self.cache_dir}/{self.program_name} {version}.zip')
+        new_cwd = tree(f'{self.cache_dir}/{self.program_name} {self.version}.zip')
         with open(f'{assets_dir}/integrity.json', 'w') as f:
             dump({'CWD': new_cwd}, f)
 
 
         self.print_and_log('Creating an archive of the current git repository...')
         self.git_repo = Repo()
-        with open(f'{self.cache_dir}/{self.program_name} {version}.zip', 'wb') as fp:
+        with open(f'{self.cache_dir}/{self.program_name} {self.version}.zip', 'wb') as fp:
             self.git_repo.archive(fp, format='zip')
 
 

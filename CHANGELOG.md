@@ -32,6 +32,7 @@
 - Stop tracking ignored __pycache__ files.
 - input handling for the new `prompt_user` function in the description and version title generation.
 - AI prompts to be more consistent cleaner and stricter. Specifically temperature, system and user prompts, limitations.
+- Incorrect arhive path, using the version as a description, not the text.
 
 ---
 
