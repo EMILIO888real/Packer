@@ -7,10 +7,12 @@
 - paths.py to be able to easily get paths to important packer files and directories cleanly and easily.
 - A new way to log using the python's built-in logging module.
 - A clean format version text function as per my preferred standart.
-- Some extra simple safety checks
+- Some extra simple safety checks.
 - `setup.py` a function to create and setup a project in packer's format.
 - an MIT license.
 - A way to run setup.py directly.
+- Documentation `for setup.py`.
+- Auto filling setup.py entered data, like program name and github repo url, if not provided.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.
@@ -21,6 +23,7 @@
 - Removed support for an git folder, now your project must be a git directory.
 - Switched to using git to create an archive of your project for GoFile.
 - Removed exclusions to packer, now git handles them exclusively.
+- setup.py now returns the github repo url.
 
 ### Fixed
 - Log file name.
