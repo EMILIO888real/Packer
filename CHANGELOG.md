@@ -24,6 +24,7 @@
 - Switched to using git to create an archive of your project for GoFile.
 - Removed exclusions to packer, now git handles them exclusively.
 - setup.py now returns the github repo url.
+- All colors for reverting a version to yellow, instead of just white.
 
 ### Fixed
 - Log file name.

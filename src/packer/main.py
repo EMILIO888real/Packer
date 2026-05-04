@@ -310,33 +310,33 @@ class Packer():
     def revert_changes(self) -> None:
         '''Reverts the version to the previous one, deletes the uploaded copy and git release if they exist, and resets the git directory to the previous commit. Also restores the integrity file.'''
 
-        self.print_and_log('Changing version...')
+        self.print_and_log('Changing version...', [255, 255, 0])
         with open(f'{assets_dir}/version.json', 'w') as f:
             dump(old_version, f)
         
         if hasattr(self, 'old_changelog'):
-            self.print_and_log('Restoring changelog...')
+            self.print_and_log('Restoring changelog...', [255, 255, 0])
             with open('CHANGELOG.md', 'w') as f:
                 f.write(self.old_changelog)
 
         if hasattr(self, 'old_integrity'):
-            self.print_and_log('Restoring integrity file...')
+            self.print_and_log('Restoring integrity file...', [255, 255, 0])
             with open(f'{assets_dir}/integrity.json', 'w') as f:
                 dump(self.old_integrity, f)
 
         if Path(f'{self.cache_dir}/archive').exists():
-            self.print_and_log('Removing temporary directory...')
+            self.print_and_log('Removing temporary directory...', [255, 255, 0])
             rmtree(f'{self.cache_dir}/archive')
 
         if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
-            self.print_and_log('Removing archive...')
+            self.print_and_log('Removing archive...', [255, 255, 0])
             remove(f'{self.cache_dir}/{self.program_name} {self.version}.zip')
 
         if hasattr(self, 'file_id'):
-            self.print_and_log('Deleting uploaded copy...')
+            self.print_and_log('Deleting uploaded copy...', [255, 255, 0])
             delete_upload(self.file_id, self.GOFILE_USER_TOKEN)
 
-        self.print_and_log('Reverting git changes...')
+        self.print_and_log('Reverting git changes...', [255, 255, 0])
         if hasattr(self, 'committed') and self.committed:
             self._run(['git', 'reset', '--hard', 'HEAD~1'])
             self._run(['git', 'clean', '-fd'])
@@ -346,7 +346,7 @@ class Packer():
             self._run(['git', 'clean', '-fd'])
 
         if hasattr(self, 'git_release'):
-            self.print_and_log('Deleting git release...')
+            self.print_and_log('Deleting git release...', [255, 255, 0])
             self.git_release.delete_release()
             self.repo.get_git_ref(f"tags/{self.version}").delete()
 
