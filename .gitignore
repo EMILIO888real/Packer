@@ -5,7 +5,8 @@
 # Developer related stuff
 tests
 dev
-__pycache__/
+**/__pycache__/
+*.py[cod]
 
 # Distribution / Packaging
-packer.egg-info/
+*.egg-info/

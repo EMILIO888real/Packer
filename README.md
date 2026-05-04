@@ -18,7 +18,7 @@ This is a very early release, and while it has been tested on multiple projects,
 
 ## Requirements
 
-- Python 3.14+
+- Python 3.8+
 - GitHub account with API token
 - GoFile account with API token
 - Git installed locally

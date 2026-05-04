@@ -7,6 +7,8 @@
 - paths.py to be able to easily get paths to important packer files and directories cleanly and easily.
 - A new way to log using the python's built-in logging module.
 - A clean format version text function as per my preferred standart.
+- Some extra simple safety checks
+- `setup.py` a function to create and setup a project in packer's format.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.
@@ -14,7 +16,9 @@
 - Switched to use sys.exit instead of the placeholder's.
 - Cleaned up the code a bit.
 - Moved `prompt_user` function to et.
-- Added `setup.py` a function to create and setup a project in packer's format.
+- Removed support for an git folder, now your project must be a git directory.
+- Switched to using git to create an archive of your project for GoFile.
+- Removed exclusions to packer, now git handles them exclusively.
 
 ### Fixed
 - Log file name.

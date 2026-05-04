@@ -15,6 +15,7 @@ from github import Github, Auth, UnknownObjectException
 from ollama import chat
 from platformdirs import user_config_dir, user_log_dir, user_data_dir, user_cache_dir
 from requests import get, post
+from git import Repo
 
 from packer.custom_modules.et import copy_with_exceptions, hide_cursor, merge_settings, print_bg_colored_text, print_colored_text, read_json, show_cursor, tree, delete_upload, log_action as _log_action, create_log_message, prompt_user
 from packer.paths import assets_dir
@@ -81,8 +82,6 @@ class Packer():
     :type version: dict
     :param old_version: The previous version of the program.
     :type old_version: dict
-    :param EXCLUSION_SET: A set of file and folder names to exclude from the archive
-    :type EXCLUSION_SET: Sequence
     :param GOFILE_USER_TOKEN: The user token for Gofile, used to upload the
     archive.
     :type GOFILE_USER_TOKEN: str
@@ -96,25 +95,19 @@ class Packer():
     :type github_repo_url: str
     :param compile_command: The command to compile the program using Nuitka, used to compile the program and upload the compiled version to the Github release.
     :type compile_command: Sequence[str], optional
-    :param git_directory: The directory of the git repository, defaults to 'git'.
-    :type git_directory: str, optional
     :param model: The language model to use for generating the version description and title, defaults to 'mistral'.
     :type model: str, optional
     '''
 
-    def __init__(self, version: dict, old_version: dict, EXCLUSION_SET: set,
+    def __init__(self, version: dict, old_version: dict,
                  GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str,
                  program_name: str, github_repo_url: str, compile_command: Sequence[str] = None,
-                 git_directory: str = 'git', model: str = 'mistral'):
+                 model: str = 'mistral'):
         self.version = version
         self.old_version = old_version
-        self.EXCLUSION_SET = EXCLUSION_SET
-        if Path(git_directory).absolute() == Path().cwd():
-            self.EXCLUSION_SET.add('.git')
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
         self.FOLDER_ID = FOLDER_ID
         self.GITHUB_REPO_TOKEN = GITHUB_REPO_TOKEN
-        self.git_directory = git_directory
         self.model = model
         self.program_name = program_name
         self.github_repo_url = github_repo_url
@@ -199,52 +192,29 @@ class Packer():
             remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
 
 
-        self.print_and_log('Copying files to a temporary directory...')
-        copy_with_exceptions('.', f'{self.cache_dir}/archive' , self.EXCLUSION_SET, self.EXCLUSION_SET)
-
-
         self.old_integrity = read_json(f'{assets_dir}/integrity.json')
 
         self.print_and_log('Generating the integrity file...')
-        new_cwd = tree(f'{self.cache_dir}/archive')
+        new_cwd = tree(f'{self.cache_dir}/{self.program_name} {version}.zip')
         with open(f'{assets_dir}/integrity.json', 'w') as f:
             dump({'CWD': new_cwd}, f)
 
+
+        self.print_and_log('Creating an archive of the current git repository...')
+        self.git_repo = Repo()
+        with open(f'{self.cache_dir}/{self.program_name} {version}.zip', 'wb') as fp:
+            self.git_repo.archive(fp, format='zip')
+
+
         self.print_and_log(f'Added file: {set(new_cwd).difference(self.old_integrity['CWD'])}')
-
-
+        self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
         if prompt_user('Is the arhive all good'):
-            self.print_and_log('Creating archive...')
-            make_archive(f'{self.cache_dir}/{self.program_name} {self.version}', 'zip', root_dir=f'{self.cache_dir}/archive')
-
-            self.print_and_log('Removing temporary directory...')
-            rmtree(f'{self.cache_dir}/archive')
-
 
             self.print_and_log('Uploading archive to Gofile...')
             response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
 
             download_url = response['data']['downloadPage']
             self.file_id = response['data']['id']
-
-            if Path().cwd() != Path(self.git_directory).absolute():
-                self.print_and_log('Updating git directory...')
-                items = listdir(Path('git'))
-                for item in items:
-                    if item not in {'.gitignore', '.git'}:
-                        if Path(f'{self.git_directory}{item}').is_file():
-                            remove(Path(f'{self.git_directory}{item}'))
-                        else:
-                            rmtree(Path(f'{self.git_directory}{item}'))
-
-                self.print_and_log('Copying archive to git directory...')
-                copy2(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), Path('git'))
-
-                self.print_and_log('Unpacking archive in git directory...')
-                unpack_archive(Path(f'{self.git_directory}{self.program_name} {self.version}.zip'), Path('git'))
-
-                self.print_and_log('Removing archive from git directory...')
-                remove(f'{self.git_directory}/{self.program_name} {self.version}.zip')
 
 
             self.print_and_log('Staging changes...')
@@ -291,7 +261,7 @@ class Packer():
             self._Popen([pyinstaller_path, f'{Path().cwd().absolute()}/main.spec'])
 
 
-            self.print_and_log('Uploading the compiled games to the github release...')
+            self.print_and_log('Uploading the compiled programs to the github release...')
             self.git_release.upload_asset(path=f'{self.cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
 
             if self.compile_command != None:
@@ -299,7 +269,6 @@ class Packer():
 
 
             self.print_and_log('Cleaning up cache...')
-            rmtree(f'{self.cache_dir}/build')
             rmtree(f'{self.cache_dir}/dist')
 
             if self.compile_command != None:
@@ -395,7 +364,7 @@ class Packer():
         :rtype: CompletedProcess
         '''
 
-        result = run(args, check=True, cwd=self.git_directory, capture_output=True)
+        result = run(args, check=True, capture_output=True)
         self.log_action(f'Ran command: {" ".join(args)}\nstdout: {result.stdout.decode("utf-8")}\nstderr: {result.stderr.decode("utf-8")}', 'SUBPROCESS')
         return result
 
@@ -461,7 +430,7 @@ if __name__ == '__main__':
 
     if project_directory == None:
         required_settings = ['github repo token', 'program name']
-        MANUAL_INPUT_SETTINGS = 6
+        MANUAL_INPUT_SETTINGS = 5
 
         print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
 
@@ -469,6 +438,8 @@ if __name__ == '__main__':
         project_directory = user_input('1. project directory (absolute path, leave empty for current directory): ')
         if project_directory == '':
             project_directory = str(Path().cwd().absolute())
+
+        project_directory.rstrip('/')
         
         if Path(project_directory).exists():
             create_project = prompt_user('Remove the existing project profile and start fresh', default='n')
@@ -484,8 +455,8 @@ if __name__ == '__main__':
                 github_pat = None
                 github_repo_url = user_input('Github repo url (username/repo): ')
 
-            print('Starting setup...')
             setup(project_directory, input('Author name of the program: '), input('Program name: '), github_pat, github_repo_url,'.')
+            print('Starting setup...')
 
 
         gofile_user_token = user_input('2. gofile user token: ')
@@ -503,21 +474,11 @@ if __name__ == '__main__':
         else:
             compile_command_input = compile_command_input.split(' ')
 
-        exclusions = []
-        if prompt_user('5. Would you like to copy .gitignore exclusions to the packer exclusions'):
-            with open(f'{project_directory}/.gitignore') as f:
-                exclusions = f.read().splitlines()
-
-        inputted_exclusions = user_input(f'5. items to exclude (separate with a comma, {'will be combined with .gitignore' if 'gitignore' != [] else ''}): ')
-        if inputted_exclusions != '':
-            exclusions.extend([item.strip() for item in inputted_exclusions.split(',')])
-
         new_project_settings = {
             project_directory: {
-                'exclusions': exclusions,
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
-                'github repo url': user_input('6. github repo url (username/repo): '),
+                'github repo url': user_input('5. github repo url (username/repo): '),
                 'compile command': compile_command_input
                 }
             }
@@ -527,7 +488,7 @@ if __name__ == '__main__':
             new_project_settings[project_directory][setting] = user_input(f'{i + MANUAL_INPUT_SETTINGS + 1}. {setting}: ')
 
         if prompt_user('Would you like to edit optional settings', default='n'):
-            optional_settings = ['git directory', 'model']
+            optional_settings = ['model']
             for i in range(len(optional_settings)):
                 setting = optional_settings[i]
                 user_answer = user_input(f'{i}. {setting}: ')
@@ -575,9 +536,9 @@ if __name__ == '__main__':
             print('Unknown version! exiting...', [255, 0, 0])
             exit()
     try:
-        packer = Packer(version, old_version, set(all_settings['exclusions']),
+        packer = Packer(version, old_version,
                         all_settings['gofile user token'], all_settings['gofile folder id'], all_settings['github repo token'],
-                        all_settings['program name'], all_settings['github repo url'], all_settings['compile command'], all_settings['git directory'], all_settings['model'])
+                        all_settings['program name'], all_settings['github repo url'], all_settings['compile command'], all_settings['model'])
         packer.run()
     except KeyboardInterrupt:
         packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
