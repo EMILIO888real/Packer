@@ -25,7 +25,45 @@ def create_venv(created_venv) -> None:
     run(['python', '-m', 'venv', '.venv'])
     created_venv.set()
 
-def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None) -> None:
+def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None) -> str:
+    '''Sets up a new project with the following structure:
+    ```
+    project_directory/
+    ├── src/
+    │   └── program_name/
+    │       ├── __init__.py
+    │       ├── main.py
+    │       ├── paths.py
+    │       └── assets/
+    ├── docs/
+    │   ├── todo.md
+    │   ├── SETTINGS.md
+    │   ├── CONFIGURATION.md
+    │   ├── CUSTOMIZATION.md
+    │   └── ROADMAP.md
+    ├── tests/
+    ├── dev/
+    ├── .gitignore
+    ├── LICENSE
+    ├── README.md
+    ├── CHANGELOG.md
+    └── pyproject.toml
+    ```
+    The function also initializes a git repository, creates an initial commit, and optionally creates a remote repository on GitHub and pushes the initial commit to it.
+
+    :param project_directory: The absolute path to the project directory. If it already exists, the user will be prompted to delete it and create a new one.
+    :type project_directory: str | Path
+    :param author_name: The name of the author of the program, used in the LICENSE file and the pyproject.toml file.
+    :type author_name: str
+    :param program_name: The name of the program, used for the project directory, the source code directory, and the pyproject.toml file.
+    :type program_name: str
+    :param github_pat: The GitHub Personal Access Token (PAT) used to create a remote repository on GitHub. If not provided, the remote repository will not be created.
+    :type github_pat: str, optional
+    :param github_repo_url: The URL of the GitHub repository in the format "username/repo". If not provided, the repository will be created with the same name as the program. This parameter is only used if github_pat is provided.
+    :type github_repo_url: str, optional
+    :return: The URL of the created GitHub repository.
+    :rtype: str
+    '''
 
     program_name = program_name.lower()
     root_dir = f'src/{program_name}'
@@ -163,6 +201,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         print_and_log('You can push manually with: git push -u origin master', 20, [255, 165, 0])
 
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
+    
+    return github_repo_url.lstrip('https://github.com/')
 
 if __name__ == '__main__':
     main(input('Project directory (absolute path, leave empty for current directory): '), input('Author name of the program: '), input('Program name: '), input('Github repo token (leave empty to skip): '), input('Github repo url (username/repo, leave empty to skip): '))

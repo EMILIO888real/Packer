@@ -429,8 +429,8 @@ if __name__ == '__main__':
 
 
     if project_directory == None:
-        required_settings = ['github repo token', 'program name']
-        MANUAL_INPUT_SETTINGS = 5
+        required_settings = ['github repo token']
+        MANUAL_INPUT_SETTINGS = 6
 
         print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
 
@@ -447,6 +447,9 @@ if __name__ == '__main__':
             create_project = True
 
         if create_project:
+            if Path(project_directory).exists():
+                rmtree(project_directory)
+
             create_github_repository = prompt_user('Create a new github repository')
             if create_github_repository:
                 github_pat = user_input('Github personal access token (with Administration permissions): ')
@@ -454,8 +457,10 @@ if __name__ == '__main__':
             else:
                 github_pat = None
                 github_repo_url = user_input('Github repo url (username/repo): ')
+            
+            program_name = input('Program name: ')
 
-            setup(project_directory, input('Author name of the program: '), input('Program name: '), github_pat, github_repo_url,'.')
+            github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url,'.')
             print('Starting setup...')
 
 
@@ -478,8 +483,9 @@ if __name__ == '__main__':
             project_directory: {
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
-                'github repo url': user_input('5. github repo url (username/repo): '),
-                'compile command': compile_command_input
+                'github repo url': user_input('5. github repo url (username/repo): ') if github_repo_url not in locals() else github_repo_url,
+                'compile command': compile_command_input,
+                'program name': user_input('6. program name: ') if 'program_name' not in locals() else program_name
                 }
             }
         
