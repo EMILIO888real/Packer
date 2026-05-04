@@ -9,6 +9,7 @@
 - A clean format version text function as per my preferred standart.
 - Some extra simple safety checks
 - `setup.py` a function to create and setup a project in packer's format.
+- an MIT license.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.
