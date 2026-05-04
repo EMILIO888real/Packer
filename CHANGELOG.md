@@ -10,7 +10,11 @@
 
 ### Changed
 - Logic for detecting a successful commit is more robust.
-- Changed to correct src layout, by having the project name
+- Changed to correct src layout, by having the project name.
+- Switched to use sys.exit instead of the placeholder's.
+- Cleaned up the code a bit.
+- Moved `prompt_user` function to et.
+- Added `setup.py` a function to create and setup a project in packer's format.
 
 ### Fixed
 - Log file name.
