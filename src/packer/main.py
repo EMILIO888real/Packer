@@ -163,7 +163,11 @@ class Packer():
                 description = f.read()
 
         while generate_description:
-            description = chat(model=self.model, messages=[{'role': 'user', 'content': f'Generate a short version description based on the changelog for this version. Generate it in markdown paragraph format. Generate only 1 paragraph of text. Use only the provided changelog to base your response. Changelog: {latest_changelog}'}])['message']['content'].replace('\n', ' ').strip().replace('  ', ' ')
+            description_prompt = [
+                {'role': 'system', 'content': 'You are a technical writer. Output ONLY the raw markdown paragraph. No intros, no explanations.'},
+                {'role': 'user', 'content': f'Summarize this changelog into exactly one markdown paragraph. Do not use lists. Use only the provided info.\n\nChangelog:\n{latest_changelog}'}
+            ]
+            description = chat(model=self.model, messages=description_prompt, options={'temperature': 0.2})['message']['content'].strip().replace('\n', ' ')
             self.print_and_log(description)
             generate_description = not prompt_user('Is the description all good', default='n')
         
@@ -179,7 +183,11 @@ class Packer():
                 version_title = f.read()
 
         while generate_title:
-            version_title = chat(model=self.model, messages=[{'role': 'system', 'content': 'Answer using only 2 words.'}, {'role': 'user', 'content': f'Generate a version name based on the the changelog for this version and don\'t include the version tag itself in the name. Don\'t put the text in quotes or leave trailing whitespaces. Also make the it a little puzzling, make it with an indirect message. Changelog: {latest_changelog}'}])['message']['content'].replace('\n', '').strip()
+            title_prompt = [
+                {'role': 'system', 'content': 'You are a cryptic oracle. Your answer must be exactly 2 or 3 words. No quotes, no punctuation, no preamble.'},
+                {'role': 'user', 'content': f'Create a mystical, indirect puzzle title for this update. Do not include version numbers.\n\nChangelog:\n{latest_changelog}'}
+            ]
+            version_title = chat(model=self.model, messages=title_prompt, options={'temperature': 0.8, 'num_predict': 10})['message']['content'].strip().replace('"', '').replace("'", "")
             self.print_and_log(version_title)
             generate_title = not prompt_user('Is the Version title all good', default='n')
     
