@@ -1,7 +1,7 @@
 
 from os import chdir, mkdir
 from pathlib import Path
-from shutil import copytree, rmtree
+from shutil import rmtree
 from subprocess import run
 from typing import Sequence
 from json import dump
@@ -25,7 +25,7 @@ def create_venv(created_venv) -> None:
     run(['python', '-m', 'venv', '.venv'])
     created_venv.set()
 
-def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, git_repository: str = 'git') -> None:
+def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None) -> None:
 
     program_name = program_name.lower()
     root_dir = f'src/{program_name}'
@@ -112,10 +112,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     with open('LICENSE', 'w') as f:
         f.write(f'MIT License\n\nCopyright (c) 2025 {author_name}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n')
 
-    print_and_log('Creating git repository...')
-    if Path(git_repository).absolute() != Path().cwd():
-        mkdir(git_repository)
-
     repo = Repo.init(project_directory)
 
     print_and_log('Creating .gitignore file...')
@@ -136,9 +132,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         )
 
     created_venv.wait()
-
-    if Path(git_repository).absolute() != Path().cwd():
-        copytree('.', git_repository)
 
     print_and_log('Staging files for initial commit...')
     repo.git.add(all=True)

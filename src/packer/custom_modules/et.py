@@ -61,13 +61,14 @@ import sys
 from collections.abc import Collection
 from os import execl, path, replace, listdir, mkdir
 from threading import Event # This is used for 2 functions in this module (loading_terminal_animation, character_loading_animation)
-from typing import Any, Callable, Optional
+from typing import Any, Callable, Optional, Union
 from pathlib import Path
 from json import dump, load
 from datetime import datetime
 from shutil import ignore_patterns, which, copy2, copytree
 from subprocess import Popen
 import logging
+import zipfile
 
 def hide_cursor() -> None:
     '''Hides the cursor
@@ -1243,7 +1244,7 @@ def delete_upload(file_id: str, api_token: str) -> str:
     else:
         return f'Unexpected response: {response.text}'
 
-def tree(path: str | Path, exclusions: Optional[Collection] = ()) -> dict:
+def tree(path: Union[str, Path], exclusions: Optional[Collection[str]] = ()) -> dict:
     '''
     Generates a nested dictionary representing the directory structure of the specified path, excluding any files or directories listed in the exclusions parameter.
 
@@ -1255,23 +1256,28 @@ def tree(path: str | Path, exclusions: Optional[Collection] = ()) -> dict:
     :rtype: dict
     '''
 
-    def iterate_dir(path: str):
-        
-        children = {'files': []}
-        for entry in sorted(Path(path).iterdir(), key=lambda p: p.name):
-            if entry.name not in exclusions:
-                if Path(entry).is_file():
-                    children['files'].append(entry.name)
-                else:
-                    children[entry.name] = iterate_dir(entry)
-        if children['files'] == []:
-            children.pop('files')
+    str_path = str(path)
+    if zipfile.is_zipfile(str_path):
+        # Treat the zip file as the root filesystem
+        root = zipfile.Path(str_path)
+    else:
+        root = Path(path)
 
+    def iterate_dir(current_node) -> dict:
+        children = {'files': []}
+        for entry in sorted(current_node.iterdir(), key=lambda p: p.name):
+            if entry.name not in exclusions:
+                if entry.is_file():
+                    children['files'].append(entry.name)
+                elif entry.is_dir():
+                    children[entry.name] = iterate_dir(entry)
+        
+        if not children['files']:
+            children.pop('files')
+            
         return children
 
-    iterate_dir(path)                
-
-    return iterate_dir(path)
+    return iterate_dir(root)
 
 def check_dicts(integrity_dict: dict, user_dict):
 

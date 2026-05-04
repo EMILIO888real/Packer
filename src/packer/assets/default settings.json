@@ -1,5 +1,4 @@
 {
-    "exclusions": null,
     "gofile user token": null,
     "gofile folder id": null,
     "github repo token": null,
@@ -7,7 +6,6 @@
     "github repo url": null,
     "compile command": null,
 
-    "git directory": ".",
     "model": "mistral",
 
     "full project path as name": false,
