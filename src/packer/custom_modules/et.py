@@ -1386,6 +1386,26 @@ def format_version_text(version: dict) -> str:
 
     return f'{version["major"]}.{version["minor"]}.{version["patch"]}'
 
+def prompt_user(question: str, default: str = 'y') -> bool:
+    '''
+    Prompts the user with a yes or no question and returns their answer as a boolean. The default answer is 'y' (yes) if the user just presses enter.
+    
+    :param question: The question to ask the user.
+    :type question: str
+    :param default: The default answer if the user just presses enter, either 'y'
+    for yes or 'n' for no, defaults to 'y'.
+    :type default: str, optional
+    :return: The user's answer as a boolean.
+    :rtype: bool
+    '''
+
+    answer = input(f'{question}? [{'Y/n' if default == 'y' else 'y/N'}] ').strip().lower()
+    if answer == '':
+        return True if default == 'y' else False
+    elif answer.startswith('y'):
+        return True
+    elif answer.startswith('n'):
+        return False
 
 if __name__ == '__main__':
     # print('This module is not meant to be run directly')

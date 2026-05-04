@@ -7,7 +7,7 @@
     "github repo url": null,
     "compile command": null,
 
-    "git directory": "git",
+    "git directory": ".",
     "model": "mistral",
 
     "full project path as name": false,

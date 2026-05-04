@@ -8,7 +8,7 @@ from pathlib import Path
 from os import remove, listdir, chdir
 from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
-from sys import platform
+from sys import platform, exit
 from time import sleep
 from typing import Optional, Sequence
 from github import Github, Auth, UnknownObjectException
@@ -16,29 +16,9 @@ from ollama import chat
 from platformdirs import user_config_dir, user_log_dir, user_data_dir, user_cache_dir
 from requests import get, post
 
-from packer.custom_modules.et import copy_with_exceptions, hide_cursor, merge_settings, print_bg_colored_text, print_colored_text, read_json, show_cursor, tree, delete_upload, log_action as _log_action, create_log_message
+from packer.custom_modules.et import copy_with_exceptions, hide_cursor, merge_settings, print_bg_colored_text, print_colored_text, read_json, show_cursor, tree, delete_upload, log_action as _log_action, create_log_message, prompt_user
 from packer.paths import assets_dir
-
-def prompt_user(question: str, default: str = 'y') -> bool:
-    '''
-    Prompts the user with a yes or no question and returns their answer as a boolean. The default answer is 'y' (yes) if the user just presses enter.
-    
-    :param question: The question to ask the user.
-    :type question: str
-    :param default: The default answer if the user just presses enter, either 'y'
-    for yes or 'n' for no, defaults to 'y'.
-    :type default: str, optional
-    :return: The user's answer as a boolean.
-    :rtype: bool
-    '''
-
-    answer = input(f'{question}? [{'Y/n' if default == 'y' else 'y/N'}] ').strip().lower()
-    if answer == '':
-        return True if default == 'y' else False
-    elif answer.startswith('y'):
-        return True
-    elif answer.startswith('n'):
-        return False
+from packer.setup import main as setup
 
 def create_go_file_folder(folder_name: str, GOFILE_USER_TOKEN: str) -> dict:
     '''Creates a folder in the root directory of the GoFile account and returns the response as a dictionary.
@@ -472,14 +452,14 @@ if __name__ == '__main__':
 
         input_project = stripped_input('Project you wish to update: ')
         if int(input_project) == new_project_index if input_project.isdigit() else input_project == 'new project':
-            project = None
+            project_directory = None
         else:
-            project = projects[int(input_project)] if input_project.isdigit() else input_project
+            project_directory = projects[int(input_project)] if input_project.isdigit() else input_project
     else:
-        project = None
+        project_directory = None
 
 
-    if project == None:
+    if project_directory == None:
         required_settings = ['github repo token', 'program name']
         MANUAL_INPUT_SETTINGS = 6
 
@@ -489,7 +469,24 @@ if __name__ == '__main__':
         project_directory = user_input('1. project directory (absolute path, leave empty for current directory): ')
         if project_directory == '':
             project_directory = str(Path().cwd().absolute())
-        project = project_directory
+        
+        if Path(project_directory).exists():
+            create_project = prompt_user('Remove the existing project profile and start fresh', default='n')
+        else:
+            create_project = True
+
+        if create_project:
+            create_github_repository = prompt_user('Create a new github repository')
+            if create_github_repository:
+                github_pat = user_input('Github personal access token (with Administration permissions): ')
+                github_repo_url = None
+            else:
+                github_pat = None
+                github_repo_url = user_input('Github repo url (username/repo): ')
+
+            print('Starting setup...')
+            setup(project_directory, input('Author name of the program: '), input('Program name: '), github_pat, github_repo_url,'.')
+
 
         gofile_user_token = user_input('2. gofile user token: ')
 
@@ -546,13 +543,16 @@ if __name__ == '__main__':
 
         print(f'Settings saved at: {config_dir}/settings.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
-    user_settings = user_settings[project]
+        if create_project:
+            exit()
+
+    user_settings = user_settings[project_directory]
 
     all_settings = merge_settings(user_settings, read_json(assets_dir.joinpath('default settings.json')))
 
-    if Path().cwd() != Path(project):
+    if Path().cwd() != Path(project_directory):
         print('Changing working directory...')
-        chdir(project)
+        chdir(project_directory)
 
     if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
         print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
