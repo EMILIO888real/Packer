@@ -483,7 +483,7 @@ if __name__ == '__main__':
             project_directory: {
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
-                'github repo url': user_input('5. github repo url (username/repo): ') if github_repo_url not in locals() else github_repo_url,
+                'github repo url': user_input('5. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
                 'compile command': compile_command_input,
                 'program name': user_input('6. program name: ') if 'program_name' not in locals() else program_name
                 }
