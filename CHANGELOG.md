@@ -30,6 +30,7 @@
 - Streamed command output to log, no extra new lines.
 - Some minor documentation inaccuracy's and other various changes that don't affect code.
 - Stop tracking ignored __pycache__ files.
+- input handling for the new `prompt_user` function in the description and version title generation.
 
 ---
 
