@@ -10,6 +10,7 @@
 - Some extra simple safety checks
 - `setup.py` a function to create and setup a project in packer's format.
 - an MIT license.
+- A way to run setup.py directly.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.

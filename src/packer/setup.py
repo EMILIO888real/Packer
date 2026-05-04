@@ -163,3 +163,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         print_and_log('You can push manually with: git push -u origin master', 20, [255, 165, 0])
 
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
+
+if __name__ == '__main__':
+    main(input('Project directory (absolute path, leave empty for current directory): '), input('Author name of the program: '), input('Program name: '), input('Github repo token (leave empty to skip): '), input('Github repo url (username/repo, leave empty to skip): '))
