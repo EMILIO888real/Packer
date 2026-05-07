@@ -1251,7 +1251,7 @@ def tree(path: Union[str, Path], exclusions: Optional[Collection[str]] = ()) -> 
 
     :param path: The root directory path to represent as a tree
     :type path: str | Path
-    :param exclusions: A collection of file or directory names to exclude from the tree representation
+    :param exclusions: A collection of glob patterns (e.g., '__pycache__', '*cache*', '*.pyc') to exclude from the tree representation
     :type exclusions: Collection[str]
     :return: A nested dictionary with directory structure, file hashes as key-value pairs, and root directory hash
     :rtype: dict
@@ -1259,18 +1259,21 @@ def tree(path: Union[str, Path], exclusions: Optional[Collection[str]] = ()) -> 
 
     root = Path(path)
 
-    def iterate_dir(current_node) -> dict:
+    def iterate_dir(current_node: Path) -> dict:
         children = {'files': {}}
         for entry in sorted(current_node.iterdir(), key=lambda p: p.name):
-            if entry.name not in exclusions:
-                if entry.is_file():
-                    file_hash = sha256()
-                    with open(str(entry), 'rb') as f:
-                        for chunk in iter(lambda: f.read(4096), b''):
-                            file_hash.update(chunk)
-                    children['files'][entry.name] = file_hash.hexdigest()
-                elif entry.is_dir():
-                    children[entry.name] = iterate_dir(entry)
+            # Skip if entry matches any exclusion pattern
+            if any(entry.match(exclusion) for exclusion in exclusions):
+                continue
+            
+            if entry.is_file():
+                file_hash = sha256()
+                with open(str(entry), 'rb') as f:
+                    for chunk in iter(lambda: f.read(4096), b''):
+                        file_hash.update(chunk)
+                children['files'][entry.name] = file_hash.hexdigest()
+            elif entry.is_dir():
+                children[entry.name] = iterate_dir(entry)
         
         if not children['files']:
             children.pop('files')
@@ -1280,7 +1283,7 @@ def tree(path: Union[str, Path], exclusions: Optional[Collection[str]] = ()) -> 
     tree_result = iterate_dir(root)
     
     return {
-        'root_hash': dirhash(root, 'sha256', ignore=list(exclusions)),
+        'root_hash': dirhash(root, 'sha256', ignore=exclusions),
         'tree': tree_result
     }
 
