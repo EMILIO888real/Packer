@@ -1,18 +1,24 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_submodules
+
+hiddenimports = collect_submodules('packer.custom_modules')
 
 a = Analysis(
-    ['src/main/main.py'],
-    pathex=['.'], # This allows PyInstaller to see the 'src' directory
+    ['src/packer/main.py'],
+    pathex=['src'],
     binaries=[],
     datas=[
-        ('src/main/assets', 'src/main/assets'), 
-        ('src/main/custom_modules', 'src/main/custom_modules'),
-        ('src/__init__.py', 'src'),
-        ('src/main/__init__.py', 'src/main'),
+        ('src/packer/assets', 'packer/assets'),
     ],
-    hiddenimports=['src.main.custom_modules', 'src.main.custom_modules.et'],
+    hiddenimports=hiddenimports,
+    hookspath=[],
+    hooksconfig={},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
 )
+
 pyz = PYZ(a.pure)
 
 exe = EXE(
@@ -26,13 +32,6 @@ exe = EXE(
     bootloader_ignore_signals=False,
     strip=False,
     upx=True,
-    upx_exclude=[],
-    runtime_tmpdir=None,
     console=True,
-    disable_windowed_traceback=False,
-    argv_emulation=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
-    onefile=True,
+    onefile=True
 )
