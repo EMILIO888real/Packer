@@ -56,6 +56,7 @@ for more info use info(func) function on specific methods
 # import all outside modules neded here, so we don't try to import them each function call
 
 from decimal import Decimal
+from hashlib import sha256
 from math import ceil
 import sys
 from collections.abc import Collection
@@ -68,7 +69,7 @@ from datetime import datetime
 from shutil import ignore_patterns, which, copy2, copytree
 from subprocess import Popen
 import logging
-import zipfile
+from dirhash import dirhash
 
 def hide_cursor() -> None:
     '''Hides the cursor
@@ -1246,29 +1247,28 @@ def delete_upload(file_id: str, api_token: str) -> str:
 
 def tree(path: Union[str, Path], exclusions: Optional[Collection[str]] = ()) -> dict:
     '''
-    Generates a nested dictionary representing the directory structure of the specified path, excluding any files or directories listed in the exclusions parameter.
+    Generate a nested dictionary representing the directory structure of the given path, including file hashes and a root directory hash.
 
     :param path: The root directory path to represent as a tree
     :type path: str | Path
     :param exclusions: A collection of file or directory names to exclude from the tree representation
     :type exclusions: Collection[str]
-    :return: A nested dictionary representing the directory structure of the specified path, excluding any files or directories listed in the exclusions parameter
+    :return: A nested dictionary with directory structure, file hashes as key-value pairs, and root directory hash
     :rtype: dict
     '''
 
-    str_path = str(path)
-    if zipfile.is_zipfile(str_path):
-        # Treat the zip file as the root filesystem
-        root = zipfile.Path(str_path)
-    else:
-        root = Path(path)
+    root = Path(path)
 
     def iterate_dir(current_node) -> dict:
-        children = {'files': []}
+        children = {'files': {}}
         for entry in sorted(current_node.iterdir(), key=lambda p: p.name):
             if entry.name not in exclusions:
                 if entry.is_file():
-                    children['files'].append(entry.name)
+                    file_hash = sha256()
+                    with open(str(entry), 'rb') as f:
+                        for chunk in iter(lambda: f.read(4096), b''):
+                            file_hash.update(chunk)
+                    children['files'][entry.name] = file_hash.hexdigest()
                 elif entry.is_dir():
                     children[entry.name] = iterate_dir(entry)
         
@@ -1277,7 +1277,12 @@ def tree(path: Union[str, Path], exclusions: Optional[Collection[str]] = ()) -> 
             
         return children
 
-    return iterate_dir(root)
+    tree_result = iterate_dir(root)
+    
+    return {
+        'root_hash': dirhash(root, 'sha256', ignore=list(exclusions)),
+        'tree': tree_result
+    }
 
 def check_dicts(integrity_dict: dict, user_dict):
 

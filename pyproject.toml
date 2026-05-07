@@ -12,6 +12,7 @@ dependencies = [
     "requests",
     "platformdirs",
     "GitPython",
+    "dirhash"
 ]
 
 [tool.setuptools.packages.find]
