@@ -13,6 +13,7 @@
 - A way to run setup.py directly.
 - Documentation `for setup.py`.
 - Auto filling setup.py entered data, like program name and github repo url, if not provided.
+- Reading the .gitignore and using it's exclusions in the tree function, since now it supports patters.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.
