@@ -1,4 +1,4 @@
-## [%new_version] - %date
+## [0.2.0] - 2026-05-07
 
 ### Added
 - A safety check for uncommit git directory.
