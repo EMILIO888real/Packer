@@ -5,10 +5,10 @@ This module contains the code for the packer, which is a script that creates an 
 from datetime import datetime
 from shutil import get_terminal_size, rmtree, make_archive, copy2, unpack_archive
 from pathlib import Path
-from os import remove, listdir, chdir
+from os import remove, chdir
 from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
-from sys import platform, exit
+from sys import executable, platform, exit
 from time import sleep
 from typing import Optional, Sequence
 from github import Github, Auth, UnknownObjectException
@@ -17,7 +17,7 @@ from platformdirs import user_config_dir, user_log_dir, user_data_dir, user_cach
 from requests import get, post
 from git import Repo
 
-from packer.custom_modules.et import copy_with_exceptions, hide_cursor, merge_settings, print_bg_colored_text, print_colored_text, read_json, show_cursor, tree, delete_upload, log_action as _log_action, create_log_message, prompt_user
+from packer.custom_modules.et import hide_cursor, merge_settings, print_bg_colored_text, print_colored_text, read_json, show_cursor, tree, delete_upload, log_action as _log_action, create_log_message, prompt_user
 from packer.paths import assets_dir
 from packer.setup import main as setup
 
@@ -271,7 +271,9 @@ class Packer():
 
             
             self.print_and_log('Bundling the program using PyInstaller...')
-            self._Popen(['pyinstaller', 'main.spec',
+            self._Popen([executable,
+                        '-m',
+                        'PyInstaller', 'main.spec',
                          '--distpath', f'{self.cache_dir}/dist',
                          '--workpath', f'{self.cache_dir}/build'])
 

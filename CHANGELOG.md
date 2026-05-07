@@ -32,6 +32,8 @@
 - The prompt for generating version description to not include ```.
 - Removed creation and deletion of the temp project directory in favour of using git to create an archive.
 - Pyinstaller is now run from path and has specific dedicated dist and build paths in the cache dir.
+- Pyinstaller to be run using the Python executable that the script is ran from.
+- Cleaned up some old and now unnceccery imports.
 
 ### Fixed
 - Log file name.
