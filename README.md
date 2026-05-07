@@ -34,13 +34,13 @@ Set up a python virtual environment and install the required dependencies:
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -r requirements.txt
+pip install -e .
 ```
 
-Just run it from the project root directory:
+Just run it in your project directory:
 
 ```bash
-python -m src.main.main
+packer
 ```
 
 Follow the prompts to create a profile / configuration for your project, and Packer will handle the rest!
