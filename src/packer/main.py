@@ -270,9 +270,10 @@ class Packer():
                 make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
 
             
-            pyinstaller_path = Path('.venv/bin/pyinstaller') if platform != 'win32' else Path('.venv/Scripts/pyinstaller.exe')
             self.print_and_log('Bundling the program using PyInstaller...')
-            self._Popen([pyinstaller_path, f'{Path().cwd().absolute()}/main.spec'])
+            self._Popen(['pyinstaller', 'main.spec',
+                         '--distpath', f'{self.cache_dir}/dist',
+                         '--workpath', f'{self.cache_dir}/build'])
 
 
             self.print_and_log('Uploading the compiled programs to the github release...')
@@ -330,10 +331,6 @@ class Packer():
             with open(f'{assets_dir}/integrity.json', 'w') as f:
                 dump(self.old_integrity, f)
 
-        if Path(f'{self.cache_dir}/archive').exists():
-            self.print_and_log('Removing temporary directory...', [255, 255, 0])
-            rmtree(f'{self.cache_dir}/archive')
-
         if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
             self.print_and_log('Removing archive...', [255, 255, 0])
             remove(f'{self.cache_dir}/{self.program_name} {self.version}.zip')
@@ -390,7 +387,7 @@ class Packer():
         :type cmd: list[str]
         '''
 
-        process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True, cwd=self.cache_dir)
+        process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
 
         hide_cursor()
         for text in process.stdout:
