@@ -14,6 +14,7 @@
 - Documentation `for setup.py`.
 - Auto filling setup.py entered data, like program name and github repo url, if not provided.
 - Reading the .gitignore and using it's exclusions in the tree function, since now it supports patters.
+- Pyinstaller to pyproject.toml, it is required by packer.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.

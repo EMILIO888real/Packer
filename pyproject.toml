@@ -12,7 +12,8 @@ dependencies = [
     "requests",
     "platformdirs",
     "GitPython",
-    "dirhash"
+    "dirhash",
+    "pyinstaller"
 ]
 
 [tool.setuptools.packages.find]
