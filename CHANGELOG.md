@@ -30,6 +30,8 @@
 - `tree` function now hashes files and the root directory for more accurate project integrity, also removed support for zipfiles.
 - The `tree` function in `et` now supports glob pattern matching for filenames, like **/__pycache__.
 - The prompt for generating version description to not include ```.
+- Removed creation and deletion of the temp project directory in favour of using git to create an archive.
+- Pyinstaller is now run from path and has specific dedicated dist and build paths in the cache dir.
 
 ### Fixed
 - Log file name.
