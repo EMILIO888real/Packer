@@ -25,6 +25,7 @@
 - Removed exclusions to packer, now git handles them exclusively.
 - setup.py now returns the github repo url.
 - All colors for reverting a version to yellow, instead of just white.
+- `tree` function now hashes files and the root directory for more accurate project integrity, also removed support for zipfiles.
 
 ### Fixed
 - Log file name.
