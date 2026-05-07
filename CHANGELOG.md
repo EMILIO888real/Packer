@@ -26,6 +26,7 @@
 - setup.py now returns the github repo url.
 - All colors for reverting a version to yellow, instead of just white.
 - `tree` function now hashes files and the root directory for more accurate project integrity, also removed support for zipfiles.
+- The `tree` function in `et` now supports glob pattern matching for filenames, like **/__pycache__.
 
 ### Fixed
 - Log file name.
