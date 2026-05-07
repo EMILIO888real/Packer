@@ -203,7 +203,13 @@ class Packer():
         self.old_integrity = read_json(f'{assets_dir}/integrity.json')
 
         self.print_and_log('Generating the integrity file...')
-        new_cwd = tree(f'{self.cache_dir}/{self.program_name} {self.version}.zip')
+
+        self.print_and_log('Getting exclusions from .gitignore...')
+        with open('.gitignore') as f:
+            exclusions = [entry for entry in f.read().splitlines() if '#' not in entry and entry != '']
+        exclusions.append('.git')
+
+        new_cwd = tree(project_directory, exclusions)
         with open(f'{assets_dir}/integrity.json', 'w') as f:
             dump({'CWD': new_cwd}, f)
 
