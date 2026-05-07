@@ -138,7 +138,7 @@ class Packer():
         with open(f'{assets_dir}/version.json', 'w') as f:
             dump(self.version, f, indent=4)
         self.version = f'{self.version['major']}.{self.version['minor']}.{self.version['patch']}' # Not using a text variable to rewrite this one 
-        old_version_text = f'{old_version['major']}.{old_version['minor']}.{old_version['patch']}' # Not possible above solution due to needing both
+        old_version_text = f'{self.old_version['major']}.{self.old_version['minor']}.{self.old_version['patch']}' # Not possible above solution due to needing both
         self.print_and_log(f'Chosen version: {self.version}')
 
 
@@ -209,7 +209,7 @@ class Packer():
             exclusions = [entry for entry in f.read().splitlines() if '#' not in entry and entry != '']
         exclusions.append('.git')
 
-        new_cwd = tree(project_directory, exclusions)
+        new_cwd = tree(Path().cwd(), exclusions)
         with open(f'{assets_dir}/integrity.json', 'w') as f:
             dump({'CWD': new_cwd}, f)
 
@@ -321,7 +321,7 @@ class Packer():
 
         self.print_and_log('Changing version...', [255, 255, 0])
         with open(f'{assets_dir}/version.json', 'w') as f:
-            dump(old_version, f)
+            dump(self.old_version, f)
         
         if hasattr(self, 'old_changelog'):
             self.print_and_log('Restoring changelog...', [255, 255, 0])
@@ -418,150 +418,153 @@ def capitalize(text: str, index: int = 3) -> str:
 def user_input(text: str) -> str:
     return stripped_input(capitalize(text))
 
-if __name__ == '__main__':
-    config_dir = user_config_dir('packer', 'EMILIO', ensure_exists=True)
+def main():
+        config_dir = user_config_dir('packer', 'EMILIO', ensure_exists=True)
 
-    if Path(f'{config_dir}/settings.json').exists():
-        user_settings = read_json(f'{config_dir}/settings.json')
+        if Path(f'{config_dir}/settings.json').exists():
+            user_settings = read_json(f'{config_dir}/settings.json')
 
-        projects = list(user_settings.keys())
-        print('Choose a project:')
-        for i in range(len(projects)):
-            print(capitalize(f'\t{i}. {Path(projects[i]).name}', 4))
+            projects = list(user_settings.keys())
+            print('Choose a project:')
+            for i in range(len(projects)):
+                print(capitalize(f'\t{i}. {Path(projects[i]).name}', 4))
 
-        new_project_index = i + 1
-        print(capitalize(f'\t{new_project_index}. new project', 4))
+            new_project_index = i + 1
+            print(capitalize(f'\t{new_project_index}. new project', 4))
 
-        input_project = stripped_input('Project you wish to update: ')
-        if int(input_project) == new_project_index if input_project.isdigit() else input_project == 'new project':
-            project_directory = None
-        else:
-            project_directory = projects[int(input_project)] if input_project.isdigit() else input_project
-    else:
-        project_directory = None
-
-
-    if project_directory == None:
-        required_settings = ['github repo token']
-        MANUAL_INPUT_SETTINGS = 6
-
-        print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
-
-
-        project_directory = user_input('1. project directory (absolute path, leave empty for current directory): ')
-        if project_directory == '':
-            project_directory = str(Path().cwd().absolute())
-
-        project_directory.rstrip('/')
-        
-        if Path(project_directory).exists():
-            create_project = prompt_user('Remove the existing project profile and start fresh', default='n')
-        else:
-            create_project = True
-
-        if create_project:
-            if Path(project_directory).exists():
-                rmtree(project_directory)
-
-            create_github_repository = prompt_user('Create a new github repository')
-            if create_github_repository:
-                github_pat = user_input('Github personal access token (with Administration permissions): ')
-                github_repo_url = None
+            input_project = stripped_input('Project you wish to update: ')
+            if int(input_project) == new_project_index if input_project.isdigit() else input_project == 'new project':
+                project_directory = None
             else:
-                github_pat = None
-                github_repo_url = user_input('Github repo url (username/repo): ')
+                project_directory = projects[int(input_project)] if input_project.isdigit() else input_project
+        else:
+            project_directory = None
+
+
+        if project_directory == None:
+            required_settings = ['github repo token']
+            MANUAL_INPUT_SETTINGS = 6
+
+            print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
+
+
+            project_directory = user_input('1. project directory (absolute path, leave empty for current directory): ')
+            if project_directory == '':
+                project_directory = str(Path().cwd().absolute())
+
+            project_directory.rstrip('/')
             
-            program_name = input('Program name: ')
+            if Path(project_directory).exists():
+                create_project = prompt_user('Remove the existing project profile and start fresh', default='n')
+            else:
+                create_project = True
 
-            github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url,'.')
-            print('Starting setup...')
+            if create_project:
+                if Path(project_directory).exists():
+                    rmtree(project_directory)
+
+                create_github_repository = prompt_user('Create a new github repository')
+                if create_github_repository:
+                    github_pat = user_input('Github personal access token (with Administration permissions): ')
+                    github_repo_url = None
+                else:
+                    github_pat = None
+                    github_repo_url = user_input('Github repo url (username/repo): ')
+                
+                program_name = input('Program name: ')
+
+                github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url,'.')
+                print('Starting setup...')
 
 
-        gofile_user_token = user_input('2. gofile user token: ')
+            gofile_user_token = user_input('2. gofile user token: ')
 
-        gofile_folder_id_input = user_input('3. gofile folder id (leave empty to create a folder): ')
-        if gofile_folder_id_input == '':
-            gofile_folder_id = create_go_file_folder(stripped_input('name of the folder: '), gofile_user_token)['data']['id']
-        else:
-            gofile_folder_id = gofile_folder_id_input
+            gofile_folder_id_input = user_input('3. gofile folder id (leave empty to create a folder): ')
+            if gofile_folder_id_input == '':
+                gofile_folder_id = create_go_file_folder(stripped_input('name of the folder: '), gofile_user_token)['data']['id']
+            else:
+                gofile_folder_id = gofile_folder_id_input
 
-        compile_command_input = user_input('4. nuitka compile command (leave empty to skip): ')
+            compile_command_input = user_input('4. nuitka compile command (leave empty to skip): ')
 
-        if compile_command_input == '':
-            compile_command_input = None
-        else:
-            compile_command_input = compile_command_input.split(' ')
+            if compile_command_input == '':
+                compile_command_input = None
+            else:
+                compile_command_input = compile_command_input.split(' ')
 
-        new_project_settings = {
-            project_directory: {
-                'gofile user token': gofile_user_token,
-                'gofile folder id': gofile_folder_id,
-                'github repo url': user_input('5. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
-                'compile command': compile_command_input,
-                'program name': user_input('6. program name: ') if 'program_name' not in locals() else program_name
+            new_project_settings = {
+                project_directory: {
+                    'gofile user token': gofile_user_token,
+                    'gofile folder id': gofile_folder_id,
+                    'github repo url': user_input('5. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
+                    'compile command': compile_command_input,
+                    'program name': user_input('6. program name: ') if 'program_name' not in locals() else program_name
+                    }
                 }
-            }
-        
-        for i in range(len(required_settings)):
-            setting = required_settings[i]
-            new_project_settings[project_directory][setting] = user_input(f'{i + MANUAL_INPUT_SETTINGS + 1}. {setting}: ')
+            
+            for i in range(len(required_settings)):
+                setting = required_settings[i]
+                new_project_settings[project_directory][setting] = user_input(f'{i + MANUAL_INPUT_SETTINGS + 1}. {setting}: ')
 
-        if prompt_user('Would you like to edit optional settings', default='n'):
-            optional_settings = ['model']
-            for i in range(len(optional_settings)):
-                setting = optional_settings[i]
-                user_answer = user_input(f'{i}. {setting}: ')
-                if user_answer != '':
-                    new_project_settings[project_directory][setting] = user_answer
+            if prompt_user('Would you like to edit optional settings', default='n'):
+                optional_settings = ['model']
+                for i in range(len(optional_settings)):
+                    setting = optional_settings[i]
+                    user_answer = user_input(f'{i}. {setting}: ')
+                    if user_answer != '':
+                        new_project_settings[project_directory][setting] = user_answer
 
 
-        if 'user_settings' not in locals():
-            user_settings = {}
-        user_settings.update(new_project_settings)
-        with open(f'{config_dir}/settings.json', 'w') as f:
-            dump(user_settings, f, indent=4)
+            if 'user_settings' not in locals():
+                user_settings = {}
+            user_settings.update(new_project_settings)
+            with open(f'{config_dir}/settings.json', 'w') as f:
+                dump(user_settings, f, indent=4)
 
-        print(f'Settings saved at: {config_dir}/settings.json! You can change them later by editing the file or deleting it to go through the setup again.')
+            print(f'Settings saved at: {config_dir}/settings.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
-        if create_project:
+            if create_project:
+                exit()
+
+        user_settings = user_settings[project_directory]
+
+        all_settings = merge_settings(user_settings, read_json(assets_dir.joinpath('default settings.json')))
+
+        if Path().cwd() != Path(project_directory):
+            print('Changing working directory...')
+            chdir(project_directory)
+
+        if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
+            print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
             exit()
 
-    user_settings = user_settings[project_directory]
+        version = read_json(f'{assets_dir}/version.json')
+        old_version = version.copy()
+        input_version = stripped_input('New version(M, m, P): ')
+        match input_version:
+            case 'M':
+                version['major'] = version['major'] + 1
+                version['minor'] = 0
+                version['patch'] = 0
+            case 'm':
+                version['minor'] = version['minor'] + 1
+                version['patch'] = 0
+            case 'P':
+                version['patch'] = version['patch'] + 1
+            case _:
+                print('Unknown version! exiting...', [255, 0, 0])
+                exit()
+        try:
+            packer = Packer(version, old_version,
+                            all_settings['gofile user token'], all_settings['gofile folder id'], all_settings['github repo token'],
+                            all_settings['program name'], all_settings['github repo url'], all_settings['compile command'], all_settings['model'])
+            packer.run()
+        except KeyboardInterrupt:
+            packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
+            packer.revert_changes()
+        except Exception as e:
+            packer.print_and_log(f'\nEncountered an error: {e}\nReverting back to previous version!', [255, 0, 0])
+            packer.revert_changes()
 
-    all_settings = merge_settings(user_settings, read_json(assets_dir.joinpath('default settings.json')))
-
-    if Path().cwd() != Path(project_directory):
-        print('Changing working directory...')
-        chdir(project_directory)
-
-    if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
-        print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
-        exit()
-
-    version = read_json(f'{assets_dir}/version.json')
-    old_version = version.copy()
-    input_version = stripped_input('New version(M, m, P): ')
-    match input_version:
-        case 'M':
-            version['major'] = version['major'] + 1
-            version['minor'] = 0
-            version['patch'] = 0
-        case 'm':
-            version['minor'] = version['minor'] + 1
-            version['patch'] = 0
-        case 'P':
-            version['patch'] = version['patch'] + 1
-        case _:
-            print('Unknown version! exiting...', [255, 0, 0])
-            exit()
-    try:
-        packer = Packer(version, old_version,
-                        all_settings['gofile user token'], all_settings['gofile folder id'], all_settings['github repo token'],
-                        all_settings['program name'], all_settings['github repo url'], all_settings['compile command'], all_settings['model'])
-        packer.run()
-    except KeyboardInterrupt:
-        packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
-        packer.revert_changes()
-    except Exception as e:
-        packer.print_and_log(f'\nEncountered an error: {e}\nReverting back to previous version!', [255, 0, 0])
-        packer.revert_changes()
+if __name__ == '__main__':
+    main()

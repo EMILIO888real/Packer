@@ -15,6 +15,7 @@
 - Auto filling setup.py entered data, like program name and github repo url, if not provided.
 - Reading the .gitignore and using it's exclusions in the tree function, since now it supports patters.
 - Pyinstaller to pyproject.toml, it is required by packer.
+- For the new launch method a `main` function was added to `main.py`.
 
 ### Changed
 - Logic for detecting a successful commit is more robust.
@@ -34,6 +35,8 @@
 - Pyinstaller is now run from path and has specific dedicated dist and build paths in the cache dir.
 - Pyinstaller to be run using the Python executable that the script is ran from.
 - Cleaned up some old and now unnceccery imports.
+- pyproject.toml to be able to run the program with just `packer` after installation.
+- Updated documentation to reflect all the changes and additions.
 
 ### Fixed
 - Log file name.

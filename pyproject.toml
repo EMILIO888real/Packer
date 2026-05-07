@@ -18,3 +18,6 @@ dependencies = [
 
 [tool.setuptools.packages.find]
 where = ["src"]  # This tells setuptools to look for packages inside 'src'
+
+[project.scripts]
+packer = "packer.main:main"
