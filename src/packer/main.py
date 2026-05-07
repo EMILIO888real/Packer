@@ -164,7 +164,7 @@ class Packer():
 
         while generate_description:
             description_prompt = [
-                {'role': 'system', 'content': 'You are a technical writer. Output ONLY the raw markdown paragraph. No intros, no explanations.'},
+                {'role': 'system', 'content': 'You are a technical writer. Output ONLY the raw markdown paragraph. No intros, no explanations. Don\'t surround the output with ```'},
                 {'role': 'user', 'content': f'Summarize this changelog into exactly one markdown paragraph. Do not use lists. Use only the provided info.\n\nChangelog:\n{latest_changelog}'}
             ]
             description = chat(model=self.model, messages=description_prompt, options={'temperature': 0.2})['message']['content'].strip().replace('\n', ' ')
