@@ -473,7 +473,7 @@ def main():
                 
                 program_name = input('Program name: ')
 
-                github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url,'.')
+                github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url)
                 print('Starting setup...')
 
 

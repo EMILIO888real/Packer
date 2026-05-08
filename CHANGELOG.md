@@ -1,3 +1,17 @@
+## [%new_version] - %date
+
+### Added
+- 
+
+### Changed
+- 
+
+### Fixed
+- 
+- removed random extra argument for setup.
+
+---
+
 ## [0.2.0] - 2026-05-07
 
 ### Added
