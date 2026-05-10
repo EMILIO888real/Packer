@@ -3,6 +3,7 @@
 ### Added
 - `ui` folder with for now only a `tui.py` file, in the future there is a plan to create a `gui.py`.
 - Git push to `change.py`, since it's better like this, user get's latests and it's fast enough.
+- disabled echo for sensitive input via the python's built-in module and function `getpass`.
 
 ### Changed
 - Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.

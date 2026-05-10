@@ -71,7 +71,7 @@ def main() -> tuple[str, dict[str: Any]]:
 
             create_github_repository = prompt_user('Create a new github repository')
             if create_github_repository:
-                github_pat = user_input('Github personal access token (with Administration permissions): ')
+                github_pat = getpass('Github personal access token (with Administration permissions): ')
                 github_repo_url = None
             else:
                 github_pat = None
@@ -83,9 +83,9 @@ def main() -> tuple[str, dict[str: Any]]:
             print('Starting setup...')
 
 
-        gofile_user_token = user_input('2. gofile user token: ')
+        gofile_user_token = getpass('2. gofile user token: ')
 
-        gofile_folder_id_input = user_input('3. gofile folder id (leave empty to create a folder): ')
+        gofile_folder_id_input = getpass('3. gofile folder id (leave empty to create a folder): ')
         if gofile_folder_id_input == '':
             gofile_folder_id = create_go_file_folder(stripped_input('name of the folder: '), gofile_user_token)['data']['id']
         else:
