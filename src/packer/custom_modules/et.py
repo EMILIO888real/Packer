@@ -70,6 +70,7 @@ from shutil import ignore_patterns, which, copy2, copytree
 from subprocess import Popen
 import logging
 from dirhash import dirhash
+from requests import get, post
 
 def hide_cursor() -> None:
     '''Hides the cursor
@@ -1420,6 +1421,59 @@ def prompt_user(question: str, default: str = 'y') -> bool:
         return True
     elif answer.startswith('n'):
         return False
+
+def capitalize(text: str, index: int = 3) -> str:
+    '''
+    Capitalizes a string at a specific index.
+
+    :param text: The string to capitalize.
+    :type text: str
+    :param index: The index at which to capitalize the string.
+    :type index: int
+    :return: The capitalized string.
+    :rtype: str
+    '''
+
+    return f'{text[:index]}{text[index:].capitalize()}'
+
+def stripped_input(prompt: object) -> str:
+    '''
+    Gets input from the user and strips it of leading and trailing whitespaces.
+    
+    :param prompt: The prompt to show to the user.
+    :type prompt: object
+    :return: The stripped input from the user.
+    :rtype: str
+    '''
+
+    return input(prompt).strip()
+
+def create_go_file_folder(folder_name: str, GOFILE_USER_TOKEN: str) -> dict:
+    '''Creates a folder in the root directory of the GoFile account and returns the response as a dictionary.
+    
+    :param folder_name: The name of the folder to be created.
+    :type folder_name: str
+    :param GOFILE_USER_TOKEN: The user token for the GoFile account.
+    :type GOFILE_USER_TOKEN: str
+    :return: The response from the GoFile API as a dictionary.
+    :rtype: dict
+    '''
+
+    payload = {'token': GOFILE_USER_TOKEN}
+
+    response = get('https://api.gofile.io/accounts/getid', params=payload)
+    account_id = response.json()['data']['id']
+    response = get(f'https://api.gofile.io/accounts/{account_id}', params=payload)
+
+    payload = {
+        'token': GOFILE_USER_TOKEN,
+        'folderName': folder_name,
+        'parentFolderId': response.json()['data']['rootFolder']
+    }
+
+    response = post('https://api.gofile.io/contents/createFolder', data=payload)
+
+    return response.json()
 
 if __name__ == '__main__':
     # print('This module is not meant to be run directly')
