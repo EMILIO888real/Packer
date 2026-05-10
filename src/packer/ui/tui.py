@@ -6,7 +6,7 @@ from typing import Any
 
 from packer.setup import main as setup
 from packer.paths import config_dir, assets_dir
-from packer.custom_modules.et import capitalize, merge_settings, prompt_user, read_json, stripped_input, create_go_file_folder
+from packer.custom_modules.et import capitalize, merge_settings, read_json, stripped_input, create_go_file_folder, simple_prompt
 
 def user_input(text: str, index: int = 3) -> str:
     '''
@@ -17,6 +17,7 @@ def user_input(text: str, index: int = 3) -> str:
     :return: The user's response.
     :rtype: str
     '''
+
     return stripped_input(capitalize(text, index))
 
 def main() -> tuple[str, dict[str: Any]]:
@@ -61,7 +62,7 @@ def main() -> tuple[str, dict[str: Any]]:
         project_directory.rstrip('/')
         
         if Path(project_directory).exists():
-            create_project = prompt_user('Remove the existing project profile and start fresh', default='n')
+            create_project = simple_prompt('Remove the existing project profile and start fresh', 'n')
         else:
             create_project = True
 
@@ -69,7 +70,7 @@ def main() -> tuple[str, dict[str: Any]]:
             if Path(project_directory).exists():
                 rmtree(project_directory)
 
-            create_github_repository = prompt_user('Create a new github repository')
+            create_github_repository = simple_prompt('Create a new github repository')
             if create_github_repository:
                 github_pat = getpass('Github personal access token (with Administration permissions): ')
                 github_repo_url = None
@@ -112,7 +113,7 @@ def main() -> tuple[str, dict[str: Any]]:
             setting = required_settings[i]
             new_project_settings[project_directory][setting] = user_input(f'{i + MANUAL_INPUT_SETTINGS + 1}. {setting}: ')
 
-        if prompt_user('Would you like to edit optional settings', default='n'):
+        if simple_prompt('Would you like to edit optional settings', 'n'):
             optional_settings = ['model']
             for i in range(len(optional_settings)):
                 setting = optional_settings[i]
