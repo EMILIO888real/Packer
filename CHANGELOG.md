@@ -2,6 +2,7 @@
 
 ### Added
 - `ui` folder with for now only a `tui.py` file, in the future there is a plan to create a `gui.py`.
+- Git push to `change.py`, since it's better like this, user get's latests and it's fast enough.
 
 ### Changed
 - Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.
@@ -10,7 +11,6 @@
 - Cleaned up some imports to not have extra unnceccery stuff and or circular imports.
 
 ### Fixed
-- 
 - removed random extra argument for setup.
 
 ---
