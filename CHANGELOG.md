@@ -4,12 +4,15 @@
 - `ui` folder with for now only a `tui.py` file, in the future there is a plan to create a `gui.py`.
 - Git push to `change.py`, since it's better like this, user get's latests and it's fast enough.
 - disabled echo for sensitive input via the python's built-in module and function `getpass`.
+- `bool_answer` function that determines if a user's answer to a yes/no question is affirmative.
+- `simple_prompt` function for much simpler cases of using `prompt_user` function since it was upgraded, for questions with y/n.
 
 ### Changed
 - Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.
 - Moved `stripped_input` to `et`, same reason, used by a different module.
 - Moved almost the entire `main` function that was inside `main.py` to `tui.py` as the new main functions there.
 - Cleaned up some imports to not have extra unnceccery stuff and or circular imports.
+- Reworked and significantly upgraded the `prompt_user` function.
 
 ### Fixed
 - removed random extra argument for setup.

@@ -1401,26 +1401,126 @@ def format_version_text(version: dict) -> str:
 
     return f'{version["major"]}.{version["minor"]}.{version["patch"]}'
 
-def prompt_user(question: str, default: str = 'y') -> bool:
+def bool_answer(answer: str | int) -> bool:
     '''
-    Prompts the user with a yes or no question and returns their answer as a boolean. The default answer is 'y' (yes) if the user just presses enter.
-    
-    :param question: The question to ask the user.
-    :type question: str
-    :param default: The default answer if the user just presses enter, either 'y'
-    for yes or 'n' for no, defaults to 'y'.
-    :type default: str, optional
-    :return: The user's answer as a boolean.
+    Determines if a user's answer to a yes/no question is affirmative.
+
+    :param answer: The user's response to a yes/no question, typically 'yes' or 'no', 0 or 1 for affirmative.
+    :type answer: str | int
+    :return: True if the answer starts with 'y' (case-insensitive) or is 0, otherwise False.
     :rtype: bool
     '''
 
-    answer = input(f'{question}? [{'Y/n' if default == 'y' else 'y/N'}] ').strip().lower()
-    if answer == '':
-        return True if default == 'y' else False
-    elif answer.startswith('y'):
-        return True
-    elif answer.startswith('n'):
-        return False
+    if isinstance(answer, str):
+        answer = answer.strip().lower()
+        if len(answer) == 1:
+            if answer == 'y':
+                return True
+            elif answer == 'n':
+                return False
+            else:
+                return
+        else:
+            if answer == 'yes':
+                return True
+            elif answer == 'no':
+                return False
+            else:
+                return
+        
+    else:
+        if answer > 1 or answer < 0:
+            return
+        else:
+            return answer == 0
+
+def prompt_user(question: str, answers: list[str] = ['yes', 'no'], default: str | int = 'y', shorten: set[str] = ('yes', 'no')) -> int:
+    '''
+    Prompts the user with a yes or no question and returns their answer as an integer (0 for yes, 1 for no).
+    The default answer is 'y' (yes) if the user just presses enter.
+    
+    :param question: The question to ask the user.
+    :type question: str
+    :param answers: List of valid answers, defaults to ['yes', 'no']
+    :type answers: list[str], optional
+    :param default: The default answer if the user just presses enter, either 'y' for yes or 'n' for no, defaults to 'y'.
+    :type default: str | int, optional
+    :param shorten: Set of answers to be shortened for input comparison, defaults to ('yes', 'no')
+    :type shorten: set[str], optional
+    :return: The user's answer as an integer (0 for yes, 1 for no).
+    :rtype: int
+    '''
+
+    if isinstance(default, str):
+        if len(default) == 1:
+            def eval_default(answer: str) -> bool:
+                return answer[:1] == default
+        else:
+            def eval_default(answer: str) -> bool:
+                return answer == default
+        
+    else:
+        def eval_default(answer: str) -> bool:
+            return answers.index(answer) == default
+
+
+    last_index = len(answers) - 1
+    options = '['
+    for i, answer in enumerate(answers):
+
+        if answer in shorten:
+            display_answer = answer[:1]
+        else:
+            display_answer = answer
+
+        if eval_default(answer):
+            options += display_answer.capitalize()
+            default_index = i
+        else:
+            options += display_answer
+
+        if i < last_index:
+            options += '/'
+
+    options += ']'
+
+
+    user_answer = input(f'{question.capitalize()}? {options} ').strip().lower()
+
+    if user_answer.isdigit():
+        user_answer = int(user_answer)
+        if user_answer > last_index or user_answer < 0:
+            return
+        else:
+            return user_answer
+
+    if user_answer == '':
+        return default if isinstance(default, int) else default_index
+    
+    if len(user_answer) == 1:
+        for i, answer in enumerate(answers):
+            if answer.startswith(user_answer):
+                return i
+    else:
+        try:
+            return answers.index(user_answer)
+        except ValueError:
+            return
+
+
+def simple_prompt(question: str, default: str | int = 'y') -> bool:
+    '''
+    Prompts the user with a yes/no question and returns their answer as a boolean value.
+
+    :param question: The question to ask the user.
+    :type question: str
+    :param default: The default answer if the user just presses enter, either 'y' for yes or 'n' for no, defaults to 'y'.
+    :type default: str | int
+    :return: True if the user answers affirmatively, False otherwise.
+    :rtype: bool
+    '''
+
+    return bool_answer(prompt_user(question, default=default))
 
 def capitalize(text: str, index: int = 3) -> str:
     '''
