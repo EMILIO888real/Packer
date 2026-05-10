@@ -39,3 +39,4 @@ with open('CHANGELOG.md', 'w') as f:
 
 run(['git', 'add', '.'])
 run(['git', 'commit', '-m', f'{modification_type} {message}'])
+run(['git', 'push'])
