@@ -17,7 +17,7 @@ from platformdirs import user_log_dir, user_data_dir, user_cache_dir
 from requests import post
 from git import Repo
 
-from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, log_action as _log_action, create_log_message, prompt_user
+from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, log_action as _log_action, create_log_message, simple_prompt
 from packer.paths import assets_dir
 from packer.ui.tui import main as tui
 
@@ -130,7 +130,7 @@ class Packer():
         self.print_and_log('Generating a version description...')
 
         generate_description = True
-        if self.chosen_description_path.exists() and prompt_user('Use the previously generated version description'):
+        if self.chosen_description_path.exists() and simple_prompt('Use the previously generated version description'):
             generate_description = False
             with open(self.chosen_description_path) as f:
                 description = f.read()
@@ -142,7 +142,7 @@ class Packer():
             ]
             description = chat(model=self.model, messages=description_prompt, options={'temperature': 0.2})['message']['content'].strip().replace('\n', ' ')
             self.print_and_log(description)
-            generate_description = not prompt_user('Is the description all good', default='n')
+            generate_description = not simple_prompt('Is the description all good', 'n')
         
         with open(self.chosen_description_path, 'w') as f:
             f.write(description)
@@ -150,7 +150,7 @@ class Packer():
         self.print_and_log('Generating a version title...')
 
         generate_title = True
-        if self.chosen_title_path.exists() and prompt_user('Use the previously generated version title'):
+        if self.chosen_title_path.exists() and simple_prompt('Use the previously generated version title'):
             generate_title = False
             with open(self.chosen_title_path) as f:
                 version_title = f.read()
@@ -162,7 +162,7 @@ class Packer():
             ]
             version_title = chat(model=self.model, messages=title_prompt, options={'temperature': 0.8, 'num_predict': 10})['message']['content'].strip().replace('"', '').replace("'", "")
             self.print_and_log(version_title)
-            generate_title = not prompt_user('Is the Version title all good', default='n')
+            generate_title = not simple_prompt('Is the Version title all good', 'n')
     
         with open(self.chosen_title_path, 'w') as f:
             f.write(version_title)
@@ -195,7 +195,7 @@ class Packer():
 
         self.print_and_log(f'Added file: {set(new_cwd).difference(self.old_integrity['CWD'])}')
         self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
-        if prompt_user('Is the arhive all good'):
+        if simple_prompt('Is the arhive all good'):
 
             self.print_and_log('Uploading archive to Gofile...')
             response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
@@ -282,7 +282,7 @@ class Packer():
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
             self.print_and_log(f'Social media post text has been saved to {self.data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(self.log_path.absolute())}')
 
-            if prompt_user('Do you want to revert', default='n'):
+            if simple_prompt('Do you want to revert', 'n'):
                 self.revert_changes()
             
         else:

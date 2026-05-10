@@ -13,6 +13,7 @@
 - Moved almost the entire `main` function that was inside `main.py` to `tui.py` as the new main functions there.
 - Cleaned up some imports to not have extra unnceccery stuff and or circular imports.
 - Reworked and significantly upgraded the `prompt_user` function.
+- All `prompt_user` function calls to `simple_prompt` in `main.py`, since the prompts relied on the previous version, which now pretty much acts like `simple_prompt`.
 
 ### Fixed
 - removed random extra argument for setup.
