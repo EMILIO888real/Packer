@@ -1,10 +1,13 @@
 ## [%new_version] - %date
 
 ### Added
-- 
+- `ui` folder with for now only a `tui.py` file, in the future there is a plan to create a `gui.py`.
 
 ### Changed
-- 
+- Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.
+- Moved `stripped_input` to `et`, same reason, used by a different module.
+- Moved almost the entire `main` function that was inside `main.py` to `tui.py` as the new main functions there.
+- Cleaned up some imports to not have extra unnceccery stuff and or circular imports.
 
 ### Fixed
 - 
