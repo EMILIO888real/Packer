@@ -1405,9 +1405,9 @@ def bool_answer(answer: str | int) -> bool:
     '''
     Determines if a user's answer to a yes/no question is affirmative.
 
-    :param answer: The user's response to a yes/no question, typically 'yes' or 'no', 0 or 1 for affirmative.
+    :param answer: The user's response to a yes/no question, typically 'yes' or 'no', 1 or 0 for affirmative.
     :type answer: str | int
-    :return: True if the answer starts with 'y' (case-insensitive) or is 0, otherwise False.
+    :return: True if the answer starts with 'y' (case-insensitive) or is 1, otherwise False.
     :rtype: bool
     '''
 
@@ -1432,22 +1432,22 @@ def bool_answer(answer: str | int) -> bool:
         if answer > 1 or answer < 0:
             return
         else:
-            return answer == 0
+            return answer == 1
 
-def prompt_user(question: str, answers: list[str] = ['yes', 'no'], default: str | int = 'y', shorten: set[str] = ('yes', 'no')) -> int:
+def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str | int = 'y', shorten: set[str] = ('yes', 'no')) -> int:
     '''
-    Prompts the user with a yes or no question and returns their answer as an integer (0 for yes, 1 for no).
-    The default answer is 'y' (yes) if the user just presses enter.
+    Prompts the user with a question and returns their selected answer as an integer index of the answers list.
+    The default answer is used if the user just presses enter.
     
     :param question: The question to ask the user.
     :type question: str
     :param answers: List of valid answers, defaults to ['yes', 'no']
     :type answers: list[str], optional
-    :param default: The default answer if the user just presses enter, either 'y' for yes or 'n' for no, defaults to 'y'.
+    :param default: The default answer if the user just presses enter, either an index or a value from the answers list, defaults to 'y'.
     :type default: str | int, optional
     :param shorten: Set of answers to be shortened for input comparison, defaults to ('yes', 'no')
     :type shorten: set[str], optional
-    :return: The user's answer as an integer (0 for yes, 1 for no).
+    :return: The user's answer as an integer index of the answers list.
     :rtype: int
     '''
 
