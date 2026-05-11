@@ -75,7 +75,7 @@ class Packer():
     def __init__(self, version: dict, old_version: dict,
                  GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str,
                  program_name: str, github_repo_url: str, compile_command: Sequence[str] = None,
-                 model: str = 'mistral'):
+                 model: str = 'mistral', before_commands: Sequence[str] = None, after_commands: Sequence[str] = None):
         self.version = version
         self.old_version = old_version
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN

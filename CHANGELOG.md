@@ -19,6 +19,7 @@
 - All necessary `prompt_user` function calls to `simple_prompt`, same reason as previous commit, outdated code.
 - 0 and 1 around, instead of 0 being True and 1 being False, it's the opposite now.
 - All instances of the name **Packer** to **packer**.
+- Compile command to be more optional, moved in the correct spot.
 
 ### Fixed
 - removed random extra argument for setup.
