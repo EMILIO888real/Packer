@@ -50,7 +50,7 @@ def main() -> tuple[str, dict[str: Any]]:
 
     if project_directory == None:
         required_settings = ['github repo token']
-        MANUAL_INPUT_SETTINGS = 6
+        MANUAL_INPUT_SETTINGS = 5
 
         print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
 
@@ -92,20 +92,13 @@ def main() -> tuple[str, dict[str: Any]]:
         else:
             gofile_folder_id = gofile_folder_id_input
 
-        compile_command_input = user_input('4. nuitka compile command (leave empty to skip): ')
-
-        if compile_command_input == '':
-            compile_command_input = None
-        else:
-            compile_command_input = compile_command_input.split(' ')
 
         new_project_settings = {
             project_directory: {
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
-                'github repo url': user_input('5. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
-                'compile command': compile_command_input,
-                'program name': user_input('6. program name: ') if 'program_name' not in locals() else program_name
+                'github repo url': user_input('4. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
+                'program name': user_input('5. program name: ') if 'program_name' not in locals() else program_name
                 }
             }
         
@@ -115,11 +108,20 @@ def main() -> tuple[str, dict[str: Any]]:
 
         if simple_prompt('Would you like to edit optional settings', 'n'):
             optional_settings = ['model']
-            for i in range(len(optional_settings)):
+            optional_settings_count = len(optional_settings)
+
+            print(f'There are {optional_settings_count} optional settings.')
+
+            for i in range(optional_settings_count):
                 setting = optional_settings[i]
                 user_answer = user_input(f'{i}. {setting}: ')
                 if user_answer != '':
                     new_project_settings[project_directory][setting] = user_answer
+
+            compile_command_input = stripped_input('nuitka compile command [None]: ')
+
+            if compile_command_input != '':
+                new_project_settings[project_directory]['compile command'] = compile_command_input.split(' ')
 
 
         if 'user_settings' not in locals():
