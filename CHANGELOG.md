@@ -15,6 +15,7 @@
 - Reworked and significantly upgraded the `prompt_user` function.
 - All `prompt_user` function calls to `simple_prompt` in `main.py`, since the prompts relied on the previous version, which now pretty much acts like `simple_prompt`.
 - All necessary `prompt_user` function calls to `simple_prompt`, same reason as previous commit, outdated code.
+- 0 and 1 around, instead of 0 being True and 1 being False, it's the opposite now.
 
 ### Fixed
 - removed random extra argument for setup.
