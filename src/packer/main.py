@@ -75,7 +75,7 @@ class Packer():
     def __init__(self, version: dict, old_version: dict,
                  GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str,
                  program_name: str, github_repo_url: str, compile_command: Sequence[str] = None,
-                 model: str = 'mistral', before_commands: Sequence[str] = None, after_commands: Sequence[str] = None):
+                 model: str = 'mistral', before_commands: Sequence[Sequence][str] = None, after_commands: Sequence[Sequence][str] = None):
         self.version = version
         self.old_version = old_version
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
@@ -85,6 +85,8 @@ class Packer():
         self.program_name = program_name
         self.github_repo_url = github_repo_url
         self.compile_command = compile_command
+        self.before_commands = before_commands
+        self.after_commands = after_commands
 
         self.terminal_width = get_terminal_size().columns
         self.last_log_time = datetime.now() # init the logger
@@ -203,6 +205,11 @@ class Packer():
             download_url = response['data']['downloadPage']
             self.file_id = response['data']['id']
 
+            if self.before_commands:
+                self.print_and_log('Running before commit commands...')
+                for cmd in self.before_commands:
+                    self._run('sh', '-c', cmd)
+
 
             self.print_and_log('Staging changes...')
             self._run(['git', 'add', '.'])
@@ -214,6 +221,11 @@ class Packer():
 
             self.print_and_log('Pushing changes...')
             self._run(['git', 'push'])
+
+            if self.after_commands:
+                self.print_and_log('Running after commit commands...')
+                for cmd in self.after_commands:
+                    self._run('sh', '-c', cmd)
 
             self.print_and_log('Generating social media post text...')
             social_media_post_text = f'# {self.program_name} Update [{self.version}]\n\n{description}\n\n## Installation\n\nAvailable via:\n\n- **GitHub**: [GitHub Repo](https://github.com/{self.github_repo_url})\n- **Third-party website (GoFile) as an archive**: [Archive]({download_url}) and click the download button.\n\n### To install:\n\n- **GitHub:**\n\tClone the repo using:\n\n\t```bash\n\tgit clone https://github.com/{self.github_repo_url}\n\t```\n\n- **Third-party website (GoFile):**\n\tSimply head to the website [Archive]({download_url}) and click the download button.\n\nAfter installing, continue following instructions via the README.\n\n## Changes in v{self.version}\n\n{latest_changelog}\n\n[Full changelog](https://github.com/{self.github_repo_url}/blob/master/CHANGELOG.md)\n\n## Tips\n\nThe difference between the two is that GitHub contains all versions (newest and older ones), which increases file size. The archive contains only the newest version. A nice upside to installing from GitHub is that you can easily update the program or, in the future, automatically update the software by simply pulling from the repo, since the GitHub URL doesn\'t change.'

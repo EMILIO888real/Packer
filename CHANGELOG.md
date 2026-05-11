@@ -8,6 +8,7 @@
 - `simple_prompt` function for much simpler cases of using `prompt_user` function since it was upgraded, for questions with y/n.
 - *.github/workflows* tree.
 - `build.yaml` file for building an exe for windows release of packer via github actions.
+- `before_commands` and `after_commands` parameters to Packer class that execute custom shell commands before and after the git commit step. Commands are run in the repository directory using `sh -c` and are properly logged. This enables flexible automation like running tests, generating files, or deployment scripts at specific points in the release process.
 
 ### Changed
 - Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.
