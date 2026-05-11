@@ -425,4 +425,9 @@ def main():
         packer.revert_changes()
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except KeyboardInterrupt:
+        exit()
+    except Exception as e:
+        print_colored_text(f'Something went wrong externally, please report this.\nError: {e}', [255, 255, 255])
