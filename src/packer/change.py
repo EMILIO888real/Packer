@@ -8,7 +8,7 @@ with NamedTemporaryFile('r', delete=False) as tf:
 run(['code', '--wait', temp_path])
 
 with open(temp_path) as f:
-    message = f.read()
+    message = f.read().strip().capitalize()
 
 remove(temp_path)
     
