@@ -1,0 +1,30 @@
+name: Build Windows EXE for Release
+on:
+  release:
+    types: [created]
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+    - name: Install dependencies
+      run: pip install -r requirements.txt
+    - name: Install PyInstaller
+      run: pip install pyinstaller
+    - name: Build executable
+      run: python -m PyInstaller main.spec
+    - name: Upload to GitHub Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: "dist/packer.exe"
+        asset_name: "packer.exe"
+        asset_content_type: application/octet-stream

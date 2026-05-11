@@ -6,6 +6,8 @@
 - disabled echo for sensitive input via the python's built-in module and function `getpass`.
 - `bool_answer` function that determines if a user's answer to a yes/no question is affirmative.
 - `simple_prompt` function for much simpler cases of using `prompt_user` function since it was upgraded, for questions with y/n.
+- *.github/workflows* tree.
+- `build.yaml` file for building an exe for windows release of packer via github actions.
 
 ### Changed
 - Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.
@@ -16,6 +18,7 @@
 - All `prompt_user` function calls to `simple_prompt` in `main.py`, since the prompts relied on the previous version, which now pretty much acts like `simple_prompt`.
 - All necessary `prompt_user` function calls to `simple_prompt`, same reason as previous commit, outdated code.
 - 0 and 1 around, instead of 0 being True and 1 being False, it's the opposite now.
+- All instances of the name **Packer** to **packer**.
 
 ### Fixed
 - removed random extra argument for setup.
