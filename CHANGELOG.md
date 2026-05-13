@@ -11,6 +11,7 @@
 - `before_commands` and `after_commands` parameters to Packer class that execute custom shell commands before and after the git commit step. Commands are run in the repository directory using `sh -c` and are properly logged. This enables flexible automation like running tests, generating files, or deployment scripts at specific points in the release process.
 - More correction on commit messages, by capitalizing them and removing trailing characters.
 - A clean way to handle exceptions, especially keyboard interrupts.
+- `main.spec` file creation and verification via running Pyinstaller for `setup.py`
 
 ### Changed
 - Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.
@@ -24,6 +25,7 @@
 - All instances of the name **Packer** to **packer**.
 - Compile command to be more optional, moved in the correct spot.
 - `setup.py` to also handle keyboardinterrupt exceptions and all other unexpected as well.
+- Reorder some steps in `setup.py`
 
 ### Fixed
 - removed random extra argument for setup.

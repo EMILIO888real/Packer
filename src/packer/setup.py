@@ -94,22 +94,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     mkdir('docs')
     mkdir('tests')
     mkdir('dev')
-
-    print_and_log('Creating a todo.md file...')
-    with open('docs/todo.md', 'w') as f:
-        f.write('# TODO\n\n- [ ] Write the README.md file\n- [ ] Write the CHANGELOG.md file\n- [ ] Write the ROADMAP.md file\nWrite the pyproject.toml file\n')
-
-    print_and_log('Creating a SETTINGS.md file...')
-    with open('docs/SETTINGS.md', 'w') as f:
-        f.write(f'# SETTINGS\n\nThis file contains detailed information on user-configurable settings for {program_name}.\n\n## Setting 1\n\nDescription of setting 1.\n\n## Setting 2\n\nDescription of setting 2.\n\n## Setting 3\n\nDescription of setting 3.\n')
-
-    print_and_log('Creating a CONFIGURATION.md file...')
-    with open('docs/CONFIGURATION.md', 'w') as f:
-        f.write(f'# CONFIGURATION\n\nThis file contains detailed information on game configuration parameters for {program_name}.\n\n## Parameter 1\n\nDescription of parameter 1.\n\n## Parameter 2\n\nDescription of parameter 2.\n\n## Parameter 3\n\nDescription of parameter 3.\n')
-
-    print_and_log('Creating a CUSTOMIZATION.md file...')
-    with open('docs/CUSTOMIZATION.md', 'w') as f:
-        f.write(f'# CUSTOMIZATION\n\nThis file contains detailed information on how to add custom assets and important notes about settings for {program_name}.\n\n## Custom Asset 1\n\nDescription of custom asset 1.\n\n## Custom Asset 2\n\nDescription of custom asset 2.\n\n## Custom Asset 3\n\nDescription of custom asset 3.\n')
     
     print_and_log('Creating __init__.py file...')
     with open(f'{root_dir}/__init__.py', 'w') as f:
@@ -131,6 +115,24 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     with open(f'{root_dir}/assets/integrity.json', 'w') as f:
         dump({'CWD': tree(f'src/{program_name}')}, f)
 
+    print_and_log('Starting outside src directory build process..')
+
+    print_and_log('Creating a todo.md file...')
+    with open('docs/todo.md', 'w') as f:
+        f.write('# TODO\n\n- [ ] Write the README.md file\n- [ ] Write the CHANGELOG.md file\n- [ ] Write the ROADMAP.md file\nWrite the pyproject.toml file\n')
+
+    print_and_log('Creating a SETTINGS.md file...')
+    with open('docs/SETTINGS.md', 'w') as f:
+        f.write(f'# SETTINGS\n\nThis file contains detailed information on user-configurable settings for {program_name}.\n\n## Setting 1\n\nDescription of setting 1.\n\n## Setting 2\n\nDescription of setting 2.\n\n## Setting 3\n\nDescription of setting 3.\n')
+
+    print_and_log('Creating a CONFIGURATION.md file...')
+    with open('docs/CONFIGURATION.md', 'w') as f:
+        f.write(f'# CONFIGURATION\n\nThis file contains detailed information on game configuration parameters for {program_name}.\n\n## Parameter 1\n\nDescription of parameter 1.\n\n## Parameter 2\n\nDescription of parameter 2.\n\n## Parameter 3\n\nDescription of parameter 3.\n')
+
+    print_and_log('Creating a CUSTOMIZATION.md file...')
+    with open('docs/CUSTOMIZATION.md', 'w') as f:
+        f.write(f'# CUSTOMIZATION\n\nThis file contains detailed information on how to add custom assets and important notes about settings for {program_name}.\n\n## Custom Asset 1\n\nDescription of custom asset 1.\n\n## Custom Asset 2\n\nDescription of custom asset 2.\n\n## Custom Asset 3\n\nDescription of custom asset 3.\n')
+
     print_and_log('Creating a pyproject.toml file...')
     with open('pyproject.toml', 'w') as f:
         f.write(f'[project]\nname = "{program_name}"\nauthor = "{author_name}"\nversion = "0.1.0"\ndescription = ""\nreadme = "README.md"\nlicense = "MIT"\ndependencies = []\n\n[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n[tool.setuptools.packages.find]\nwhere = ["src"]  # This tells setuptools to look for packages inside \'src\'\n')
@@ -150,6 +152,58 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Creating an MIT license...')
     with open('LICENSE', 'w') as f:
         f.write(f'MIT License\n\nCopyright (c) 2025 {author_name}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n')
+
+    print_and_log('Creating .spec file...')
+    with open(f'main.spec', 'w') as f:
+        f.write(
+f'''
+# -*- mode: python ; coding: utf-8 -*-
+
+from PyInstaller.utils.hooks import collect_submodules
+
+hiddenimports = collect_submodules('{program_name}.custom_modules')
+
+a = Analysis(
+    ['src/{program_name}/main.py'],
+    pathex=['src'],
+    binaries=[],
+    datas=[
+        ('src/{program_name}/assets', '{program_name}/assets'),
+    ],
+    hiddenimports=hiddenimports,
+    hookspath=[],
+    hooksconfig={{}},
+    runtime_hooks=[],
+    excludes=[],
+    noarchive=False,
+)
+
+pyz = PYZ(a.pure)
+
+exe = EXE(
+    pyz,
+    a.scripts,
+    a.binaries,
+    a.datas,
+    [],
+    name='{program_name}',
+    debug=False,
+    bootloader_ignore_signals=False,
+    strip=False,
+    upx=True,
+    console=True,
+    onefile=True
+)
+''')
+        
+    print_and_log('Verify main.spec via running it...')
+
+    verify_result = run([f'pyinstaller', 'main.spec'], capture_output=True)
+
+    print_and_log(f'Ran command: pyinstaller main.spec\nstdout: {verify_result.stdout.decode()}\nstderr: {verify_result.stderr.decode()}')
+
+    print_and_log('Removing build directory...')
+    rmtree('build')
 
     repo = Repo.init(project_directory)
 
@@ -201,6 +255,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         print_and_log(f'Warning: Push failed with error: {e}', 30, [255, 165, 0])
         print_and_log('You can push manually with: git push -u origin master', 20, [255, 165, 0])
 
+    print_and_log(f'Please check the {project_directory}/dist directory to verify that the .spec file was correctly processed.')
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
     
     return github_repo_url.lstrip('https://github.com/')
