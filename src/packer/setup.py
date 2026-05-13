@@ -8,6 +8,7 @@ from json import dump
 from git import Repo
 from github import Auth, Github
 from multiprocessing import Process, Event
+from sys import exit
 
 from packer.custom_modules.et import init_logger, print_colored_text, tree, read_json, format_version_text, prompt_user
 from packer.paths import assets_dir
@@ -205,4 +206,14 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     return github_repo_url.lstrip('https://github.com/')
 
 if __name__ == '__main__':
-    main(input('Project directory (absolute path, leave empty for current directory): '), input('Author name of the program: '), input('Program name: '), input('Github repo token (leave empty to skip): '), input('Github repo url (username/repo, leave empty to skip): '))
+    try:
+        print(f'github repo url: {main(input('Project directory (absolute path, leave empty for current directory): '),
+                      input('Author name of the program: '),
+                      input('Program name: '),
+                      input('Github repo token (leave empty to skip): '),
+                      input('Github repo url (username/repo, leave empty to skip): '))}')
+    except KeyboardInterrupt:
+        exit()
+    except Exception as e:
+        print_colored_text(f'Something went wrong, please report this. | Error: {e}')
+        exit()

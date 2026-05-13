@@ -431,3 +431,4 @@ if __name__ == '__main__':
         exit()
     except Exception as e:
         print_colored_text(f'Something went wrong externally, please report this.\nError: {e}', [255, 255, 255])
+        exit()
