@@ -12,6 +12,7 @@
 - More correction on commit messages, by capitalizing them and removing trailing characters.
 - A clean way to handle exceptions, especially keyboard interrupts.
 - `main.spec` file creation and verification via running Pyinstaller for `setup.py`
+- New program name safety checking to check if the name is valid for a python project.
 
 ### Changed
 - Moved `create_go_file_folder` to `et`, since it used by a different module instead of just the main module.
