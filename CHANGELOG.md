@@ -30,6 +30,7 @@
 
 ### Fixed
 - removed random extra argument for setup.
+- Some `user_input` function calls to just `stripped_input`.
 
 ---
 
