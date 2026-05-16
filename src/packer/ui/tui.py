@@ -142,5 +142,3 @@ def main() -> tuple[str, dict[str: Any]]:
     user_settings = user_settings[project_directory]
 
     return (project_directory, merge_settings(user_settings, read_json(assets_dir.joinpath('default settings.json'))))
-
-main()
