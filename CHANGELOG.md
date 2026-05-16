@@ -1,4 +1,4 @@
-## [%new_version] - %date
+## [0.3.0] - 2026-05-16
 
 ### Added
 - `ui` folder with for now only a `tui.py` file, in the future there is a plan to create a `gui.py`.
