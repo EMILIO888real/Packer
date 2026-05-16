@@ -67,9 +67,6 @@ def main() -> tuple[str, dict[str: Any]]:
             create_project = True
 
         if create_project:
-            if Path(project_directory).exists():
-                rmtree(project_directory)
-
             create_github_repository = simple_prompt('Create a new github repository')
             if create_github_repository:
                 github_pat = getpass('Github personal access token (with Administration permissions): ')
