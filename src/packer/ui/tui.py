@@ -73,7 +73,7 @@ def main() -> tuple[str, dict[str: Any]]:
                 github_repo_url = None
             else:
                 github_pat = None
-                github_repo_url = user_input('Github repo url (username/repo): ')
+                github_repo_url = stripped_input('Github repo url (username/repo): ')
             
             program_name = input('Program name: ')
 
