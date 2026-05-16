@@ -3,6 +3,10 @@ from json import dump
 from pathlib import Path
 from typing import Any
 from platformdirs import user_documents_dir
+from re import match
+from keyword import iskeyword
+from sys import builtin_module_names
+from importlib import import_module
 
 from packer.setup import main as setup
 from packer.paths import config_dir, assets_dir
@@ -54,8 +58,19 @@ def main() -> tuple[str, dict[str: Any]]:
         MANUAL_INPUT_SETTINGS = 6
 
         print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
-
         program_name = input('1. Program name: ')
+
+        try:
+            import_module(program_name)
+            import_in_conflict = True
+        except ImportError:
+            import_in_conflict = False
+            pass
+
+        while (program_name[:1].isdigit()) or (program_name.count(' ') > 0) or (not match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', program_name)) or (iskeyword(program_name)) or (program_name in builtin_module_names or (import_in_conflict)):
+            print('Name isn\'t acceptable since it doesn\'t follow restrictions:\n\t* Can\'t start with a number\n\t* Can\'t contain any spaces\n\t* Can\'t contain any special characters (Alphanumeric characters and underscores only)\n\t* Can\'t be a Python keyword\n\t* Can\'t be a built-in module name\n\t* Can\'t be in conflict with other existing modules')
+            program_name = input('Reenter the program name: ')
+
         default_project_dir = f'{user_documents_dir()}/{program_name}'
 
         project_directory = user_input(f'2. project directory (absolute path, default to: {default_project_dir}): ')
@@ -127,3 +142,5 @@ def main() -> tuple[str, dict[str: Any]]:
     user_settings = user_settings[project_directory]
 
     return (project_directory, merge_settings(user_settings, read_json(assets_dir.joinpath('default settings.json'))))
+
+main()
