@@ -35,6 +35,7 @@
 ### Fixed
 - removed random extra argument for setup.
 - Some `user_input` function calls to just `stripped_input`.
+- Updated the build.yaml file to use the new python standart for installing dependencies via `pip install -e .`, instead of `pip install -r requirements.txt`.
 
 ---
 
