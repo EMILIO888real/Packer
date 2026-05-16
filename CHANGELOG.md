@@ -27,6 +27,9 @@
 - `setup.py` to also handle keyboardInterrupt exceptions and all other unexpected as well.
 - Reorder some steps in `setup.py`
 - Removed the redundant prompt for an already existing project creation.
+- Cleaned up input in the `tui` module.
+- Moved program name as the first input for a project creation and thanks to that there is an option to select a default project creation directory.
+- Removed all safety and checks for creating a profile, since it's in `setup` and if the user already had a folder you don't create a new directory to just set settings.
 
 ### Fixed
 - removed random extra argument for setup.

@@ -1,8 +1,8 @@
 from getpass import getpass, getuser
 from json import dump
 from pathlib import Path
-from shutil import rmtree
 from typing import Any
+from platformdirs import user_documents_dir
 
 from packer.setup import main as setup
 from packer.paths import config_dir, assets_dir
@@ -49,41 +49,35 @@ def main() -> tuple[str, dict[str: Any]]:
 
 
     if project_directory == None:
+
         required_settings = ['github repo token']
-        MANUAL_INPUT_SETTINGS = 5
+        MANUAL_INPUT_SETTINGS = 6
 
         print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
 
+        program_name = input('1. Program name: ')
+        default_project_dir = f'{user_documents_dir()}/{program_name}'
 
-        project_directory = user_input('1. project directory (absolute path, leave empty for current directory): ')
+        project_directory = user_input(f'2. project directory (absolute path, default to: {default_project_dir}): ')
         if project_directory == '':
-            project_directory = str(Path().cwd().absolute())
+            project_directory = default_project_dir
 
         project_directory.rstrip('/')
-        
-        if Path(project_directory).exists():
-            create_project = simple_prompt('Remove the existing project profile and start fresh', 'n')
+
+        if simple_prompt('Create a new github repository'):
+            github_pat = getpass('Github personal access token (with Administration permissions): ')
+            github_repo_url = None
         else:
-            create_project = True
+            github_pat = None
+            github_repo_url = stripped_input('Github repo url (username/repo): ')
 
-        if create_project:
-            create_github_repository = simple_prompt('Create a new github repository')
-            if create_github_repository:
-                github_pat = getpass('Github personal access token (with Administration permissions): ')
-                github_repo_url = None
-            else:
-                github_pat = None
-                github_repo_url = stripped_input('Github repo url (username/repo): ')
-            
-            program_name = input('Program name: ')
+        print('Starting setup...')
+        github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url)
+        print('Setup complete. Continuing with configuration.')
 
-            github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url)
-            print('Starting setup...')
+        gofile_user_token = getpass('3. gofile user token: ')
 
-
-        gofile_user_token = getpass('2. gofile user token: ')
-
-        gofile_folder_id_input = getpass('3. gofile folder id (leave empty to create a folder): ')
+        gofile_folder_id_input = getpass('4. gofile folder id (leave empty to create a folder): ')
         if gofile_folder_id_input == '':
             gofile_folder_id = create_go_file_folder(stripped_input('name of the folder: '), gofile_user_token)['data']['id']
         else:
@@ -94,8 +88,8 @@ def main() -> tuple[str, dict[str: Any]]:
             project_directory: {
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
-                'github repo url': user_input('4. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
-                'program name': user_input('5. program name: ') if 'program_name' not in locals() else program_name
+                'github repo url': user_input('5. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
+                'program name': user_input('6. program name: ') if 'program_name' not in locals() else program_name
                 }
             }
         
@@ -129,8 +123,6 @@ def main() -> tuple[str, dict[str: Any]]:
 
         print(f'Settings saved at: {config_dir}/settings.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
-        if create_project:
-            exit()
 
     user_settings = user_settings[project_directory]
 
