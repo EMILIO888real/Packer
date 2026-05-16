@@ -236,7 +236,7 @@ exe = EXE(
         github_repo_url = Github(auth=Auth.Token(github_pat)).get_user().create_repo(
             program_name,
             description=f'Temporary description, this repo was created by packer\'s setup.py v{packer_version}',
-            private=False,  # Set to True for a private repo
+            private=False
         ).clone_url
     
     print_and_log('Creating remote repository...')
