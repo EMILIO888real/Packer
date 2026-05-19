@@ -1,3 +1,17 @@
+## [%new_version] - %date
+
+### Added
+- 
+
+### Changed
+- 
+- Ollama chat function call structure. nothing output wise changed.
+
+### Fixed
+- 
+
+---
+
 ## [0.3.0] - 2026-05-16
 
 ### Added
