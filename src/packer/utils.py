@@ -58,3 +58,24 @@ def simple_merge_settings(user_settings: dict[str, Any], default_settings: dict[
     '''
 
     return merge_settings(user_settings, default_settings if default_config is None else default_settings.update(default_config))
+
+def normalize_settings_keys(all_settings: dict[str: Any]) -> dict[str: Any]:
+    '''
+    Normalize configuration settings keys by replacing spaces with underscores.
+    
+    This function processes a dictionary of settings and converts any keys that 
+    contain spaces into keys with underscores, making them valid Python identifiers.
+    
+    :param all_settings: Dictionary containing configuration settings with potentially 
+                         spaces in keys
+    :type all_settings: dict[str, Any]
+    :return: Dictionary with normalized keys (spaces replaced with underscores)
+    :rtype: dict[str, Any]
+    '''
+
+    normalized_settings = {}
+
+    for item in all_settings.items():
+        normalized_settings[item[0].replace(' ', '_')] = item[1]
+    
+    return normalized_settings
