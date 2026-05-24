@@ -1,6 +1,9 @@
 from importlib.resources.abc import Traversable
 from json import JSONDecodeError, load
 from pathlib import Path
+from typing import Any
+
+from packer.custom_modules.et import merge_settings
 
 
 def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[dict, dict, dict | None]:
@@ -35,3 +38,23 @@ def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[
         return f'Something went wrong.\nError: {e}'
 
     return (user_settings, default_settings, default_config if 'default_config' in locals() else None)
+
+def simple_merge_settings(user_settings: dict[str, Any], default_settings: dict[str, Any], default_config: dict[str, Any] | None = None) -> dict[str: Any]:
+    '''
+    Merge user settings with default settings and optional default configuration.
+
+    This function combines user-provided settings with default settings. If a
+    default configuration is provided, it is also merged into the result. The
+    merging process ensures that user settings take precedence over defaults.
+
+    :param user_settings: A dictionary of user-defined settings
+    :type user_settings: dict[str, Any]
+    :param default_settings: A dictionary of default settings
+    :type default_settings: dict[str, Any]
+    :param default_config: An optional dictionary of default configuration values
+    :type default_config: dict[str, Any] | None
+    :return: A merged dictionary containing the combined settings and configuration
+    :rtype: dict[str, Any]
+    '''
+
+    return merge_settings(user_settings, default_settings if default_config is None else default_settings.update(default_config))
