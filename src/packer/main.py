@@ -218,7 +218,7 @@ class Packer():
 
             self.print_and_log('Committing changes...')
 
-            generate_commit_message = False
+            generate_commit_message = True
             while generate_commit_message:
                 commit_version_summery = chat(self.model,
                 [
@@ -227,7 +227,7 @@ class Packer():
                 ])['message']['content']
 
                 self.print_and_log(commit_version_summery)
-                generate_commit_message = simple_prompt('Is the git commit message good', default='n')
+                generate_commit_message = not simple_prompt('Is the git commit message good', default='n')
 
             commit_subject = f'chore(release): version {self.version}'
             commit_body = f'{commit_version_summery}'
@@ -450,5 +450,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         exit()
     except Exception as e:
-        print_colored_text(f'Something went wrong externally, please report this.\nError: {e}', [255, 255, 255])
+        print_colored_text(f'Something went wrong externally, please report this.\nError: {e}', [255, 0, 0])
         exit()
