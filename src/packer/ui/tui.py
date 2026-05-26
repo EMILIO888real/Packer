@@ -47,7 +47,7 @@ def main() -> tuple[str, Settings]:
         if int(input_project) == new_project_index if input_project.isdigit() else input_project == 'new project':
             project_directory = None
         else:
-            project_directory = projects[int(input_project)] if input_project.isdigit() else projects[input_project]
+            project_directory = projects[project_names[int(input_project)]] if input_project.isdigit() else projects[input_project]
     else:
         project_directory = None
 
