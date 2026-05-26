@@ -1,14 +1,23 @@
 ## [%new_version] - %date
 
 ### Added
-- 
+- A public API for importing parts of the program.
+- `utils` module for utilities and the `load_config` general function for loading and making settings available for the entire project.
+- `simple_merge_settings` function to utils for easier standart settings merge.
+- `normalize_settings_keys` function to `utils`, it changes whitespace " " to "_", to be able to be usable for python variables.
+- Commit_version_summery generation via AI.
+- `config.py` for centralized settings access by just import them.
 
 ### Changed
-- 
+- `change.py` to be importable and cleaned it up a bit more to be easier to use, some basic things, like adding parameters and so on.>
 - Ollama chat function call structure. nothing output wise changed.
-
-### Fixed
-- 
+- `load_config` to handle missing user settings, in that case it is None, just like default config.
+- Refactored commit message to be easier editable in the future, cleaned it up.
+- Settings to now use a Settings object for type and error checking via `pydantic.BaseModel`
+- `all_settings` in `main.py` to now rely and use the object to access fields instead of a dict, since then the IDE can catch mistakes and check types
+- `tui.py` to utilize the new `config.py`.
+- `load_config` in `utils.py` to now check if user settings exists otherwise return None.
+- Removed hidden imports from the newly created .spec file in the `setup.py` module.
 
 ---
 
