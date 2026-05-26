@@ -49,7 +49,7 @@ class Settings(BaseModel):
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
 all_settings: dict[Any] | None = None
 
-def load(project: str | Path) -> None:
+def load(project: str | Path) -> Settings:
     '''
     Load and merge configuration settings for a project.
 
@@ -58,8 +58,12 @@ def load(project: str | Path) -> None:
 
     :param project: The project path or name to load settings for
     :type project: str | Path
+    :return: A Settings object containing the merged configuration
+    :rtype: Settings
     '''
 
     global all_settings
 
     all_settings = Settings(**normalize_settings_keys(simple_merge_settings(user_settings[str(Path(project).absolute())], default_settings, default_config)))
+
+    return all_settings
