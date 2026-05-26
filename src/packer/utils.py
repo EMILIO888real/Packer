@@ -6,7 +6,7 @@ from typing import Any
 from packer.custom_modules.et import merge_settings
 
 
-def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[dict, dict, dict | None]:
+def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[dict | None, dict, dict | None]:
     '''
     Load configuration settings from files.
 
@@ -18,7 +18,7 @@ def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[
     :param config_dir: Path to the user configuration directory
     :type config_dir: str | Path
     :return: Tuple containing (user_settings, default_settings, default_config)
-             where default_config may be None if not present. **Or a str for an error**.
+             where default_config or user_settings may be None if not present. **Or a str for an error**.
     :rtype: tuple[dict, dict, dict | None] | str
     '''
 
@@ -29,9 +29,12 @@ def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[
         if Path(f'{assets_dir}/default config.json').exists():
             with open(f'{assets_dir}/default config.json') as f:
                 default_config = load(f)
+        if Path(f'{str(Path(config_dir).absolute())}/settings.json').exists():
+            with open(f'{str(Path(config_dir).absolute())}/settings.json') as f:
+                user_settings = load(f)
+        else:
+            user_settings = None
 
-        with open(f'{str(Path(config_dir).absolute())}/settings.json') as f:
-            user_settings = load(f)
     except JSONDecodeError:
         return 'Couldn\'t parse settings\nPlease make sure your settings uses the JSON (JavaScript Object Notation) https://json.org syntax (ECMA-262 3rd edition)'
     except Exception as e:
