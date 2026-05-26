@@ -34,19 +34,20 @@ def main() -> tuple[str, Settings]:
     '''
 
     if user_settings is not None:
-        projects = list(user_settings.keys())
+        projects = {str(Path(project_directory).name): project_directory for project_directory in user_settings.keys()}
+        project_names = list(projects.keys())
         print('Choose a project:')
-        for i in range(len(projects)):
-            print(capitalize(f'\t{i}. {Path(projects[i]).name}', 4))
+        for i in range(len(project_names)):
+            print(f'\t{i}. {project_names[i]}')
 
         new_project_index = i + 1
-        print(capitalize(f'\t{new_project_index}. new project', 4))
+        print(f'\t{new_project_index}. new project')
 
         input_project = stripped_input('Project you wish to update: ')
         if int(input_project) == new_project_index if input_project.isdigit() else input_project == 'new project':
             project_directory = None
         else:
-            project_directory = projects[int(input_project)] if input_project.isdigit() else input_project
+            project_directory = projects[int(input_project)] if input_project.isdigit() else projects[input_project]
     else:
         project_directory = None
 
