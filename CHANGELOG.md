@@ -19,6 +19,10 @@
 - `load_config` in `utils.py` to now check if user settings exists otherwise return None.
 - Removed hidden imports from the newly created .spec file in the `setup.py` module.
 
+### Fixed
+- The minor mistake for checking if the commit message is generated to liking or not.
+- Error not finding the correct project from the name alone, since the user only enters the program name not the entire path.
+
 ---
 
 ## [0.3.0] - 2026-05-16
