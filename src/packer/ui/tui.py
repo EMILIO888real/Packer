@@ -9,8 +9,9 @@ from sys import builtin_module_names
 from importlib import import_module
 
 from packer.setup import main as setup
-from packer.paths import config_dir, assets_dir
-from packer.custom_modules.et import capitalize, merge_settings, read_json, stripped_input, create_go_file_folder, simple_prompt
+from packer.paths import config_dir
+from packer.custom_modules.et import capitalize, stripped_input, create_go_file_folder, simple_prompt
+from packer.config import load, user_settings, Settings
 
 def user_input(text: str, index: int = 3) -> str:
     '''
@@ -24,7 +25,7 @@ def user_input(text: str, index: int = 3) -> str:
 
     return stripped_input(capitalize(text, index))
 
-def main() -> tuple[str, dict[str: Any]]:
+def main() -> tuple[str, Settings]:
     '''
     Main function for the TUI. This script handles user input and performs various tasks based on the input. It includes options to create a new Go file or folder, setup configurations, manage assets, and interact with custom modules. The function also provides interactive prompts for user inputs and processes these inputs accordingly.
 
@@ -32,9 +33,7 @@ def main() -> tuple[str, dict[str: Any]]:
     :rtype: tuple
     '''
 
-    if Path(f'{config_dir}/settings.json').exists():
-        user_settings = read_json(f'{config_dir}/settings.json')
-
+    if user_settings is not None:
         projects = list(user_settings.keys())
         print('Choose a project:')
         for i in range(len(projects)):
@@ -129,16 +128,9 @@ def main() -> tuple[str, dict[str: Any]]:
             if compile_command_input != '':
                 new_project_settings[project_directory]['compile command'] = compile_command_input.split(' ')
 
-
-        if 'user_settings' not in locals():
-            user_settings = {}
-        user_settings.update(new_project_settings)
         with open(f'{config_dir}/settings.json', 'w') as f:
-            dump(user_settings, f, indent=4)
+            dump(new_project_settings, f, indent=4)
 
         print(f'Settings saved at: {config_dir}/settings.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
-
-    user_settings = user_settings[project_directory]
-
-    return (project_directory, merge_settings(user_settings, read_json(assets_dir.joinpath('default settings.json'))))
+    return (project_directory, load(project_directory))
