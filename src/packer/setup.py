@@ -159,10 +159,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 f'''
 # -*- mode: python ; coding: utf-8 -*-
 
-from PyInstaller.utils.hooks import collect_submodules
-
-hiddenimports = collect_submodules('{program_name}.custom_modules')
-
 a = Analysis(
     ['src/{program_name}/main.py'],
     pathex=['src'],
