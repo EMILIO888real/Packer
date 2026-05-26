@@ -434,8 +434,8 @@ def main():
             exit()
     try:
         packer = Packer(version, old_version,
-                        all_settings['gofile user token'], all_settings['gofile folder id'], all_settings['github repo token'],
-                        all_settings['program name'], all_settings['github repo url'], all_settings['compile command'], all_settings['model'])
+                        all_settings.gofile_user_token, all_settings.gofile_folder_id, all_settings.github_repo_token,
+                        all_settings.program_name, all_settings.github_repo_url, all_settings.compile_command, all_settings.model)
         packer.run()
     except KeyboardInterrupt:
         packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
