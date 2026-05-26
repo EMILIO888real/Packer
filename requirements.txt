@@ -16,7 +16,7 @@ idna==3.13
 iniconfig==2.3.0
 ollama==0.6.2
 packaging==26.2
--e git+https://github.com/EMILIO888real/Packer.git@10ce5815afad4ca5b8cd8ae43b7c7aa1359cec14#egg=packer
+-e git+https://github.com/EMILIO888real/Packer.git@cbff15b9b26acae532d3f88d68053471a44e7358#egg=packer
 pathspec==1.1.1
 platformdirs==4.9.6
 pluggy==1.6.0

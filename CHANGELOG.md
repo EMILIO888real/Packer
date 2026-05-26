@@ -1,4 +1,4 @@
-## [%new_version] - %date
+## [0.4.0] - 2026-05-27
 
 ### Added
 - A public API for importing parts of the program.
