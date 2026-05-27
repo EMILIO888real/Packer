@@ -1,3 +1,17 @@
+## [%new_version] - %date
+
+### Added
+- 
+
+### Changed
+- 
+- Cleaned up the release notes to be more high level like the git commit message, by just using that for both.
+
+### Fixed
+- 
+
+---
+
 ## [0.4.0] - 2026-05-27
 
 ### Added
