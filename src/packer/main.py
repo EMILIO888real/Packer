@@ -138,12 +138,11 @@ class Packer():
                 description = f.read()
 
         while generate_description:
-            description = chat(model=self.model,
-                               messages=[
-                                   {'role': 'system', 'content': 'You are a technical writer. Output ONLY the raw markdown paragraph. No intros, no explanations. Don\'t surround the output with ```.'},
-                                   {'role': 'user', 'content': f'Summarize this changelog into exactly one markdown paragraph. Do not use lists. Use only the provided info.\n\nChangelog:\n{latest_changelog}'}
-                                   ],
-                                options={'temperature': 0.2})['message']['content'].strip().replace('\n', ' ')
+            description = chat(self.model,
+                               [
+                                    {'role': 'system', 'content': 'You are a senior developer writing professional release notes. Summarize the following changelog into one short sentence. Focus strictly on the high-level impact (e.g., \'This release introduces a new TUI and streamlines Windows builds.\') rather than listing individual functions or fixes. Use professional, active language. Output ONLY the summary text, no markdown block syntax, no intros, and no explanations.'},
+                                    {'role': 'user', 'content': f'Summarize the following changelog into exactly one concise sentence. Group related technical changes (e.g., UI, Build Automation, Refactoring). Do not use bullet points. Do not mention specific function names unless they are major features. Ensure the tone is professional.\n\nChangelog:\n{latest_changelog}'}
+                                ])['message']['content'].strip()
             self.print_and_log(description)
             generate_description = not simple_prompt('Is the description all good', 'n')
         
@@ -216,26 +215,17 @@ class Packer():
             self.print_and_log('Staging changes...')
             self._run(['git', 'add', '.'])
 
+
             self.print_and_log('Committing changes...')
 
-            generate_commit_message = True
-            while generate_commit_message:
-                commit_version_summery = chat(self.model,
-                [
-                {'role': 'system', 'content': 'You are a senior developer writing professional release notes. Summarize the following changelog into one short sentence. Focus strictly on the high-level impact (e.g., \'This release introduces a new TUI and streamlines Windows builds.\') rather than listing individual functions or fixes. Use professional, active language. Output ONLY the summary text, no markdown block syntax, no intros, and no explanations.'},
-                {'role': 'user', 'content': f'Summarize the following changelog into exactly one concise sentence. Group related technical changes (e.g., UI, Build Automation, Refactoring). Do not use bullet points. Do not mention specific function names unless they are major features. Ensure the tone is professional.\n\nChangelog:\n{latest_changelog}'}
-                ])['message']['content']
-
-                self.print_and_log(commit_version_summery)
-                generate_commit_message = not simple_prompt('Is the git commit message good', default='n')
-
             commit_subject = f'chore(release): version {self.version}'
-            commit_body = f'{commit_version_summery}'
+            commit_body = f'{description}'
             commit_metadata = f'Gofile url: {download_url}\nPublished by packer v{self.version}!'
 
             commit_message = f'{commit_subject}\n\n{commit_body}\n\n{commit_metadata}'
 
             self.committed = True if self._run(['git', 'commit', '-m', commit_message]).returncode == 0 else False
+
 
             sha = run(['git', 'rev-parse', 'HEAD'], capture_output=True).stdout.decode().strip()
 
