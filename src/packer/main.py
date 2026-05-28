@@ -16,6 +16,7 @@ from ollama import chat
 from platformdirs import user_log_dir, user_data_dir, user_cache_dir
 from requests import post
 from git import Repo
+import tomlkit
 
 from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, log_action as _log_action, create_log_message, simple_prompt
 from packer.paths import assets_dir
@@ -113,6 +114,20 @@ class Packer():
         with open(f'{assets_dir}/version.json', 'w') as f:
             dump(self.version, f, indent=4)
         self.version = f'{self.version['major']}.{self.version['minor']}.{self.version['patch']}' # Not using a text variable to rewrite this one 
+        with open('pyproject.toml', 'r', encoding='utf-8') as f:
+            config = tomlkit.load(f)
+
+        # (Note: In a pyproject.toml, 'version' is usually inside the [tool.poetry] or [project] table)
+        if 'project' in config:
+            config['project']['version'] = self.version
+        elif 'tool' in config and 'poetry' in config['tool']:
+            config['tool']['poetry']['version'] = self.version
+        else:
+            config['version'] = self.version # Fallback if it's just a top-level global key
+
+        with open('pyproject.toml', 'w', encoding='utf-8') as f:
+            tomlkit.dump(config, f)
+
         old_version_text = f'{self.old_version['major']}.{self.old_version['minor']}.{self.old_version['patch']}' # Not possible above solution due to needing both
         self.print_and_log(f'Chosen version: {self.version}')
 
