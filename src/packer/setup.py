@@ -2,13 +2,13 @@
 from os import chdir, mkdir
 from pathlib import Path
 from shutil import rmtree
-from subprocess import run
+from subprocess import CalledProcessError, run
 from typing import Sequence
 from json import dump
 from git import Repo
 from github import Auth, Github
 from multiprocessing import Process, Event
-from sys import exit
+from sys import exit, platform
 
 from packer.custom_modules.et import init_logger, print_colored_text, tree, read_json, format_version_text, prompt_user
 from packer.paths import assets_dir
@@ -17,8 +17,8 @@ logger = init_logger('packer setup', 'EMILIO')
 
 packer_version = format_version_text(read_json(f'{assets_dir}/version.json'))
 
-def print_and_log(text: str, level: int = 20, color: Sequence[int] = [255, 255, 255]) -> None:
-    print_colored_text(text, color)
+def print_and_log(text: str, level: int = 20, color: Sequence[int] = [255, 255, 255], end: str = '\n') -> None:
+    print_colored_text(text, color, end=end)
     logger.log(level, text)
 
 def create_venv(created_venv) -> None:
@@ -101,11 +101,11 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating paths.py file...')
     with open(f'{root_dir}/paths.py', 'w') as f:
-        f.write('from importlib import resources\n\nroot_dir = resources.files(\'packer\') \nassets_dir = root_dir.joinpath(\'assets\')\n')
+        f.write(f'from importlib import resources\n\nroot_dir = resources.files(\'{program_name}\') \nassets_dir = root_dir.joinpath(\'assets\')\n')
 
     print_and_log('Creating main.py file...')
     with open(f'{root_dir}/main.py', 'w') as f:
-        f.write('from packer.paths import assets_dir\n\n\ndef main():\n    print("Hello, world!")\n\nif __name__ == "__main__":\n    main()\n')
+        f.write(f'from {program_name}.paths import assets_dir\n\n\ndef main():\n    print("Hello, world!")\n\nif __name__ == "__main__":\n    main()\n')
 
     print_and_log('Creating version.json file...')
     with open(f'{root_dir}/assets/version.json', 'w') as f:
@@ -135,7 +135,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating a pyproject.toml file...')
     with open('pyproject.toml', 'w') as f:
-        f.write(f'[project]\nname = "{program_name}"\nauthor = "{author_name}"\nversion = "0.1.0"\ndescription = ""\nreadme = "README.md"\nlicense = "MIT"\ndependencies = []\n\n[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n[tool.setuptools.packages.find]\nwhere = ["src"]  # This tells setuptools to look for packages inside \'src\'\n')
+        f.write(f'[project]\nname = "{program_name}"\nversion = "0.1.0"\ndescription = ""\nreadme = "README.md"\nlicense = "MIT"\ndependencies = []\n\n[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n[tool.setuptools.packages.find]\nwhere = ["src"]  # This tells setuptools to look for packages inside \'src\'\n\n[project.scripts]\n{program_name} = "{program_name}.main:main"')
 
     print_and_log('Creating CHANGELOG.md...')
     with open('CHANGELOG.md', 'w') as f:
@@ -166,7 +166,6 @@ a = Analysis(
     datas=[
         ('src/{program_name}/assets', '{program_name}/assets'),
     ],
-    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={{}},
     runtime_hooks=[],
@@ -220,6 +219,7 @@ exe = EXE(
             f'{program_name}.egg-info/\n'
         )
 
+    print_and_log('Waiting for .venv to finish creating...')
     created_venv.wait()
 
     print_and_log('Staging files for initial commit...')
@@ -234,27 +234,35 @@ exe = EXE(
             description=f'Temporary description, this repo was created by packer\'s setup.py v{packer_version}',
             private=False
         ).clone_url
-    
-    print_and_log('Creating remote repository...')
-    origin = repo.create_remote('origin', github_repo_url)
 
-    # This ensures 'git push' or 'git pull' knows where to go by default
-    print_and_log('Registering the master branch with the remote repository...')
-    with repo.config_writer() as writer:
-        writer.set_value('branch "master"', 'remote', 'origin')
-        writer.set_value('branch "master"', 'merge', 'refs/heads/master')
+    if github_repo_url is not None:
+        print_and_log('Creating remote repository...')
+        origin = repo.create_remote('origin', github_repo_url)
 
-    print_and_log('Pushing initial commit to remote repository...')
+        # This ensures 'git push' or 'git pull' knows where to go by default
+        print_and_log('Registering the master branch with the remote repository...')
+        with repo.config_writer() as writer:
+            writer.set_value('branch "master"', 'remote', 'origin')
+            writer.set_value('branch "master"', 'merge', 'refs/heads/master')
+
+        print_and_log('Pushing initial commit to remote repository...')
+        try:
+            origin.push()
+        except Exception as e:
+            print_and_log(f'Warning: Push failed with error: {e}', 30, [255, 165, 0])
+            print_and_log('You can push manually with: git push -u origin master', 20, [255, 165, 0])
+
+    print_and_log(f'Please check the {project_directory}/dist directory to verify that the .spec file was correctly processed.\nWe will start it up for you automatically. It should just print out in the black box "Hello world!"')
     try:
-        origin.push()
-    except Exception as e:
-        print_and_log(f'Warning: Push failed with error: {e}', 30, [255, 165, 0])
-        print_and_log('You can push manually with: git push -u origin master', 20, [255, 165, 0])
-
-    print_and_log(f'Please check the {project_directory}/dist directory to verify that the .spec file was correctly processed.')
+        output = run([f'./dist/{program_name}{'.exe' if platform == 'win32' else ''}'], capture_output=True, text=True, check=True).stdout.rstrip('\n')
+        print_and_log(f'Successfully ran the build. The output: {output}', end=' ')
+        print_and_log(f'[{'valid' if output == 'Hello, world!' else 'invalid'}]', 30, [0, 255, 0] if output == 'Hello, world!' else [255, 0, 0])
+    except CalledProcessError as e:
+        print_and_log(f'Something went wrong in the built version: {e}', 30, [255, 0, 0])
+    
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
     
-    return github_repo_url.lstrip('https://github.com/')
+    return github_repo_url.lstrip('https://github.com/') if github_repo_url is not None else None
 
 if __name__ == '__main__':
     try:
@@ -266,5 +274,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         exit()
     except Exception as e:
-        print_colored_text(f'Something went wrong, please report this. | Error: {e}')
+        print_and_log(f'Something went wrong, please report this. | Error: {e}', color=[255, 0, 0])
         exit()
