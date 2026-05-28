@@ -1,14 +1,20 @@
 ## [%new_version] - %date
 
 ### Added
-- 
+- Project script section to the new project created `pyproject.toml` file with a command to run the project's main file's main function after installing with `pip install -e .`.
+- Automatic build file (executable) output validation via simply running it and looking for the correct output: "Hello, world!".
+
 
 ### Changed
-- 
+- `print_and_log` function to also be able to pass the `end` parameter to specify what type of str to attach to the end.
 - Cleaned up the release notes to be more high level like the git commit message, by just using that for both.
+- Various print function calls to also log and print it in a colorful way the output.
+- return value and parameters in the `main` function of `setup.py` to allow not creating a Github repo.
 
 ### Fixed
-- 
+- Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
+- Removed author from `pyproject.toml` file.
+
 
 ---
 
