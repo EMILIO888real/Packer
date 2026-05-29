@@ -138,7 +138,6 @@ class Packer():
             latest_changelog = full_changelog[full_changelog.find(f'## [%new_version]') + 27:full_changelog.find(f'## [{old_version_text}]') - 7]
 
         self.print_and_log('Updating changelog with the new version...')
-        self.old_changelog = full_changelog[:]
         full_changelog = full_changelog.replace('%new_version', self.version).replace('%date', str(datetime.date(datetime.now())), 1)
         with open('CHANGELOG.md', 'w') as f:
             f.write(full_changelog)
@@ -191,7 +190,7 @@ class Packer():
             remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
 
 
-        self.old_integrity = read_json(f'{assets_dir}/integrity.json')
+        old_integrity = read_json(f'{assets_dir}/integrity.json')
 
         self.print_and_log('Generating the integrity file...')
 
@@ -211,7 +210,7 @@ class Packer():
             self.git_repo.archive(fp, format='zip')
 
 
-        self.print_and_log(f'Added file: {set(new_cwd).difference(self.old_integrity['CWD'])}')
+        self.print_and_log(f'Added file: {set(new_cwd).difference(old_integrity['CWD'])}')
         self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
         if simple_prompt('Is the arhive all good'):
 
@@ -346,20 +345,6 @@ class Packer():
     
     def revert_changes(self) -> None:
         '''Reverts the version to the previous one, deletes the uploaded copy and git release if they exist, and resets the git directory to the previous commit. Also restores the integrity file.'''
-
-        self.print_and_log('Changing version...', [255, 255, 0])
-        with open(f'{assets_dir}/version.json', 'w') as f:
-            dump(self.old_version, f)
-        
-        if hasattr(self, 'old_changelog'):
-            self.print_and_log('Restoring changelog...', [255, 255, 0])
-            with open('CHANGELOG.md', 'w') as f:
-                f.write(self.old_changelog)
-
-        if hasattr(self, 'old_integrity'):
-            self.print_and_log('Restoring integrity file...', [255, 255, 0])
-            with open(f'{assets_dir}/integrity.json', 'w') as f:
-                dump(self.old_integrity, f)
 
         if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
             self.print_and_log('Removing archive...', [255, 255, 0])

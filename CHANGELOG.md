@@ -13,7 +13,8 @@
 - return value and parameters in the `main` function of `setup.py` to allow not creating a Github repo.
 - Added `pyproject.toml` file version identifier automatic updating via the excellent tomlkit module, that will preserve the file's structure.
 - Newly created project version by `setup` to 0.0.0 instead of 0.1.0.
-- All git interactions to utilize the excellent `gitpython` library.
+- All git interactions to utilize the excellent `GitPython` library.
+- `revert_changes` method of `packer`, since a lot of it's functionality wasn't useful, since it would have been automatically handled by git anyways.
 
 ### Fixed
 - Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
