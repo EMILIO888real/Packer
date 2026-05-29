@@ -15,7 +15,7 @@ from github import Github, Auth, UnknownObjectException
 from ollama import chat
 from platformdirs import user_log_dir, user_data_dir, user_cache_dir
 from requests import post
-from git import Repo
+from git import GitCommandError, Repo
 import tomlkit
 
 from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, log_action as _log_action, create_log_message, simple_prompt
@@ -228,7 +228,7 @@ class Packer():
 
 
             self.print_and_log('Staging changes...')
-            self._run(['git', 'add', '.'])
+            self.log_action(f'Entries added: {self.git_repo.index.add(['.'])}', 'SUBPROCESS')
 
 
             self.print_and_log('Committing changes...')
@@ -239,13 +239,18 @@ class Packer():
 
             commit_message = f'{commit_subject}\n\n{commit_body}\n\n{commit_metadata}'
 
-            self.committed = True if self._run(['git', 'commit', '-m', commit_message]).returncode == 0 else False
+            try:
+                self.git_repo.index.commit(commit_message)
+                self.committed = True 
+            except GitCommandError as e:
+                self.committed = False
+                self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
 
 
-            sha = run(['git', 'rev-parse', 'HEAD'], capture_output=True).stdout.decode().strip()
+            sha = self.git_repo.head.commit.hexsha
 
             self.print_and_log('Pushing changes...')
-            self._run(['git', 'push'])
+            self.git_repo.remotes.origin.push()
 
             if self.after_commands:
                 self.print_and_log('Running after commit commands...')
@@ -316,6 +321,19 @@ class Packer():
             with open(f'{self.data_dir}/social media post.md', 'w') as f:
                 f.write(social_media_post_text)
 
+            self.print_and_log('Merging development branch...')
+            self.git_repo.git.merge('development')
+
+            self.print_and_log('Deleting the old merged branch...')
+            self.git_repo.delete_head('development')
+
+            self.print_and_log('Creating a new branch and switching to it...')
+            new_branch = self.git_repo.create_head('development')
+            new_branch.checkout()
+
+            self.print_and_log('Updating origin...')
+            self.git_repo.remotes.origin.push()
+
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
             self.print_and_log(f'Social media post text has been saved to {self.data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(self.log_path.absolute())}')
 
@@ -353,12 +371,12 @@ class Packer():
 
         self.print_and_log('Reverting git changes...', [255, 255, 0])
         if hasattr(self, 'committed') and self.committed:
-            self._run(['git', 'reset', '--hard', 'HEAD~1'])
-            self._run(['git', 'clean', '-fd'])
-            self._run(['git', 'push', '--force']) # In case we pushed it to github already!
+            self.git_repo.head.reset(commit='HEAD~1', working_tree=True)
+            self.git_repo.git.clean('-fd')
+            self.git_repo.remotes.origin.push(force=True) # In case we pushed it to github already!
         else:
-            self._run(['git', 'reset', '--hard', 'HEAD'])
-            self._run(['git', 'clean', '-fd'])
+            self.git_repo.head.reset(working_tree=True)
+            self.git_repo.git.clean('-fd')
 
         if hasattr(self, 'git_release'):
             self.print_and_log('Deleting git release...', [255, 255, 0])

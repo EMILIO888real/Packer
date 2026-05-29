@@ -3,6 +3,7 @@
 ### Added
 - Project script section to the new project created `pyproject.toml` file with a command to run the project's main file's main function after installing with `pip install -e .`.
 - Automatic build file (executable) output validation via simply running it and looking for the correct output: "Hello, world!".
+- Automatic git branch handling (Merging, creation and checkout).
 
 
 ### Changed
@@ -12,6 +13,7 @@
 - return value and parameters in the `main` function of `setup.py` to allow not creating a Github repo.
 - Added `pyproject.toml` file version identifier automatic updating via the excellent tomlkit module, that will preserve the file's structure.
 - Newly created project version by `setup` to 0.0.0 instead of 0.1.0.
+- All git interactions to utilize the excellent `gitpython` library.
 
 ### Fixed
 - Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
