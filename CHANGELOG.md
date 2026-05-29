@@ -16,6 +16,7 @@
 - All git interactions to utilize the excellent `GitPython` library.
 - `revert_changes` method of `Packer`, since a lot of it's functionality wasn't useful, since it would have been automatically handled by Git anyways.
 - `change.py` modules function to only capitalize the First letter and not make the rest of the letter Lower.
+- Code location to have the user related stuff, like prompting more towards the beginning.
 
 ### Fixed
 - Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
