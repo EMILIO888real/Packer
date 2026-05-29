@@ -104,29 +104,11 @@ class Packer():
             f.write('')
         self.print_and_log('Starting packer...')
 
-        self.print_and_log('Creating requirements.txt...')
-        pip_path = Path('.venv/bin/pip') if platform != 'win32' else Path('.venv/Scripts/pip.exe')
-        with open('requirements.txt', 'w') as f:
-            run([pip_path, 'freeze', '--require-virtualenv', '-l'], stdout=f)
-
 
         self.print_and_log('Updating version...')
         with open(f'{assets_dir}/version.json', 'w') as f:
             dump(self.version, f, indent=4)
         self.version = f'{self.version['major']}.{self.version['minor']}.{self.version['patch']}' # Not using a text variable to rewrite this one 
-        with open('pyproject.toml', 'r', encoding='utf-8') as f:
-            config = tomlkit.load(f)
-
-        # (Note: In a pyproject.toml, 'version' is usually inside the [tool.poetry] or [project] table)
-        if 'project' in config:
-            config['project']['version'] = self.version
-        elif 'tool' in config and 'poetry' in config['tool']:
-            config['tool']['poetry']['version'] = self.version
-        else:
-            config['version'] = self.version # Fallback if it's just a top-level global key
-
-        with open('pyproject.toml', 'w', encoding='utf-8') as f:
-            tomlkit.dump(config, f)
 
         old_version_text = f'{self.old_version['major']}.{self.old_version['minor']}.{self.old_version['patch']}' # Not possible above solution due to needing both
         self.print_and_log(f'Chosen version: {self.version}')
@@ -185,6 +167,28 @@ class Packer():
             f.write(version_title)
 
 
+        self.print_and_log('Creating requirements.txt...')
+        pip_path = Path('.venv/bin/pip') if platform != 'win32' else Path('.venv/Scripts/pip.exe')
+        with open('requirements.txt', 'w') as f:
+            run([pip_path, 'freeze', '--require-virtualenv', '-l'], stdout=f)
+
+
+        self.print_and_log('Updating pyproject.toml...')
+        with open('pyproject.toml', 'r', encoding='utf-8') as f:
+            config = tomlkit.load(f)
+
+        # (Note: In a pyproject.toml, 'version' is usually inside the [tool.poetry] or [project] table)
+        if 'project' in config:
+            config['project']['version'] = self.version
+        elif 'tool' in config and 'poetry' in config['tool']:
+            config['tool']['poetry']['version'] = self.version
+        else:
+            config['version'] = self.version # Fallback if it's just a top-level global key
+
+        with open('pyproject.toml', 'w', encoding='utf-8') as f:
+            tomlkit.dump(config, f)
+
+
         if Path(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip').exists():
             self.print_and_log('Removing old archive...')
             remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
@@ -212,7 +216,7 @@ class Packer():
 
         self.print_and_log(f'Added file: {set(new_cwd).difference(old_integrity['CWD'])}')
         self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
-        if simple_prompt('Is the arhive all good'):
+        if simple_prompt('Is the arhive all good (no going back after this)'):
 
             self.print_and_log('Uploading archive to Gofile...')
             response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
