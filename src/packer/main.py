@@ -17,6 +17,7 @@ from platformdirs import user_log_dir, user_data_dir, user_cache_dir
 from requests import post
 from git import GitCommandError, Repo
 import tomlkit
+from threading import Thread, Event
 
 from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, log_action as _log_action, create_log_message, simple_prompt
 from packer.paths import assets_dir
@@ -218,6 +219,23 @@ class Packer():
         self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
         if simple_prompt('Is the arhive all good (no going back after this)'):
 
+            if self.compile_command != None:
+                self.print_and_log('Compiling the program using Nuitka...')
+                waiting_for_compile_command = Event()
+                compile_command_done = self._Popen(self.compile_command, waiting_for_compile_command)
+
+                self.print_and_log('Creating archive of the compiled program...')
+                make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
+
+            
+            self.print_and_log('Bundling the program using PyInstaller...')
+            waiting_for_pyinstaller_bundling = Event()
+            pyinstaller_done = self._Popen([executable,
+                        '-m',
+                        'PyInstaller', 'main.spec',
+                         '--distpath', f'{self.cache_dir}/dist',
+                         '--workpath', f'{self.cache_dir}/build'], waiting_for_pyinstaller_bundling)
+
             self.print_and_log('Uploading archive to Gofile...')
             response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
 
@@ -279,27 +297,16 @@ class Packer():
             
             self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}', message=social_media_post_text)
 
-
-            if self.compile_command != None:
-                self.print_and_log('Compiling the program using Nuitka...')
-                self._Popen(self.compile_command)
-
-                self.print_and_log('Creating archive of the compiled program...')
-                make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
-
-            
-            self.print_and_log('Bundling the program using PyInstaller...')
-            self._Popen([executable,
-                        '-m',
-                        'PyInstaller', 'main.spec',
-                         '--distpath', f'{self.cache_dir}/dist',
-                         '--workpath', f'{self.cache_dir}/build'])
-
-
             self.print_and_log('Uploading the compiled programs to the github release...')
+
+            waiting_for_pyinstaller_bundling.set()
+            pyinstaller_done.wait()
+
             self.git_release.upload_asset(path=f'{self.cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
 
             if self.compile_command != None:
+                waiting_for_compile_command.set()
+                compile_command_done.wait()
                 self.git_release.upload_asset(path=f'{self.cache_dir}{self.program_name} [nuitka].zip', content_type='application/zip')
 
 
@@ -398,24 +405,37 @@ class Packer():
         self.log_action(f'Ran command: {" ".join(args)}\nstdout: {result.stdout.decode("utf-8")}\nstderr: {result.stderr.decode("utf-8")}', 'SUBPROCESS')
         return result
 
-    def _Popen(self, cmd: list[str]) -> None:
+    def _Popen(self, cmd: list[str], waiting: Event) -> Event:
         '''
         Runs a subprocess command in the git directory and prints the stdout in real time. Also logs the stdout to the packer log file.
         
         :param cmd: The command and its arguments.
         :type cmd: list[str]
+        :param waiting: An event to signal when to start printing the output.
+        :type waiting: Event
+        :return: An event that is set when the subprocess is done.
+        :rtype: Event
         '''
 
-        process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
+        done = Event()
 
-        hide_cursor()
-        for text in process.stdout:
-            text = text.rstrip('\n')
-            self.log_action(text, 'SUBPROCESS')
-            print_bg_colored_text(text, 255, 192, 203, self.terminal_width)
-        show_cursor()
+        def thread_function(done: Event):
+            process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
 
-        process.wait()
+            hide_cursor()
+            for text in process.stdout:
+                text = text.rstrip('\n')
+                self.log_action(text, 'SUBPROCESS')
+                if waiting.is_set():
+                    print_bg_colored_text(text, 255, 192, 203, self.terminal_width)
+            show_cursor()
+
+            process.wait()
+            done.set()
+
+        Thread(target=thread_function, args=[done], daemon=True).start()
+
+        return done
 
 def main():
     project_directory, all_settings = tui()
