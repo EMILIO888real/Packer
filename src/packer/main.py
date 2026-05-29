@@ -339,7 +339,8 @@ class Packer():
             self.git_repo.git.merge('development')
 
             self.print_and_log('Deleting the old merged branch...')
-            self.git_repo.delete_head('development')
+            self.git_repo.heads['master'].checkout()
+            self.git_repo.git.merge('development')
 
             self.print_and_log('Creating a new branch and switching to it...')
             new_branch = self.git_repo.create_head('development')

@@ -25,6 +25,7 @@
 - Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
 - Removed author from `pyproject.toml` file.
 
+- Git branch deletion, to first switch to the main branch, since it isn't possible to delete the branch currently in use.
 
 ---
 
