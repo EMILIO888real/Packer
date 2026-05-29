@@ -249,7 +249,9 @@ class Packer():
 
 
             self.print_and_log('Staging changes...')
-            self.log_action(f'Entries added: {self.git_repo.index.add(['pyproject.toml', 'requirements.txt', f'src/{self.program_name}/assets/version.json', f'src/{self.program_name}/assets/integrity.json'])}', 'SUBPROCESS')
+            self.log_action(f'Entries added: {self.git_repo.index.add(['pyproject.toml', 'requirements.txt', 'CHANGELOG.md',
+                                                                       f'src/{self.program_name}/assets/version.json',
+                                                                       f'src/{self.program_name}/assets/integrity.json'])}', 'SUBPROCESS')
 
 
             self.print_and_log('Committing changes...')
@@ -299,12 +301,14 @@ class Packer():
 
             self.print_and_log('Uploading the compiled programs to the github release...')
 
+            self.print_and_log('Waiting for pyinstaller to finish...')
             waiting_for_pyinstaller_bundling.set()
             pyinstaller_done.wait()
 
             self.git_release.upload_asset(path=f'{self.cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
 
             if self.compile_command != None:
+                self.print_and_log('Waiting for Nuitka to finish...')
                 waiting_for_compile_command.set()
                 compile_command_done.wait()
                 self.git_release.upload_asset(path=f'{self.cache_dir}{self.program_name} [nuitka].zip', content_type='application/zip')
