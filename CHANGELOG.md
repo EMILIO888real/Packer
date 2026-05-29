@@ -26,6 +26,7 @@
 - Removed author from `pyproject.toml` file.
 
 - Git branch deletion, to first switch to the main branch, since it isn't possible to delete the branch currently in use.
+- Swapped the place of the code responsible for writing `CHANGELOG.md` new version's boilerplate code to happen after the branch, since otherwise git would discard changes.
 
 ---
 

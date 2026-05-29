@@ -325,15 +325,10 @@ class Packer():
             remove(f'{self.data_dir}/chosen description.txt')
             remove(f'{self.data_dir}/chosen version title.txt')
 
-            self.print_and_log('Adding changelog template for next version...')
-
-            with open('CHANGELOG.md', 'w') as f:
-                f.write(f'## [%new_version] - %date\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- \n\n---\n\n{full_changelog}')
-
             self.print_and_log('Writing social media post text to a file...')
-            
             with open(f'{self.data_dir}/social media post.md', 'w') as f:
                 f.write(social_media_post_text)
+
 
             self.print_and_log('Merging development branch...')
             self.git_repo.git.merge('development')
@@ -348,6 +343,11 @@ class Packer():
 
             self.print_and_log('Updating origin...')
             self.git_repo.remotes.origin.push()
+
+
+            self.print_and_log('Adding changelog template for next version...')
+            with open('CHANGELOG.md', 'w') as f:
+                f.write(f'## [%new_version] - %date\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- \n\n---\n\n{full_changelog}')
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
             self.print_and_log(f'Social media post text has been saved to {self.data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(self.log_path.absolute())}')
