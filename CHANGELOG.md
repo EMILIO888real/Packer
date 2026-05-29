@@ -18,6 +18,7 @@
 - `change.py` modules function to only capitalize the First letter and not make the rest of the letter Lower.
 - Code location to have the user related stuff, like prompting more towards the beginning.
 - Bundling and compilation to start running as soon as possible and print it out in an interactive way only when we are waiting on just that, otherwise it's only logged.
+- `Git` add to utilize a whitelist of files to add instead of lazy staging via `git add .`, since it was causing a lot of problems.
 
 ### Fixed
 - Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
