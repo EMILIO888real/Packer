@@ -109,7 +109,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating version.json file...')
     with open(f'{root_dir}/assets/version.json', 'w') as f:
-        f.write('{"major": 0, "minor": 1, "patch": 0}')
+        f.write('{"major": 0, "minor": 0, "patch": 0}')
 
     print_and_log('Creating an integrity file...')
     with open(f'{root_dir}/assets/integrity.json', 'w') as f:
@@ -135,7 +135,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating a pyproject.toml file...')
     with open('pyproject.toml', 'w') as f:
-        f.write(f'[project]\nname = "{program_name}"\nversion = "0.1.0"\ndescription = ""\nreadme = "README.md"\nlicense = "MIT"\ndependencies = []\n\n[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n[tool.setuptools.packages.find]\nwhere = ["src"]  # This tells setuptools to look for packages inside \'src\'\n\n[project.scripts]\n{program_name} = "{program_name}.main:main"')
+        f.write(f'[project]\nname = "{program_name}"\nversion = "0.0.0"\ndescription = ""\nreadme = "README.md"\nlicense = "MIT"\ndependencies = []\n\n[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n[tool.setuptools.packages.find]\nwhere = ["src"]  # This tells setuptools to look for packages inside \'src\'\n\n[project.scripts]\n{program_name} = "{program_name}.main:main"')
 
     print_and_log('Creating CHANGELOG.md...')
     with open('CHANGELOG.md', 'w') as f:
@@ -147,7 +147,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating ROADMAP.md...')
     with open('docs/ROADMAP.md', 'w') as f:
-        f.write('# Roadmap\n\n## Version 0.1.0\n\n- [ ] Initial release\n\n## Version 0.2.0\n\n- [ ] Add new features\n- [ ] Fix bugs\n\n## Version 1.0.0\n\n- [ ] Stable release with all planned features implemented and tested.\n')
+        f.write('# Roadmap\n\n## Version 0.0.0\n\n- [ ] Initial release\n\n## Version 0.2.0\n\n- [ ] Add new features\n- [ ] Fix bugs\n\n## Version 1.0.0\n\n- [ ] Stable release with all planned features implemented and tested.\n')
 
     print_and_log('Creating an MIT license...')
     with open('LICENSE', 'w') as f:

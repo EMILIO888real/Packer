@@ -11,6 +11,7 @@
 - Various print function calls to also log and print it in a colorful way the output.
 - return value and parameters in the `main` function of `setup.py` to allow not creating a Github repo.
 - Added `pyproject.toml` file version identifier automatic updating via the excellent tomlkit module, that will preserve the file's structure.
+- Newly created project version by `setup` to 0.0.0 instead of 0.1.0.
 
 ### Fixed
 - Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
