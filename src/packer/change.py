@@ -23,7 +23,8 @@ def main(root_dir: str = '.', text_editor: str = 'code', modification_type: str 
     run([text_editor, '--wait', temp_path])
 
     with open(temp_path) as f:
-        message = f.read().strip().capitalize()
+        message = f.read().strip()
+        message = f'{message[:1].capitalize()}{message[1:]}'
     remove(temp_path)
 
     if not message.endswith('.'):
