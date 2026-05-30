@@ -10,5 +10,6 @@
 
     "model": "mistral",
     "text editor": "code",
-    "verbose": true
+    "verbose": true,
+    "skip git status": false
 }

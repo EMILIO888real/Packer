@@ -99,7 +99,7 @@ class Packer():
         self.chosen_description_path = Path(f'{self.data_dir}/chosen description.txt')
         self.chosen_title_path = Path(f'{self.data_dir}/chosen version title.txt')
 
-        self.print_and_log = self.print_and_log if settings.verbose else self.log
+        self.print_and_log = self._print_and_log if settings.verbose else self._log
 
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
@@ -397,13 +397,13 @@ class Packer():
             self.git_release.delete_release()
             self.repo.get_git_ref(f"tags/{self.version}").delete()
 
-    def print_and_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+    def _print_and_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
             '''Prints the text and logs it to the packer log file.'''
 
             print_colored_text(text, color)
             self.log_action(text, level)
 
-    def log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+    def _log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
         self.log_action(text, level)
 
     def log_action(self, action: str, level: int = 20):
@@ -469,10 +469,11 @@ def main():
     if Path().cwd() != Path(project_directory):
         print('Changing working directory...')
         chdir(project_directory)
-
-    if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
-        print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
-        exit()
+    
+    if not all_settings.skip_git_status:
+        if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
+            print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
+            exit()
 
     version = read_json(f'{assets_dir}/version.json')
     old_version = version.copy()

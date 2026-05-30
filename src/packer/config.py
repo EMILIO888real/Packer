@@ -45,6 +45,8 @@ class Settings(BaseModel):
     compile_command: Sequence[str] | None = None
 
     text_editor: str = 'code'
+    verbose: bool = True,
+    skip_git_status: bool = False
 
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
 all_settings: dict[Any] | None = None
