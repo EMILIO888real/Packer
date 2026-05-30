@@ -339,17 +339,25 @@ class Packer():
                 self.print_and_log('Deleting the old merged branch...')
                 self.git_repo.git.branch('-D', 'development')
 
+            if 'development' not in self.git_repo.heads:
                 self.print_and_log('Creating a new branch and switching to it...')
-                new_branch = self.git_repo.create_head('development')
-                new_branch.checkout()
+                self.git_repo.create_head('development').checkout()
 
                 self.print_and_log('Updating origin...')
                 self.git_repo.remotes.origin.push()
+            else:
+                self.print_and_log('Switching to existing development branch...')
+                self.git_repo.heads['development'].checkout()
 
 
             self.print_and_log('Adding changelog template for next version...')
             with open('CHANGELOG.md', 'w') as f:
                 f.write(f'## [%new_version] - %date\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- \n\n---\n\n{full_changelog}')
+
+            self.print_and_log('Committing next version preparation and updating origin...')
+            added_items = self.git_repo.index.add(['CHANGELOG.md'])
+            self.git_repo.index.commit(f'Prepared next version development branch by updating: {added_items}')
+            self.git_repo.remotes.origin.push()
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
             self.print_and_log(f'Social media post text has been saved to {self.data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(self.log_path.absolute())}')

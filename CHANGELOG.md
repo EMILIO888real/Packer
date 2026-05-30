@@ -20,6 +20,7 @@
 - Bundling and compilation to start running as soon as possible and print it out in an interactive way only when we are waiting on just that, otherwise it's only logged.
 - `Git` add to utilize a whitelist of files to add instead of lazy staging via `git add .`, since it was causing a lot of problems.
 - Added output to notify when the program is waiting for bundling and or compilation.
+- `Git branch` automation logic to be a bit smarter, to correctly use weird states of the git repository and commit next version code boilerplate and other prep work.
 
 ### Fixed
 - Mistakes in `setup.py` `main` function code parts for creating a new project's `main.py` and `paths.py` to actually use the user provided software name.
