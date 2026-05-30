@@ -1,4 +1,4 @@
-## [%new_version] - %date
+## [0.5.0] - 2026-05-30
 
 ### Added
 - Project script section to the new project created `pyproject.toml` file with a command to run the project's main file's main function after installing with `pip install -e .`.

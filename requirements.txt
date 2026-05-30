@@ -16,7 +16,7 @@ idna==3.13
 iniconfig==2.3.0
 ollama==0.6.2
 packaging==26.2
--e git+https://github.com/EMILIO888real/Packer.git@cbff15b9b26acae532d3f88d68053471a44e7358#egg=packer
+-e git+https://github.com/EMILIO888real/Packer.git@b22042a852a7260e935ba4ea35c1771bf13b08fc#egg=packer
 pathspec==1.1.1
 platformdirs==4.9.6
 pluggy==1.6.0
@@ -34,6 +34,7 @@ requests==2.33.1
 scantree==0.0.4
 setuptools==82.0.1
 smmap==5.0.3
+tomlkit==0.15.0
 typing-inspection==0.4.2
 typing_extensions==4.15.0
 urllib3==2.6.3
