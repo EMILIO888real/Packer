@@ -19,7 +19,7 @@ from git import GitCommandError, Repo
 import tomlkit
 from threading import Thread, Event
 
-from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, log_action as _log_action, create_log_message, simple_prompt
+from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.paths import assets_dir
 from packer.ui.tui import main as tui
 
@@ -91,7 +91,7 @@ class Packer():
         self.after_commands = after_commands
 
         self.terminal_width = get_terminal_size().columns
-        self.last_log_time = datetime.now() # init the logger
+        self.logger = init_logger('packer', 'EMILIO')
         self.log_path = Path(f'{user_log_dir('packer', 'EMILIO', ensure_exists=True)}/{datetime.date(datetime.now())}.log')
         self.data_dir = user_data_dir('packer', 'EMILIO', ensure_exists=True)
         self.cache_dir = user_cache_dir('packer', 'EMILIO', ensure_exists=True)
@@ -251,7 +251,7 @@ class Packer():
             self.print_and_log('Staging changes...')
             self.log_action(f'Entries added: {self.git_repo.index.add(['pyproject.toml', 'requirements.txt', 'CHANGELOG.md',
                                                                        f'src/{self.program_name}/assets/version.json',
-                                                                       f'src/{self.program_name}/assets/integrity.json'])}', 'SUBPROCESS')
+                                                                       f'src/{self.program_name}/assets/integrity.json'])}')
 
 
             self.print_and_log('Committing changes...')
@@ -394,17 +394,22 @@ class Packer():
             self.git_release.delete_release()
             self.repo.get_git_ref(f"tags/{self.version}").delete()
 
-    def print_and_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255]):
+    def print_and_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
             '''Prints the text and logs it to the packer log file.'''
 
             print_colored_text(text, color)
-            self.log_action(text, 'PACKER')
+            self.log_action(text, level)
 
-    def log_action(self, action: str, type: str):
-            '''Logs the action to the packer log file with a timestamp and type.'''
+    def log_action(self, action: str, level: int = 20):
+            '''Logs the action with the provided level
+            
+            :param action: The action to log.
+            :type action: str
+            :param level: Level of urgency 10-50 (DEBUG-CRITICAL)
+            :type level: int
+            '''
 
-            _log_action(create_log_message(action, type, last_log_time=self.last_log_time), self.log_path)
-            self.last_log_time = datetime.now()
+            self.logger.log(level, action)
 
     def _run(self, args: list[str]) -> CompletedProcess:
         '''
@@ -417,7 +422,7 @@ class Packer():
         '''
 
         result = run(args, check=True, capture_output=True)
-        self.log_action(f'Ran command: {" ".join(args)}\nstdout: {result.stdout.decode("utf-8")}\nstderr: {result.stderr.decode("utf-8")}', 'SUBPROCESS')
+        self.log_action(f'Ran command: {" ".join(args)}\nstdout: {result.stdout.decode("utf-8")}\nstderr: {result.stderr.decode("utf-8")}')
         return result
 
     def _Popen(self, cmd: list[str], waiting: Event) -> Event:
@@ -440,7 +445,7 @@ class Packer():
             hide_cursor()
             for text in process.stdout:
                 text = text.rstrip('\n')
-                self.log_action(text, 'SUBPROCESS')
+                self.log_action(text)
                 if waiting.is_set():
                     print_bg_colored_text(text, 255, 192, 203, self.terminal_width)
             show_cursor()
