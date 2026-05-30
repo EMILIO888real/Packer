@@ -4,11 +4,11 @@
     "github repo token": null,
     "program name": null,
     "github repo url": null,
-
-    "model": "mistral",
     "before commands": null,
     "after commands": null,
     "compile command": null,
 
-    "text editor": "code"
+    "model": "mistral",
+    "text editor": "code",
+    "verbose": true
 }

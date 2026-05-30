@@ -1,14 +1,14 @@
 ## [%new_version] - %date
 
 ### Added
-- 
+- settings parameter to Packer that allows more user related settings for controlling Packer behavior, they are optional extra options, by default Packer create's a Settings object with all the mandatory settings to `'None'`, they aren't checked there anyway.
+- Option for verbosity via extra optional settings.
 
 ### Changed
-- 
 - Logging in `Packer` class to utilize the standart new in `et`.
 
 ### Fixed
-- 
+- Packer implemented default UI to check for other settings, like `after_commands` and so on.
 
 ---
 

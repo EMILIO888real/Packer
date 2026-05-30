@@ -22,6 +22,7 @@ from threading import Thread, Event
 from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.paths import assets_dir
 from packer.ui.tui import main as tui
+from packer.config import Settings
 
 def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
@@ -57,8 +58,7 @@ class Packer():
     :type version: dict
     :param old_version: The previous version of the program.
     :type old_version: dict
-    :param GOFILE_USER_TOKEN: The user token for Gofile, used to upload the
-    archive.
+    :param GOFILE_USER_TOKEN: The user token for Gofile, used to upload the archive.
     :type GOFILE_USER_TOKEN: str
     :param FOLDER_ID: The folder id for Gofile, used to upload the archive
     :type FOLDER_ID: str
@@ -77,13 +77,14 @@ class Packer():
     def __init__(self, version: dict, old_version: dict,
                  GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str,
                  program_name: str, github_repo_url: str, compile_command: Sequence[str] = None,
-                 model: str = 'mistral', before_commands: Sequence[Sequence][str] = None, after_commands: Sequence[Sequence][str] = None):
+                 before_commands: Sequence[Sequence][str] = None, after_commands: Sequence[Sequence][str] = None,
+                 settings: Settings | None = Settings(gofile_user_token='None', gofile_folder_id='None', github_repo_token='None', program_name='None', github_repo_url='None')):
         self.version = version
         self.old_version = old_version
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
         self.FOLDER_ID = FOLDER_ID
         self.GITHUB_REPO_TOKEN = GITHUB_REPO_TOKEN
-        self.model = model
+        self.model = settings.model
         self.program_name = program_name
         self.github_repo_url = github_repo_url
         self.compile_command = compile_command
@@ -97,6 +98,8 @@ class Packer():
         self.cache_dir = user_cache_dir('packer', 'EMILIO', ensure_exists=True)
         self.chosen_description_path = Path(f'{self.data_dir}/chosen description.txt')
         self.chosen_title_path = Path(f'{self.data_dir}/chosen version title.txt')
+
+        self.print_and_log = self.print_and_log if settings.verbose else self.log
 
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
@@ -400,6 +403,9 @@ class Packer():
             print_colored_text(text, color)
             self.log_action(text, level)
 
+    def log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+        self.log_action(text, level)
+
     def log_action(self, action: str, level: int = 20):
             '''Logs the action with the provided level
             
@@ -487,7 +493,9 @@ def main():
     try:
         packer = Packer(version, old_version,
                         all_settings.gofile_user_token, all_settings.gofile_folder_id, all_settings.github_repo_token,
-                        all_settings.program_name, all_settings.github_repo_url, all_settings.compile_command, all_settings.model)
+                        all_settings.program_name, all_settings.github_repo_url,
+                        all_settings.compile_command, all_settings.after_commands, all_settings.after_commands,
+                        all_settings)
         packer.run()
     except KeyboardInterrupt:
         packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
