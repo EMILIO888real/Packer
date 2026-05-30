@@ -329,20 +329,22 @@ class Packer():
             with open(f'{self.data_dir}/social media post.md', 'w') as f:
                 f.write(social_media_post_text)
 
+            if self.git_repo.active_branch.name == 'development':
+                self.print_and_log('Switching to master branch...')
+                self.git_repo.heads['master'].checkout()
 
-            self.print_and_log('Merging development branch...')
-            self.git_repo.git.merge('development', '-X', 'theirs')
+                self.print_and_log('Merging development branch...')
+                self.git_repo.git.merge('development', '-X', 'theirs')
 
-            self.print_and_log('Deleting the old merged branch...')
-            self.git_repo.heads['master'].checkout()
-            self.git_repo.git.merge('development')
+                self.print_and_log('Deleting the old merged branch...')
+                self.git_repo.git.branch('-D', 'development')
 
-            self.print_and_log('Creating a new branch and switching to it...')
-            new_branch = self.git_repo.create_head('development')
-            new_branch.checkout()
+                self.print_and_log('Creating a new branch and switching to it...')
+                new_branch = self.git_repo.create_head('development')
+                new_branch.checkout()
 
-            self.print_and_log('Updating origin...')
-            self.git_repo.remotes.origin.push()
+                self.print_and_log('Updating origin...')
+                self.git_repo.remotes.origin.push()
 
 
             self.print_and_log('Adding changelog template for next version...')

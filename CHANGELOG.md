@@ -28,6 +28,7 @@
 - Git branch deletion, to first switch to the main branch, since it isn't possible to delete the branch currently in use.
 - Swapped the place of the code responsible for writing `CHANGELOG.md` new version's boilerplate code to happen after the branch, since otherwise git would discard changes.
 - Merging logic to just always prefer "theirs" changes or the development branches version in case of conflict.
+- `Git branch` logic and also changed it to run when it's needed, when you are on the development branch, otherwise skip it.
 
 ---
 
