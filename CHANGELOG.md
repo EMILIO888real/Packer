@@ -1,3 +1,16 @@
+## [%new_version] - %date
+
+### Added
+- 
+
+### Changed
+- 
+
+### Fixed
+- 
+
+---
+
 ## [0.5.0] - 2026-05-30
 
 ### Added
