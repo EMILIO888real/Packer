@@ -1,4 +1,4 @@
-## [%new_version] - %date
+## [0.6.0] - 2026-06-01
 
 ### Added
 - settings parameter to Packer that allows more user related settings for controlling Packer behavior, they are optional extra options, by default Packer create's a Settings object with all the mandatory settings to `'None'`, they aren't checked there anyway.
@@ -14,6 +14,7 @@
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.
 - A mistake in the `verbose` setting.
 - Mistake in how the save files were handled in case of missing it, bound to have more error, since it is such a big architectural change.
+- Another oversight regarding settings initialization for Packer, since now user interaction isn't necessary.
 
 ---
 

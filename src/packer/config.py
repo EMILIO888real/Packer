@@ -46,11 +46,11 @@ class Project(BaseModel):
 class Settings(BaseModel):
     model: str = 'mistral'
     text_editor: str = 'code'
-    verbose: bool = True,
+    verbose: bool = True
     skip_git_status: bool = False
 
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
-all_settings: dict[str: Any] = Settings(**normalize_settings_keys(simple_merge_settings(user_settings, default_settings, default_config)))
+all_settings: Settings = Settings(**normalize_settings_keys(simple_merge_settings(user_settings, default_settings, default_config)))
 
 projects_configurations: dict[str: dict[str: Any]]
 if Path(f'{config_dir}/projects.json').exists():

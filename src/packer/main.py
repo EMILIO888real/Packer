@@ -76,14 +76,13 @@ class Packer():
     def __init__(self, version: dict, old_version: dict,
                  GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str,
                  program_name: str, github_repo_url: str, compile_command: Sequence[str] = None,
-                 before_commands: Sequence[Sequence][str] = None, after_commands: Sequence[Sequence][str] = None,
-                 settings: Settings | None = Settings(gofile_user_token='None', gofile_folder_id='None', github_repo_token='None', program_name='None', github_repo_url='None')):
+                 before_commands: Sequence[Sequence][str] = None, after_commands: Sequence[Sequence][str] = None):
         self.version = version
         self.old_version = old_version
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
         self.FOLDER_ID = FOLDER_ID
         self.GITHUB_REPO_TOKEN = GITHUB_REPO_TOKEN
-        self.model = settings.model
+        self.model = all_settings.model
         self.program_name = program_name
         self.github_repo_url = github_repo_url
         self.compile_command = compile_command
@@ -100,7 +99,7 @@ class Packer():
 
         self.assets_dir = f'./src/{program_name}/assets'
 
-        self.print_and_log = self._print_and_log if settings.verbose else self._log
+        self.print_and_log = self._print_and_log if all_settings.verbose else self._log
 
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
@@ -496,8 +495,7 @@ def main():
         packer = Packer(version, old_version,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
                         project_configuration.program_name, project_configuration.github_repo_url,
-                        project_configuration.compile_command, project_configuration.after_commands, project_configuration.after_commands,
-                        project_configuration)
+                        project_configuration.compile_command, project_configuration.after_commands, project_configuration.after_commands)
         packer.run()
     except KeyboardInterrupt:
         packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
