@@ -8,6 +8,7 @@
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
 - `capitalize` function in `et` to just capitalize the letter and not lower the rest of the characters.
+- The entire save file architecture to use 2 setting files now instead of a single. One for saving project related settings, metadata, while the other saving Packer across all project, user settings.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.

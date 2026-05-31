@@ -29,43 +29,32 @@ from pathlib import Path
 from typing import Any, Sequence
 from pydantic import BaseModel
 from packer.paths import assets_dir, config_dir
-from packer.utils import load_config, normalize_settings_keys
-from packer.utils import simple_merge_settings
+from packer.utils import load_config, normalize_settings_keys, simple_merge_settings
+import json
 
-class Settings(BaseModel):
+class Project(BaseModel):
     gofile_user_token: str
     gofile_folder_id: str
     github_repo_token: str
     program_name: str
     github_repo_url: str
 
-    model: str = 'mistral'
     before_commands: Sequence[Sequence[str]] | None = None
     after_commands: Sequence[Sequence[str]] | None = None
     compile_command: Sequence[str] | None = None
 
+class Settings(BaseModel):
+    model: str = 'mistral'
     text_editor: str = 'code'
     verbose: bool = True,
     skip_git_status: bool = False
 
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
-all_settings: dict[Any] | None = None
+all_settings: dict[str: Any] = Settings(**normalize_settings_keys(simple_merge_settings(user_settings, default_settings, default_config)))
 
-def load(project: str | Path) -> Settings:
-    '''
-    Load and merge configuration settings for a project.
-
-    This function loads the user settings, default settings, and default configuration
-    for a given project, then merges them together to create a complete settings object.
-
-    :param project: The project path or name to load settings for
-    :type project: str | Path
-    :return: A Settings object containing the merged configuration
-    :rtype: Settings
-    '''
-
-    global all_settings
-
-    all_settings = Settings(**normalize_settings_keys(simple_merge_settings(user_settings[str(Path(project).absolute())], default_settings, default_config)))
-
-    return all_settings
+projects_configurations: dict[str: dict[str: Any]]
+if Path(f'{config_dir}/projects.json').exists():
+    with open(f'{config_dir}/projects.json') as f:
+        projects_configurations = json.load(f)
+else:
+    projects_configurations = None

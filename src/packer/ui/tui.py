@@ -11,7 +11,8 @@ from importlib import import_module
 from packer.setup import main as setup
 from packer.paths import config_dir
 from packer.custom_modules.et import capitalize, stripped_input, create_go_file_folder, simple_prompt
-from packer.config import load, user_settings, Settings
+from packer.config import Project, projects_configurations, Settings
+from packer.utils import normalize_settings_keys
 
 def user_input(text: str, index: int = 3) -> str:
     '''
@@ -33,8 +34,8 @@ def main() -> tuple[str, Settings]:
     :rtype: tuple
     '''
 
-    if user_settings is not None:
-        projects = {str(Path(project_directory).name): project_directory for project_directory in user_settings.keys()}
+    if projects_configurations is not None:
+        projects = {str(Path(project_directory).name): project_directory for project_directory in projects_configurations.keys()}
         project_names = list(projects.keys())
         print('Choose a project:')
         for i in range(len(project_names)):
@@ -54,10 +55,7 @@ def main() -> tuple[str, Settings]:
 
     if project_directory == None:
 
-        required_settings = ['github repo token']
-        MANUAL_INPUT_SETTINGS = 6
-
-        print(f'Creating a new project profile!\nYou will need to set up some required settings[{len(required_settings) + MANUAL_INPUT_SETTINGS}] before we begin.')
+        print(f'Creating a new project profile!\nYou will need to set up some required settings[7] before we begin.')
         program_name = input('1. Program name: ')
 
         try:
@@ -88,50 +86,36 @@ def main() -> tuple[str, Settings]:
 
         print('Starting setup...')
         github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url)
-        print('Setup complete. Continuing with configuration.')
+        print('Setup complete. Continuing with configuration...')
 
-        gofile_user_token = getpass('3. gofile user token: ')
+        gofile_user_token = getpass('3. Gofile user token: ')
 
-        gofile_folder_id_input = getpass('4. gofile folder id (leave empty to create a folder): ')
+        gofile_folder_id_input = getpass('4. Gofile folder id (leave empty to create a folder): ')
         if gofile_folder_id_input == '':
-            gofile_folder_id = create_go_file_folder(stripped_input('name of the folder: '), gofile_user_token)['data']['id']
+            gofile_folder_id = create_go_file_folder(input('name of the folder: '), gofile_user_token)['data']['id']
         else:
             gofile_folder_id = gofile_folder_id_input
 
-
+        print('Now go over to Github and create a PAT and enter it below.')
         new_project_settings = {
             project_directory: {
+                'github repo token': getpass('5. Github repo token: '),
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
-                'github repo url': user_input('5. github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
-                'program name': user_input('6. program name: ') if 'program_name' not in locals() else program_name
+                'github repo url': input('6. Github repo url (username/repo): ') if 'github_repo_url' not in locals() else github_repo_url,
+                'program name': input('7. Program name: ') if 'program_name' not in locals() else program_name
                 }
             }
-        
-        for i in range(len(required_settings)):
-            setting = required_settings[i]
-            new_project_settings[project_directory][setting] = user_input(f'{i + MANUAL_INPUT_SETTINGS + 1}. {setting}: ')
 
-        if simple_prompt('Would you like to edit optional settings', 'n'):
-            optional_settings = ['model']
-            optional_settings_count = len(optional_settings)
-
-            print(f'There are {optional_settings_count} optional settings.')
-
-            for i in range(optional_settings_count):
-                setting = optional_settings[i]
-                user_answer = user_input(f'{i}. {setting}: ')
-                if user_answer != '':
-                    new_project_settings[project_directory][setting] = user_answer
-
+        if simple_prompt(f'Would you like to edit optional settings[1]', 'n'):
             compile_command_input = stripped_input('nuitka compile command [None]: ')
-
             if compile_command_input != '':
                 new_project_settings[project_directory]['compile command'] = compile_command_input.split(' ')
 
-        with open(f'{config_dir}/settings.json', 'w') as f:
+        with open(f'{config_dir}/projects.json', 'w') as f:
             dump(new_project_settings, f, indent=4)
 
-        print(f'Settings saved at: {config_dir}/settings.json! You can change them later by editing the file or deleting it to go through the setup again.')
+        print(f'Project configuration saved at: {config_dir}/projects.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
-    return (project_directory, load(project_directory))
+    
+    return (project_directory, Project(**normalize_settings_keys(new_project_settings[project_directory])) if projects_configurations is None else projects_configurations[project_directory])

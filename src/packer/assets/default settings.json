@@ -1,13 +1,4 @@
 {
-    "gofile user token": null,
-    "gofile folder id": null,
-    "github repo token": null,
-    "program name": null,
-    "github repo url": null,
-    "before commands": null,
-    "after commands": null,
-    "compile command": null,
-
     "model": "mistral",
     "text editor": "code",
     "verbose": true,

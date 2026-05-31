@@ -20,9 +20,8 @@ import tomlkit
 from threading import Thread, Event
 
 from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
-from packer.paths import assets_dir
 from packer.ui.tui import main as tui
-from packer.config import Settings
+from packer.config import Settings, all_settings
 
 def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
@@ -99,6 +98,8 @@ class Packer():
         self.chosen_description_path = Path(f'{self.data_dir}/chosen description.txt')
         self.chosen_title_path = Path(f'{self.data_dir}/chosen version title.txt')
 
+        self.assets_dir = f'./src/{program_name}/assets'
+
         self.print_and_log = self._print_and_log if settings.verbose else self._log
 
     def run(self):
@@ -110,7 +111,7 @@ class Packer():
 
 
         self.print_and_log('Updating version...')
-        with open(f'{assets_dir}/version.json', 'w') as f:
+        with open(f'{self.assets_dir}/version.json', 'w') as f:
             dump(self.version, f, indent=4)
         self.version = f'{self.version['major']}.{self.version['minor']}.{self.version['patch']}' # Not using a text variable to rewrite this one 
 
@@ -198,7 +199,7 @@ class Packer():
             remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
 
 
-        old_integrity = read_json(f'{assets_dir}/integrity.json')
+        old_integrity = read_json(f'{self.assets_dir}/integrity.json')
 
         self.print_and_log('Generating the integrity file...')
 
@@ -208,7 +209,7 @@ class Packer():
         exclusions.append('.git')
 
         new_cwd = tree(Path().cwd(), exclusions)
-        with open(f'{assets_dir}/integrity.json', 'w') as f:
+        with open(f'{self.assets_dir}/integrity.json', 'w') as f:
             dump({'CWD': new_cwd}, f)
 
 
@@ -464,7 +465,7 @@ class Packer():
         return done
 
 def main():
-    project_directory, all_settings = tui()
+    project_directory, project_configuration = tui()
 
     if Path().cwd() != Path(project_directory):
         print('Changing working directory...')
@@ -475,7 +476,7 @@ def main():
             print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
             exit()
 
-    version = read_json(f'{assets_dir}/version.json')
+    version = read_json(f'{project_directory}/src/{project_configuration.program_name}/assets/version.json')
     old_version = version.copy()
     input_version = stripped_input('New version(M, m, P): ')
     match input_version:
@@ -493,10 +494,10 @@ def main():
             exit()
     try:
         packer = Packer(version, old_version,
-                        all_settings.gofile_user_token, all_settings.gofile_folder_id, all_settings.github_repo_token,
-                        all_settings.program_name, all_settings.github_repo_url,
-                        all_settings.compile_command, all_settings.after_commands, all_settings.after_commands,
-                        all_settings)
+                        project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
+                        project_configuration.program_name, project_configuration.github_repo_url,
+                        project_configuration.compile_command, project_configuration.after_commands, project_configuration.after_commands,
+                        project_configuration)
         packer.run()
     except KeyboardInterrupt:
         packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
