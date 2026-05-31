@@ -7,6 +7,7 @@
 
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
+- `capitalize` function in `et` to just capitalize the letter and not lower the rest of the characters.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.

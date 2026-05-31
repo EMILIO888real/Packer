@@ -1534,7 +1534,7 @@ def capitalize(text: str, index: int = 3) -> str:
     :rtype: str
     '''
 
-    return f'{text[:index]}{text[index:].capitalize()}'
+    return f'{text[:index]}{text[index:index + 1].upper()}{text[index + 1:]}'
 
 def stripped_input(prompt: object) -> str:
     '''
