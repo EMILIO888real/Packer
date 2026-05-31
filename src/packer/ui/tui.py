@@ -118,4 +118,4 @@ def main() -> tuple[str, Settings]:
         print(f'Project configuration saved at: {config_dir}/projects.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
     
-    return (project_directory, Project(**normalize_settings_keys(new_project_settings[project_directory])) if projects_configurations is None else projects_configurations[project_directory])
+    return (project_directory, Project(**normalize_settings_keys(new_project_settings[project_directory] if projects_configurations is None else projects_configurations[project_directory])))

@@ -13,6 +13,7 @@
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.
 - A mistake in the `verbose` setting.
+- Mistake in how the save files were handled in case of missing it, bound to have more error, since it is such a big architectural change.
 
 ---
 
