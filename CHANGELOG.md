@@ -1,14 +1,16 @@
-## [0.6.0] - 2026-06-01
+## [%new_version] - %date
 
 ### Added
 - settings parameter to Packer that allows more user related settings for controlling Packer behavior, they are optional extra options, by default Packer create's a Settings object with all the mandatory settings to `'None'`, they aren't checked there anyway.
 - Option for verbosity via extra optional settings.
 - Skip git status setting for skipping the safety check for a clean git directory, mostly for development purposes.
+- Automatically suggest an author name, based on the logged in user name.
 
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
 - `capitalize` function in `et` to just capitalize the letter and not lower the rest of the characters.
 - The entire save file architecture to use 2 setting files now instead of a single. One for saving project related settings, metadata, while the other saving Packer across all project, user settings.
+- Removed `user_input` function, since it was buns.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.

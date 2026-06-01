@@ -10,21 +10,9 @@ from importlib import import_module
 
 from packer.setup import main as setup
 from packer.paths import config_dir
-from packer.custom_modules.et import capitalize, stripped_input, create_go_file_folder, simple_prompt
+from packer.custom_modules.et import stripped_input, create_go_file_folder, simple_prompt
 from packer.config import Project, projects_configurations, Settings
 from packer.utils import normalize_settings_keys
-
-def user_input(text: str, index: int = 3) -> str:
-    '''
-    strips user input and capitalizes input.
-
-    :param text: The text to be displayed and the user will input.
-    :type text: str
-    :return: The user's response.
-    :rtype: str
-    '''
-
-    return stripped_input(capitalize(text, index))
 
 def main() -> tuple[str, Settings]:
     '''
@@ -71,7 +59,7 @@ def main() -> tuple[str, Settings]:
 
         default_project_dir = f'{user_documents_dir()}/{program_name}'
 
-        project_directory = user_input(f'2. project directory (absolute path, default to: {default_project_dir}): ')
+        project_directory = input(f'2. Project directory (absolute path, default to: {default_project_dir}): ')
         if project_directory == '':
             project_directory = default_project_dir
 
@@ -85,7 +73,13 @@ def main() -> tuple[str, Settings]:
             github_repo_url = stripped_input('Github repo url (username/repo): ')
 
         print('Starting setup...')
-        github_repo_url = setup(project_directory, input('Author name of the program: '), program_name, github_pat, github_repo_url)
+        default_name = getuser()
+
+        author_name = input(f'Author name of the program [default to: {default_name}]: ')
+        if author_name == '':
+            author_name = default_name
+
+        github_repo_url = setup(project_directory, author_name, program_name, github_pat, github_repo_url)
         print('Setup complete. Continuing with configuration...')
 
         gofile_user_token = getpass('3. Gofile user token: ')

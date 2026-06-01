@@ -21,7 +21,7 @@ from threading import Thread, Event
 
 from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.ui.tui import main as tui
-from packer.config import Settings, all_settings
+from packer.config import all_settings
 
 def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
