@@ -1,6 +1,7 @@
 from os import remove
 from subprocess import run
 from tempfile import NamedTemporaryFile
+from packer.config import all_settings
 
 def main(root_dir: str = '.', text_editor: str = 'code', modification_type: str = 'a'):
     '''
@@ -55,4 +56,4 @@ def main(root_dir: str = '.', text_editor: str = 'code', modification_type: str 
     run(['git', 'push'])
 
 if __name__ == '__main__':
-    main(modification_type=input('Enter the modification type [a, c, f] '))
+    main(text_editor=all_settings.text_editor, modification_type=input('Enter the modification type [a, c, f] '))

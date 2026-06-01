@@ -5,6 +5,7 @@
 - Option for verbosity via extra optional settings.
 - Skip git status setting for skipping the safety check for a clean git directory, mostly for development purposes.
 - Automatically suggest an author name, based on the logged in user name.
+- Text editor choice to use the user settings if you launch `main` from `change.py`, instead of importing it.
 
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
