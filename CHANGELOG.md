@@ -7,12 +7,14 @@
 - Automatically suggest an author name, based on the logged in user name.
 - Text editor choice to use the user settings if you launch `main` from `change.py`, instead of importing it.
 - Optional way to edit the AI generated version description and or version title via the user's preferred text editor.
+- The option to set your own version description prompts and or version title prompts for each of your projects.
 
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
 - `capitalize` function in `et` to just capitalize the letter and not lower the rest of the characters.
 - The entire save file architecture to use 2 setting files now instead of a single. One for saving project related settings, metadata, while the other saving Packer across all project, user settings.
 - Removed `user_input` function, since it was buns.
+- Packer classes default parameter values to use the `Project` classes default generated fields.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.

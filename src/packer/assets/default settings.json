@@ -1,5 +1,4 @@
 {
-    "model": "mistral",
     "text editor": "code",
     "verbose": true,
     "skip git status": false

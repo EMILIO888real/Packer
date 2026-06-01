@@ -42,9 +42,17 @@ class Project(BaseModel):
     before_commands: Sequence[Sequence[str]] | None = None
     after_commands: Sequence[Sequence[str]] | None = None
     compile_command: Sequence[str] | None = None
+    model: str = 'mistral'
+    description_prompt: list[dict[str, str]] = [
+        {'role': 'system', 'content': 'You are a senior developer writing professional release notes. Summarize the following changelog into one short sentence. Focus strictly on the high-level impact (e.g., \'This release introduces a new TUI and streamlines Windows builds.\') rather than listing individual functions or fixes. Use professional, active language. Output ONLY the summary text, no markdown block syntax, no intros, and no explanations.'},
+        {'role': 'user', 'content': f'Summarize the following changelog into exactly one concise sentence. Group related technical changes (e.g., UI, Build Automation, Refactoring). Do not use bullet points. Do not mention specific function names unless they are major features. Ensure the tone is professional.\n\nChangelog:\n%latest_changelog'}
+    ]
+    title_prompt: list[dict[str, str]] = [
+        {'role': 'system', 'content': 'You are a cryptic oracle. Your answer must be exactly 2 or 3 words. No quotes, no punctuation, no preamble.'},
+        {'role': 'user', 'content': f'Create a mystical, indirect puzzle title for this update. Do not include version numbers.\n\nChangelog:%latest_changelog\n'}
+    ]
 
 class Settings(BaseModel):
-    model: str = 'mistral'
     text_editor: str = 'code'
     verbose: bool = True
     skip_git_status: bool = False
@@ -52,7 +60,7 @@ class Settings(BaseModel):
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
 all_settings: Settings = Settings(**normalize_settings_keys(simple_merge_settings(user_settings, default_settings, default_config)))
 
-projects_configurations: dict[str: dict[str: Any]]
+projects_configurations: dict[str, dict[str, Any]]
 if Path(f'{config_dir}/projects.json').exists():
     with open(f'{config_dir}/projects.json') as f:
         projects_configurations = json.load(f)

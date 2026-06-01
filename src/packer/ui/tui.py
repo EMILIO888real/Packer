@@ -11,10 +11,10 @@ from importlib import import_module
 from packer.setup import main as setup
 from packer.paths import config_dir
 from packer.custom_modules.et import stripped_input, create_go_file_folder, simple_prompt
-from packer.config import Project, projects_configurations, Settings
+from packer.config import Project, projects_configurations
 from packer.utils import normalize_settings_keys
 
-def main() -> tuple[str, Settings]:
+def main() -> tuple[str, Project]:
     '''
     Main function for the TUI. This script handles user input and performs various tasks based on the input. It includes options to create a new Go file or folder, setup configurations, manage assets, and interact with custom modules. The function also provides interactive prompts for user inputs and processes these inputs accordingly.
 

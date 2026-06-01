@@ -21,7 +21,7 @@ from threading import Thread, Event
 
 from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.ui.tui import main as tui
-from packer.config import all_settings
+from packer.config import all_settings, Project
 
 def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
@@ -74,20 +74,24 @@ class Packer():
     '''
 
     def __init__(self, version: dict, old_version: dict,
-                 GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str,
-                 program_name: str, github_repo_url: str, compile_command: Sequence[str] = None,
-                 before_commands: Sequence[Sequence][str] = None, after_commands: Sequence[Sequence][str] = None):
+                 GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str, program_name: str, github_repo_url: str,
+                 compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
+                 before_commands: Sequence[Sequence][str] = Project.model_fields['before_commands'].default, after_commands: Sequence[Sequence][str] = Project.model_fields['after_commands'].default,
+                 model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default
+                ):
         self.version = version
         self.old_version = old_version
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
         self.FOLDER_ID = FOLDER_ID
         self.GITHUB_REPO_TOKEN = GITHUB_REPO_TOKEN
-        self.model = all_settings.model
+        self.model = model
         self.program_name = program_name
         self.github_repo_url = github_repo_url
         self.compile_command = compile_command
         self.before_commands = before_commands
         self.after_commands = after_commands
+        self.description_prompt = description_prompt
+        self.title_prompt = title_prompt
 
         self.terminal_width = get_terminal_size().columns
         self.logger = init_logger('packer', 'EMILIO')
@@ -137,12 +141,9 @@ class Packer():
             with open(self.chosen_description_path) as f:
                 description = f.read()
 
+        self.description_prompt[1]['content'] = self.description_prompt[1]['content'].replace('%latest_changelog', latest_changelog)
         while generate_description:
-            description = chat(self.model,
-                               [
-                                    {'role': 'system', 'content': 'You are a senior developer writing professional release notes. Summarize the following changelog into one short sentence. Focus strictly on the high-level impact (e.g., \'This release introduces a new TUI and streamlines Windows builds.\') rather than listing individual functions or fixes. Use professional, active language. Output ONLY the summary text, no markdown block syntax, no intros, and no explanations.'},
-                                    {'role': 'user', 'content': f'Summarize the following changelog into exactly one concise sentence. Group related technical changes (e.g., UI, Build Automation, Refactoring). Do not use bullet points. Do not mention specific function names unless they are major features. Ensure the tone is professional.\n\nChangelog:\n{latest_changelog}'}
-                                ])['message']['content'].strip()
+            description = chat(self.model, self.description_prompt)['message']['content'].strip()
             self.print_and_log(description)
             generate_description = not simple_prompt('Is the description all good', 'n')
         
@@ -161,12 +162,9 @@ class Packer():
             with open(self.chosen_title_path) as f:
                 version_title = f.read()
 
+        self.title_prompt[1]['content'] = self.title_prompt[1]['content'].replace('%latest_changelog', latest_changelog)
         while generate_title:
-            version_title = chat(self.model,
-                                 [
-                                     {'role': 'system', 'content': 'You are a cryptic oracle. Your answer must be exactly 2 or 3 words. No quotes, no punctuation, no preamble.'},
-                                     {'role': 'user', 'content': f'Create a mystical, indirect puzzle title for this update. Do not include version numbers.\n\nChangelog:\n{latest_changelog}'}
-                                 ],
+            version_title = chat(self.model, self.title_prompt,
                                  options={'temperature': 0.8, 'num_predict': 10})['message']['content'].strip().replace('"', '').replace("'", "")
             self.print_and_log(version_title)
             generate_title = not simple_prompt('Is the Version title all good', 'n')
@@ -502,7 +500,8 @@ def main():
         packer = Packer(version, old_version,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
                         project_configuration.program_name, project_configuration.github_repo_url,
-                        project_configuration.compile_command, project_configuration.after_commands, project_configuration.after_commands)
+                        project_configuration.compile_command, project_configuration.after_commands, project_configuration.after_commands, 
+                        project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)
         packer.run()
     except KeyboardInterrupt:
         packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
