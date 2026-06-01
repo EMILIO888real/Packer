@@ -148,6 +148,10 @@ class Packer():
         
         with open(self.chosen_description_path, 'w') as f:
             f.write(description)
+        self._run([all_settings.text_editor, '--wait', self.chosen_description_path])
+        with open(self.chosen_description_path) as f:
+            description = f.read()
+
 
         self.print_and_log('Generating a version title...')
 
@@ -169,6 +173,9 @@ class Packer():
     
         with open(self.chosen_title_path, 'w') as f:
             f.write(version_title)
+        self._run([all_settings.text_editor, '--wait', self.chosen_title_path])
+        with open(self.chosen_title_path) as f:
+            version_title = f.read()
 
 
         self.print_and_log('Creating requirements.txt...')
