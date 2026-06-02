@@ -8,6 +8,7 @@
 - Text editor choice to use the user settings if you launch `main` from `change.py`, instead of importing it.
 - Optional way to edit the AI generated version description and or version title via the user's preferred text editor.
 - The option to set your own version description prompts and or version title prompts for each of your projects.
+- The option to run this project without any AI models, by providing `None` value instead of prompts to the constructor.
 
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
@@ -15,6 +16,8 @@
 - The entire save file architecture to use 2 setting files now instead of a single. One for saving project related settings, metadata, while the other saving Packer across all project, user settings.
 - Removed `user_input` function, since it was buns.
 - Packer classes default parameter values to use the `Project` classes default generated fields.
+- Text for the files that open in the text editor, so it's simpler and more obvious what the user should do.
+- Logic to handle differentiating between user and system prompts, assuming user uses only 2 role: user and role: system.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.
