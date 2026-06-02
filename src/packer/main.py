@@ -506,7 +506,7 @@ def main():
         packer = Packer(version, old_version,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
                         project_configuration.program_name, project_configuration.github_repo_url,
-                        project_configuration.compile_command, project_configuration.after_commands, project_configuration.after_commands, 
+                        project_configuration.compile_command, project_configuration.before_commands, project_configuration.after_commands, 
                         project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)
         packer.run()
     except KeyboardInterrupt:

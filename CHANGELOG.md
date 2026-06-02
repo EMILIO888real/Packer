@@ -9,6 +9,9 @@
 - Optional way to edit the AI generated version description and or version title via the user's preferred text editor.
 - The option to set your own version description prompts and or version title prompts for each of your projects.
 - The option to run this project without any AI models, by providing `None` value instead of prompts to the constructor.
+- Some helper functions to simplify `tui.py`: `check_module_conflict` and `print_list`.
+- A helper function for prompting optional settings: `prompt_optional_setting` to reduce code complexity.
+- All optional setting setting in the `TUI`, except for AI prompts.
 
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
@@ -18,6 +21,7 @@
 - Packer classes default parameter values to use the `Project` classes default generated fields.
 - Text for the files that open in the text editor, so it's simpler and more obvious what the user should do.
 - Logic to handle differentiating between user and system prompts, assuming user uses only 2 role: user and role: system.
+- Cleaned up `tui.py` main function to handle everything much easier.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.
