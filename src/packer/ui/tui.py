@@ -107,6 +107,11 @@ def main() -> tuple[str, Project]:
         if project_directory == '':
             project_directory = default_project_dir
 
+        if Path(project_directory).exists():
+            if not simple_prompt('Directory already exists, overwrite it', 'n'):
+                print('Aborting setup')
+                return
+
         project_directory.rstrip('/')
 
 

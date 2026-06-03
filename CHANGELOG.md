@@ -25,6 +25,7 @@
 - Cleaned up `tui.py` main function to handle everything much easier.
 - All IO interactions with the script, not the file system have been cleaned up a bit more by splitting them into more functions for simplicity.
 - All inputs to utilize queues if they are provided.
+- `setup` to not have any UI inputs, the only one there that was has been changed to a parameter for the `main` function.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.

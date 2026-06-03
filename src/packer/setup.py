@@ -10,7 +10,7 @@ from github import Auth, Github
 from multiprocessing import Process, Event
 from sys import exit, platform
 
-from packer.custom_modules.et import init_logger, print_colored_text, tree, read_json, format_version_text, prompt_user
+from packer.custom_modules.et import init_logger, print_colored_text, tree, read_json, format_version_text
 from packer.paths import assets_dir
 
 logger = init_logger('packer setup', 'EMILIO')
@@ -26,7 +26,7 @@ def create_venv(created_venv) -> None:
     run(['python', '-m', 'venv', '.venv'])
     created_venv.set()
 
-def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None) -> str:
+def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, overwrite_existing: bool = False) -> str:
     '''Sets up a new project with the following structure:
     ```
     project_directory/
@@ -62,6 +62,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :type github_pat: str, optional
     :param github_repo_url: The URL of the GitHub repository in the format "username/repo". If not provided, the repository will be created with the same name as the program. This parameter is only used if github_pat is provided.
     :type github_repo_url: str, optional
+    :param overwrite_existing: Overwrite the existing folder if it exists, defaults to False.
+    :type overwrite_existing: bool, optional
     :return: The URL of the created GitHub repository.
     :rtype: str
     '''
@@ -70,7 +72,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     root_dir = f'src/{program_name}'
 
     if Path(project_directory).exists():
-        if prompt_user(f'The directory "{project_directory}" already exists. Do you want to delete it and create a new one'):
+        if overwrite_existing:
             print_and_log('Deleting existing directory...')
             rmtree(project_directory)
         else:
