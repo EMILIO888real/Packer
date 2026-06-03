@@ -3,6 +3,7 @@ This module contains the code for the packer, which is a script that creates an 
 '''
 
 from datetime import datetime
+from multiprocessing import Queue
 from shutil import get_terminal_size, rmtree, make_archive
 from pathlib import Path
 from os import remove, chdir
@@ -10,7 +11,7 @@ from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from sys import executable, platform, exit
 from time import sleep
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
 from platformdirs import user_log_dir, user_data_dir, user_cache_dir
@@ -19,7 +20,7 @@ from git import GitCommandError, Repo
 import tomlkit
 from threading import Thread, Event
 
-from packer.custom_modules.et import hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
+from packer.custom_modules.et import bool_answer, hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.ui.tui import main as tui
 from packer.config import all_settings, Project
 
@@ -75,10 +76,13 @@ class Packer():
 
     def __init__(self, version: dict, old_version: dict,
                  GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str, program_name: str, github_repo_url: str,
+                 input_queue: Queue = None, output_queue: Queue = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: Sequence[Sequence][str] = Project.model_fields['before_commands'].default, after_commands: Sequence[Sequence][str] = Project.model_fields['after_commands'].default,
                  model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default
                 ):
+        self.input_queue = input_queue
+        self.output_queue = output_queue
         self.version = version
         self.old_version = old_version
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
@@ -103,7 +107,8 @@ class Packer():
 
         self.assets_dir = f'./src/{program_name}/assets'
 
-        self.print_and_log = self._print_and_log if all_settings.verbose else self._log
+        self.print_and_log = self._print_and_log if all_settings.verbose else self._just_log
+        self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
 
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
@@ -136,7 +141,7 @@ class Packer():
         self.print_and_log('Generating a version description...')
 
         generate_description = True
-        if self.chosen_description_path.exists() and simple_prompt('Use the previously generated version description'):
+        if self.chosen_description_path.exists() and self.prompt_user('Use the previously generated version description'):
             generate_description = False
             with open(self.chosen_description_path) as f:
                 description = f.read()
@@ -146,7 +151,7 @@ class Packer():
             while generate_description:
                 description = chat(self.model, self.description_prompt)['message']['content'].strip()
                 self.print_and_log(description)
-                generate_description = not simple_prompt('Is the description all good', 'n')
+                generate_description = not self.prompt_user('Is the description all good', 'n')
         else:
             description = 'Write your version description in this file. (press ctrl+a and then start writing your description. After you have written it, save it and close the editor)'
         
@@ -160,7 +165,7 @@ class Packer():
         self.print_and_log('Generating a version title...')
 
         generate_title = True
-        if self.chosen_title_path.exists() and simple_prompt('Use the previously generated version title'):
+        if self.chosen_title_path.exists() and self.prompt_user('Use the previously generated version title'):
             generate_title = False
             with open(self.chosen_title_path) as f:
                 version_title = f.read()
@@ -171,7 +176,7 @@ class Packer():
                 version_title = chat(self.model, self.title_prompt,
                                     options={'temperature': 0.8, 'num_predict': 10})['message']['content'].strip().replace('"', '').replace("'", "")
                 self.print_and_log(version_title)
-                generate_title = not simple_prompt('Is the Version title all good', 'n')
+                generate_title = not self.prompt_user('Is the Version title all good', 'n')
         else:
             version_title = 'Write your version title in this file. (press ctrl+a and then start writing your title. After you have written it, save it and close the editor)'
     
@@ -231,7 +236,7 @@ class Packer():
 
         self.print_and_log(f'Added file: {set(new_cwd).difference(old_integrity['CWD'])}')
         self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
-        if simple_prompt('Is the arhive all good (no going back after this)'):
+        if self.prompt_user('Is the arhive all good (no going back after this)'):
 
             if self.compile_command != None:
                 self.print_and_log('Compiling the program using Nuitka...')
@@ -376,7 +381,7 @@ class Packer():
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
             self.print_and_log(f'Social media post text has been saved to {self.data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(self.log_path.absolute())}')
 
-            if simple_prompt('Do you want to revert', 'n'):
+            if self.prompt_user('Do you want to revert', 'n'):
                 self.revert_changes()
             
         else:
@@ -408,13 +413,87 @@ class Packer():
             self.git_release.delete_release()
             self.repo.get_git_ref(f"tags/{self.version}").delete()
 
-    def _print_and_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+    def _print_and_log(self, text: str, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
             '''Prints the text and logs it to the packer log file.'''
 
             print_colored_text(text, color)
             self.log_action(text, level)
+    
+    def _send_queue_request(self, question: str, default: str | int = 'y') -> str | int:
+        '''
+        Sends a question to the input queue for processing.
 
-    def _log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+        :param question: The question to be asked to the user.
+        :type question: str
+        :param default: The default value to use if no input is provided.
+        :type default: str | int
+        :return: The answer provided by the user or the default value.
+        :rtype: str | int
+        '''
+
+        self.output.put({'question': question, 'default': default, 'expected output type': str | int})
+        
+    def _get_queue_input(self, question: str, default: str | int = 'y') -> Any:
+        '''
+        Gets input from the input queue.
+
+        :param question: The question that was asked to the user.
+        :type question: str
+        :param default: The default value to use if no input is provided.
+        :type default: str | int
+        :return: The answer provided by the user or the default value.
+        :rtype: Any
+        '''
+
+        answer = self.input.get()
+        if not answer:
+            answer = default
+        answer = bool_answer(answer)
+        self.log_action(f'Requested user input to {question} | Answer = {answer}')
+        return answer
+    
+    def _queue_prompt(self, question: str, default: str | int = 'y') -> bool:
+        '''
+        Prompts the user with a question using the input queue.
+
+        :param question: The question to be asked to the user.
+        :type question: str
+        :param default: The default value to use if no input is provided.
+        :type default: str | int
+        :return: The boolean value of the answer provided by the user or the default value.
+        :rtype: bool
+        '''
+
+        self._send_queue_request(question, default)
+        return self._get_queue_input(question, default)
+    
+    def _terminal_prompt(self, question: str, default: str | int = 'y') -> bool:
+        '''
+        Prompts the user with a question using the terminal.
+
+        :param question: The question to be asked to the user.
+        :type question: str
+        :param default: The default value to use if no input is provided.
+        :type default: str | int
+        :return: The boolean value of the answer provided by the user or the default value.
+        :rtype: bool
+        '''
+
+        answer = simple_prompt(question, default)
+        self.log_action(f'Requested user input to {question} | Answer = {answer}')
+        return answer
+
+    def _just_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+        '''
+        Logs text to the packer log file without printing it.
+
+        :param text: The text to be logged.
+        :param color: The color to use for printing (not used in logging).
+        :type color: Optional[Sequence[int]]
+        :param level: The logging level to use.
+        :type level: int
+        '''
+
         self.log_action(text, level)
 
     def log_action(self, action: str, level: int = 20):

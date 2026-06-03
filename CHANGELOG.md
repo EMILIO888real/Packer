@@ -12,6 +12,7 @@
 - Some helper functions to simplify `tui.py`: `check_module_conflict` and `print_list`.
 - A helper function for prompting optional settings: `prompt_optional_setting` to reduce code complexity.
 - All optional setting setting in the `TUI`, except for AI prompts.
+- Input and output to logging.
 
 ### Changed
 - Logging in `Packer` class to utilize the standart new in `et`.
@@ -22,6 +23,8 @@
 - Text for the files that open in the text editor, so it's simpler and more obvious what the user should do.
 - Logic to handle differentiating between user and system prompts, assuming user uses only 2 role: user and role: system.
 - Cleaned up `tui.py` main function to handle everything much easier.
+- All IO interactions with the script, not the file system have been cleaned up a bit more by splitting them into more functions for simplicity.
+- All inputs to utilize queues if they are provided.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.
