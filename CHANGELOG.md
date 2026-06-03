@@ -26,6 +26,8 @@
 - All IO interactions with the script, not the file system have been cleaned up a bit more by splitting them into more functions for simplicity.
 - All inputs to utilize queues if they are provided.
 - `setup` to not have any UI inputs, the only one there that was has been changed to a parameter for the `main` function.
+- Git repo initiation for `Packer` to happen once in the constructor.
+- Any encountered error's to be logged at the highest level.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.

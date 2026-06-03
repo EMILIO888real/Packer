@@ -104,6 +104,7 @@ class Packer():
         self.cache_dir = user_cache_dir('packer', 'EMILIO', ensure_exists=True)
         self.chosen_description_path = Path(f'{self.data_dir}/chosen description.txt')
         self.chosen_title_path = Path(f'{self.data_dir}/chosen version title.txt')
+        self.git_repo = Repo()
 
         self.assets_dir = f'./src/{program_name}/assets'
 
@@ -229,7 +230,6 @@ class Packer():
 
 
         self.print_and_log('Creating an archive of the current git repository...')
-        self.git_repo = Repo()
         with open(f'{self.cache_dir}/{self.program_name} {self.version}.zip', 'wb') as fp:
             self.git_repo.archive(fp, format='zip')
 
@@ -590,10 +590,10 @@ def main():
                         project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)
         packer.run()
     except KeyboardInterrupt:
-        packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0])
+        packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0], level=30)
         packer.revert_changes()
     except Exception as e:
-        packer.print_and_log(f'\nEncountered an error: {e}\nReverting back to previous version!', [255, 0, 0])
+        packer.print_and_log(f'\nEncountered an error: {e}\nReverting back to previous version!', [255, 0, 0], level=50)
         packer.revert_changes()
 
 if __name__ == '__main__':
