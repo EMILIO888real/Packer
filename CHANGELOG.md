@@ -38,6 +38,7 @@
 - Another oversight regarding settings initialization for Packer, since now user interaction isn't necessary.
 - Forgot to default the queues to None, since the `main` function in `main.py` uses a list of args approach to passing valus instead of kwargs.
 - Fixed the version identifier to the correct version.
+- Text editor opening after choosing a generated version description or title, by providing the path as a str instead if Path object.
 
 ---
 
