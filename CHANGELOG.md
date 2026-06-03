@@ -1,4 +1,4 @@
-## [%new_version] - %date
+## [0.6.0] - 2026-06-03
 
 ### Added
 - settings parameter to Packer that allows more user related settings for controlling Packer behavior, they are optional extra options, by default Packer create's a Settings object with all the mandatory settings to `'None'`, they aren't checked there anyway.
