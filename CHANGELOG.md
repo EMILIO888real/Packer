@@ -29,6 +29,7 @@
 - Git repo initiation for `Packer` to happen once in the constructor.
 - Any encountered error's to be logged at the highest level.
 - How logging Packer's IO happens, user interactions, surrounded the answer and the question with "" to be easier readable.
+- Removed \n character at the start of the error IO for `Packer`.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.

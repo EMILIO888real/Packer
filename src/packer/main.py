@@ -590,10 +590,10 @@ def main():
                         project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)
         packer.run()
     except KeyboardInterrupt:
-        packer.print_and_log('\nProcess interrupted by user!\nReverting back to previous version!', [255, 255, 0], level=30)
+        packer.print_and_log('Process interrupted by user!\nReverting back to previous version!', [255, 255, 0], level=30)
         packer.revert_changes()
     except Exception as e:
-        packer.print_and_log(f'\nEncountered an error: {e}\nReverting back to previous version!', [255, 0, 0], level=50)
+        packer.print_and_log(f'Encountered an error: {e}\nReverting back to previous version!', [255, 0, 0], level=50)
         packer.revert_changes()
 
 if __name__ == '__main__':
@@ -602,5 +602,5 @@ if __name__ == '__main__':
     except KeyboardInterrupt:
         exit()
     except Exception as e:
-        print_colored_text(f'Something went wrong externally, please report this.\nError: {e}', [255, 0, 0])
+        print_colored_text(f'Something went wrong externally, please report this. | Error: {e}', [255, 0, 0])
         exit()
