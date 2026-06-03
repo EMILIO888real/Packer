@@ -355,6 +355,9 @@ class Packer():
                 self.print_and_log('Merging development branch...')
                 self.git_repo.git.merge('development', '-X', 'theirs')
 
+                self.print_and_log('Pushing master branch to origin...')
+                self.git_repo.remotes.origin.push('master')
+
                 self.print_and_log('Deleting the old merged branch...')
                 self.git_repo.git.branch('-D', 'development')
 
@@ -362,8 +365,8 @@ class Packer():
                 self.print_and_log('Creating a new branch and switching to it...')
                 self.git_repo.create_head('development').checkout()
 
-                self.print_and_log('Updating origin...')
-                self.git_repo.remotes.origin.push()
+                self.print_and_log('Pushing new development branch to origin...')
+                self.git_repo.git.push('--set-upstream', 'origin', 'development')
             else:
                 self.print_and_log('Switching to existing development branch...')
                 self.git_repo.heads['development'].checkout()

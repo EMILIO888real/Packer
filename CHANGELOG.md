@@ -7,7 +7,7 @@
 - 
 
 ### Fixed
-- 
+- Git branch logic to update the origin (Github's) version of those branches.
 
 ---
 
