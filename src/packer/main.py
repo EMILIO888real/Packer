@@ -449,7 +449,7 @@ class Packer():
         if not answer:
             answer = default
         answer = bool_answer(answer)
-        self.log_action(f'Requested user input to {question} | Answer = {answer}')
+        self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
     
     def _queue_prompt(self, question: str, default: str | int = 'y') -> bool:
@@ -480,7 +480,7 @@ class Packer():
         '''
 
         answer = simple_prompt(question, default)
-        self.log_action(f'Requested user input to {question} | Answer = {answer}')
+        self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
 
     def _just_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):

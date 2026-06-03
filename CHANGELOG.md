@@ -28,6 +28,7 @@
 - `setup` to not have any UI inputs, the only one there that was has been changed to a parameter for the `main` function.
 - Git repo initiation for `Packer` to happen once in the constructor.
 - Any encountered error's to be logged at the highest level.
+- How logging Packer's IO happens, user interactions, surrounded the answer and the question with "" to be easier readable.
 
 ### Fixed
 - Packer implemented default UI to check for other settings, like `after_commands` and so on.
