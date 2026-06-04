@@ -2,6 +2,7 @@
 
 ### Added
 - 
+- A prompt at the end of `tui` configuration for a new project whether to open `projects.json` in a text editor.
 
 ### Changed
 - 

@@ -7,11 +7,12 @@ from re import match
 from keyword import iskeyword
 from sys import builtin_module_names
 from importlib import import_module
+from subprocess import run
 
 from packer.setup import main as setup
 from packer.paths import config_dir
 from packer.custom_modules.et import stripped_input, create_go_file_folder, simple_prompt
-from packer.config import Project, projects_configurations
+from packer.config import Project, projects_configurations, all_settings
 from packer.utils import normalize_settings_keys
 
 def print_list(items: list[Any], start: Any = '* ', end: Any = '\n', index: bool = False, index_text: str = '%i. '):
@@ -174,6 +175,10 @@ def main() -> tuple[str, Project]:
 
             print(f'To customize description or title prompt edit the {config_dir}/projects.json file directly. And follow this structure: list[dict[str, str]]. \
                   You can check out the defaults for examples via Project class documentation.')
+            
+            if simple_prompt('Open projects.json', 'n'):
+                run([all_settings.text_editor, '--wait', f'{config_dir}/projects.json'])
+                    
 
 
         with open(f'{config_dir}/projects.json', 'w') as f:
