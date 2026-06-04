@@ -10,6 +10,7 @@
 
 ### Fixed
 - Git branch logic to update the origin (Github's) version of those branches.
+- New version git tag landing on the same as the previous tag, now the tag is explicit attached to the latest commit vai sha.
 
 ---
 

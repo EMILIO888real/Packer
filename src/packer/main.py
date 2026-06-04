@@ -332,7 +332,8 @@ class Packer():
                     print('Waiting...')
                     sleep(1)
             
-            self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}', message=social_media_post_text)
+            self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}',
+                                                            message=social_media_post_text, target_commitish=sha)
 
             self.print_and_log('Uploading the compiled programs to the github release...')
 
