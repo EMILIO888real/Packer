@@ -215,15 +215,12 @@ class Packer():
             remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
 
 
-        old_integrity = read_json(f'{self.assets_dir}/integrity.json')
-
-        self.print_and_log('Generating the integrity file...')
-
         self.print_and_log('Getting exclusions from .gitignore...')
         with open('.gitignore') as f:
             exclusions = [entry for entry in f.read().splitlines() if '#' not in entry and entry != '']
         exclusions.append('.git')
 
+        self.print_and_log('Generating the integrity file...')
         new_cwd = tree(Path().cwd(), exclusions)
         with open(f'{self.assets_dir}/integrity.json', 'w') as f:
             dump({'CWD': new_cwd}, f)
@@ -234,7 +231,26 @@ class Packer():
             self.git_repo.archive(fp, format='zip')
 
 
-        self.print_and_log(f'Added file: {set(new_cwd).difference(old_integrity['CWD'])}')
+        tags = sorted(self.git_repo.tags, key=lambda x: x.commit.committed_date, reverse=True)
+
+        if not tags:
+            self.print_and_log('No git tags found. Skipping file changes to latest version...')
+
+        latest_tag = tags[0]
+        latest_tag_commit = latest_tag.commit
+        current_commit = self.git_repo.head.commit
+
+        self.print_and_log(f'Comparing current HEAD ({current_commit.hexsha[:7]}) against latest tag: {latest_tag.name} ({latest_tag_commit.hexsha[:7]})')
+        diffs = latest_tag_commit.diff(current_commit)
+
+        for diff in diffs:
+            if diff.new_file:
+                self.print_and_log(f'ADDED:    {diff.b_path}')
+            elif diff.deleted_file:
+                self.print_and_log(f'REMOVED:  {diff.a_path}')
+            else:
+                self.print_and_log(f'MODIFIED: {diff.a_path}')
+
         self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
@@ -414,7 +430,7 @@ class Packer():
         if hasattr(self, 'git_release'):
             self.print_and_log('Deleting git release...', [255, 255, 0])
             self.git_release.delete_release()
-            self.repo.get_git_ref(f"tags/{self.version}").delete()
+            self.repo.get_git_ref(f'tags/{self.version}').delete()
 
     def _print_and_log(self, text: str, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
             '''Prints the text and logs it to the packer log file.'''

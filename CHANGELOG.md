@@ -6,6 +6,7 @@
 
 ### Changed
 - 
+- The way `Packer` class checks modified, deleted and added files to use Git instead of utilizing the previous and new integrity.
 
 ### Fixed
 - Git branch logic to update the origin (Github's) version of those branches.
