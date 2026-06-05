@@ -23,14 +23,18 @@ Attributes:
     default_config: A dictionary containing the default configuration config for any packer style projects.
 '''
 
-__all__ = 'user_settings, default_settings, default_config, all_settings, load'
+__all__ = 'user_settings, default_settings, default_config, all_settings, load, packer_version'
 
 from pathlib import Path
 from typing import Any, Sequence
 from pydantic import BaseModel
+from packer.custom_modules.et import format_version_text
 from packer.paths import assets_dir, config_dir
 from packer.utils import load_config, normalize_settings_keys, simple_merge_settings
 import json
+
+with open(f'{assets_dir}/version.json') as f:
+    packer_version = format_version_text(json.load(f))
 
 class Project(BaseModel):
     gofile_user_token: str

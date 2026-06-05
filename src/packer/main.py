@@ -9,7 +9,7 @@ from pathlib import Path
 from os import remove, chdir
 from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
-from sys import executable, platform, exit
+import sys
 from time import sleep
 from typing import Any, Optional, Sequence
 from github import Github, Auth, UnknownObjectException
@@ -17,13 +17,19 @@ from ollama import chat
 from requests import post
 from git import GitCommandError, Repo
 import tomlkit
-from threading import Thread, Event
+import threading
 
-from packer.custom_modules.et import bool_answer, hide_cursor, launch_in_new_terminal, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
+from packer.custom_modules.et import bool_answer, hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.ui.tui import main as tui
-from packer.config import all_settings, Project
-from packer.paths import assets_dir, log_path, data_dir, cache_dir
+from packer.config import all_settings, Project, packer_version
+from packer.paths import log_path, data_dir, cache_dir
+from packer.exceptions import global_exception_handler
 
+def thread_excepthook(args):
+    sys.excepthook(args.exc_type, args.exc_value, args.exc_traceback)
+
+sys.excepthook = global_exception_handler # replace the default error handler with our own.
+threading.excepthook = thread_excepthook # Also, so other threads access the same handler
 
 def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
@@ -185,7 +191,7 @@ class Packer():
 
 
         self.print_and_log('Creating requirements.txt...')
-        pip_path = Path('.venv/bin/pip') if platform != 'win32' else Path('.venv/Scripts/pip.exe')
+        pip_path = Path('.venv/bin/pip') if sys.platform != 'win32' else Path('.venv/Scripts/pip.exe')
         with open('requirements.txt', 'w') as f:
             run([pip_path, 'freeze', '--require-virtualenv', '-l'], stdout=f)
 
@@ -252,7 +258,7 @@ class Packer():
 
             if self.compile_command != None:
                 self.print_and_log('Compiling the program using Nuitka...')
-                waiting_for_compile_command = Event()
+                waiting_for_compile_command = threading.Event()
                 compile_command_done = self._Popen(self.compile_command, waiting_for_compile_command)
 
                 self.print_and_log('Creating archive of the compiled program...')
@@ -260,8 +266,8 @@ class Packer():
 
             
             self.print_and_log('Bundling the program using PyInstaller...')
-            waiting_for_pyinstaller_bundling = Event()
-            pyinstaller_done = self._Popen([executable,
+            waiting_for_pyinstaller_bundling = threading.Event()
+            pyinstaller_done = self._Popen([sys.executable,
                         '-m',
                         'PyInstaller', 'main.spec',
                          '--distpath', f'{cache_dir}/dist',
@@ -289,7 +295,7 @@ class Packer():
 
             commit_subject = f'chore(release): version {self.version}'
             commit_body = f'{description}'
-            commit_metadata = f'Gofile url: {download_url}\nPublished by packer v{self.version}!'
+            commit_metadata = f'Gofile url: {download_url}\nPublished by packer v{packer_version}!'
 
             commit_message = f'{commit_subject}\n\n{commit_body}\n\n{commit_metadata}'
 
@@ -539,7 +545,7 @@ class Packer():
         self.log_action(f'Ran command: {" ".join(args)}\nstdout: {result.stdout.decode("utf-8")}\nstderr: {result.stderr.decode("utf-8")}')
         return result
 
-    def _Popen(self, cmd: list[str], waiting: Event) -> Event:
+    def _Popen(self, cmd: list[str], waiting: threading.Event) -> threading.Event:
         '''
         Runs a subprocess command in the git directory and prints the stdout in real time. Also logs the stdout to the packer log file.
         
@@ -551,9 +557,9 @@ class Packer():
         :rtype: Event
         '''
 
-        done = Event()
+        done = threading.Event()
 
-        def thread_function(done: Event):
+        def thread_function(done: threading.Event):
             process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
 
             hide_cursor()
@@ -567,7 +573,7 @@ class Packer():
             process.wait()
             done.set()
 
-        Thread(target=thread_function, args=[done], daemon=True).start()
+        threading.Thread(target=thread_function, args=[done], daemon=True).start()
 
         return done
 
@@ -581,7 +587,7 @@ def main():
     if not all_settings.skip_git_status:
         if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
             print('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
-            exit()
+            sys.exit()
 
     version = read_json(f'{project_directory}/src/{project_configuration.program_name}/assets/version.json')
     old_version = version.copy()
@@ -598,7 +604,7 @@ def main():
             version['patch'] = version['patch'] + 1
         case _:
             print('Unknown version! exiting...', [255, 0, 0])
-            exit()
+            sys.exit()
     try:
         packer = Packer(version, old_version,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
@@ -618,7 +624,7 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        exit()
+        sys.exit()
     except Exception as e:
         print_colored_text(f'Something went wrong externally, please report this. | Error: {e}', [255, 0, 0])
-        exit()
+        sys.exit()

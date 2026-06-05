@@ -11,11 +11,9 @@ from multiprocessing import Process, Event
 from sys import exit, platform
 
 from packer.custom_modules.et import init_logger, print_colored_text, tree, read_json, format_version_text
-from packer.paths import assets_dir
+from packer.config import packer_version
 
 logger = init_logger('packer setup', 'EMILIO')
-
-packer_version = format_version_text(read_json(f'{assets_dir}/version.json'))
 
 def print_and_log(text: str, level: int = 20, color: Sequence[int] = [255, 255, 255], end: str = '\n') -> None:
     print_colored_text(text, color, end=end)
