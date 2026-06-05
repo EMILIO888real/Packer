@@ -8,6 +8,7 @@
 - 
 - The way `Packer` class checks modified, deleted and added files to use Git instead of utilizing the previous and new integrity.
 - `revert_changes` function, starts with `print_and_log`, since every use case was already manually doing it every time and also added to a call in case git didn't successfully commit.
+- All user tied paths to be handled in `config.py` and then just be imported by all parts of the program that needs them.
 
 ### Fixed
 - Git branch logic to update the origin (Github's) version of those branches.

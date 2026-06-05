@@ -14,15 +14,16 @@ from time import sleep
 from typing import Any, Optional, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
-from platformdirs import user_log_dir, user_data_dir, user_cache_dir
 from requests import post
 from git import GitCommandError, Repo
 import tomlkit
 from threading import Thread, Event
 
-from packer.custom_modules.et import bool_answer, hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
+from packer.custom_modules.et import bool_answer, hide_cursor, launch_in_new_terminal, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.ui.tui import main as tui
 from packer.config import all_settings, Project
+from packer.paths import assets_dir, log_path, data_dir, cache_dir
+
 
 def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
@@ -99,11 +100,8 @@ class Packer():
 
         self.terminal_width = get_terminal_size().columns
         self.logger = init_logger('packer', 'EMILIO')
-        self.log_path = Path(f'{user_log_dir('packer', 'EMILIO', ensure_exists=True)}/{datetime.date(datetime.now())}.log')
-        self.data_dir = user_data_dir('packer', 'EMILIO', ensure_exists=True)
-        self.cache_dir = user_cache_dir('packer', 'EMILIO', ensure_exists=True)
-        self.chosen_description_path = Path(f'{self.data_dir}/chosen description.txt')
-        self.chosen_title_path = Path(f'{self.data_dir}/chosen version title.txt')
+        self.chosen_description_path = Path(f'{data_dir}/chosen description.txt')
+        self.chosen_title_path = Path(f'{data_dir}/chosen version title.txt')
         self.git_repo = Repo()
 
         self.assets_dir = f'./src/{program_name}/assets'
@@ -114,8 +112,6 @@ class Packer():
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
 
-        with open(self.log_path, 'w') as f:
-            f.write('')
         self.print_and_log('Starting packer...')
 
 
@@ -210,9 +206,9 @@ class Packer():
             tomlkit.dump(config, f)
 
 
-        if Path(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip').exists():
+        if Path(f'{cache_dir}/{self.program_name} {old_version_text}.zip').exists():
             self.print_and_log('Removing old archive...')
-            remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
+            remove(f'{cache_dir}/{self.program_name} {old_version_text}.zip')
 
 
         self.print_and_log('Getting exclusions from .gitignore...')
@@ -227,7 +223,7 @@ class Packer():
 
 
         self.print_and_log('Creating an archive of the current git repository...')
-        with open(f'{self.cache_dir}/{self.program_name} {self.version}.zip', 'wb') as fp:
+        with open(f'{cache_dir}/{self.program_name} {self.version}.zip', 'wb') as fp:
             self.git_repo.archive(fp, format='zip')
 
 
@@ -251,7 +247,7 @@ class Packer():
             else:
                 self.print_and_log(f'MODIFIED: {diff.a_path}')
 
-        self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
+        self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
             if self.compile_command != None:
@@ -260,7 +256,7 @@ class Packer():
                 compile_command_done = self._Popen(self.compile_command, waiting_for_compile_command)
 
                 self.print_and_log('Creating archive of the compiled program...')
-                make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
+                make_archive(f'{cache_dir}/{self.program_name} [nuitka]', 'zip', f'{cache_dir}/main.dist')
 
             
             self.print_and_log('Bundling the program using PyInstaller...')
@@ -268,11 +264,11 @@ class Packer():
             pyinstaller_done = self._Popen([executable,
                         '-m',
                         'PyInstaller', 'main.spec',
-                         '--distpath', f'{self.cache_dir}/dist',
-                         '--workpath', f'{self.cache_dir}/build'], waiting_for_pyinstaller_bundling)
+                         '--distpath', f'{cache_dir}/dist',
+                         '--workpath', f'{cache_dir}/build'], waiting_for_pyinstaller_bundling)
 
             self.print_and_log('Uploading archive to Gofile...')
-            response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
+            response = upload_gofile_file(Path(f'{cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
 
             download_url = response['data']['downloadPage']
             self.file_id = response['data']['id']
@@ -342,28 +338,28 @@ class Packer():
             waiting_for_pyinstaller_bundling.set()
             pyinstaller_done.wait()
 
-            self.git_release.upload_asset(path=f'{self.cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
+            self.git_release.upload_asset(path=f'{cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
 
             if self.compile_command != None:
                 self.print_and_log('Waiting for Nuitka to finish...')
                 waiting_for_compile_command.set()
                 compile_command_done.wait()
-                self.git_release.upload_asset(path=f'{self.cache_dir}{self.program_name} [nuitka].zip', content_type='application/zip')
+                self.git_release.upload_asset(path=f'{cache_dir}{self.program_name} [nuitka].zip', content_type='application/zip')
 
 
             self.print_and_log('Cleaning up cache...')
-            rmtree(f'{self.cache_dir}/dist')
+            rmtree(f'{cache_dir}/dist')
 
             if self.compile_command != None:
-                rmtree(f'{self.cache_dir}/main.dist')
-                remove(f'{self.cache_dir}{self.program_name} [nuitka].zip')
+                rmtree(f'{cache_dir}/main.dist')
+                remove(f'{cache_dir}{self.program_name} [nuitka].zip')
 
             self.print_and_log('Cleaning up temporary files...')
-            remove(f'{self.data_dir}/chosen description.txt')
-            remove(f'{self.data_dir}/chosen version title.txt')
+            remove(f'{data_dir}/chosen description.txt')
+            remove(f'{data_dir}/chosen version title.txt')
 
             self.print_and_log('Writing social media post text to a file...')
-            with open(f'{self.data_dir}/social media post.md', 'w') as f:
+            with open(f'{data_dir}/social media post.md', 'w') as f:
                 f.write(social_media_post_text)
 
             if self.git_repo.active_branch.name == 'development':
@@ -400,7 +396,7 @@ class Packer():
             self.git_repo.remotes.origin.push()
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
-            self.print_and_log(f'Social media post text has been saved to {self.data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(self.log_path.absolute())}')
+            self.print_and_log(f'Social media post text has been saved to {data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(log_path.absolute())}')
 
             if self.prompt_user('Do you want to revert', 'n'):
                 self.revert_changes()
@@ -413,9 +409,9 @@ class Packer():
         '''Reverts the version to the previous one, deletes the uploaded copy and git release if they exist, and resets the git directory to the previous commit. Also restores the integrity file.'''
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
-        if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
+        if Path(f'{cache_dir}/{self.program_name} {self.version}.zip').exists():
             self.print_and_log('Removing archive...', [255, 255, 0])
-            remove(f'{self.cache_dir}/{self.program_name} {self.version}.zip')
+            remove(f'{cache_dir}/{self.program_name} {self.version}.zip')
 
         if hasattr(self, 'file_id'):
             self.print_and_log('Deleting uploaded copy...', [255, 255, 0])
