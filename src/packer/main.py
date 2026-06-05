@@ -303,6 +303,7 @@ class Packer():
             except GitCommandError as e:
                 self.committed = False
                 self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
+                self.revert_changes()
 
 
             sha = self.git_repo.head.commit.hexsha
@@ -405,11 +406,12 @@ class Packer():
                 self.revert_changes()
             
         else:
-            self.print_and_log('Canceled going further!\nReverting back to previous version!')
+            self.print_and_log('Canceled going further!')
             self.revert_changes()
     
     def revert_changes(self) -> None:
         '''Reverts the version to the previous one, deletes the uploaded copy and git release if they exist, and resets the git directory to the previous commit. Also restores the integrity file.'''
+        self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
         if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
             self.print_and_log('Removing archive...', [255, 255, 0])
@@ -610,10 +612,10 @@ def main():
                         project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)
         packer.run()
     except KeyboardInterrupt:
-        packer.print_and_log('Process interrupted by user!\nReverting back to previous version!', [255, 255, 0], level=30)
+        packer.print_and_log('Process interrupted by user!', [255, 255, 0], level=30)
         packer.revert_changes()
     except Exception as e:
-        packer.print_and_log(f'Encountered an error: {e}\nReverting back to previous version!', [255, 0, 0], level=50)
+        packer.print_and_log(f'Encountered an error: {e}!', [255, 0, 0], level=50)
         packer.revert_changes()
 
 if __name__ == '__main__':
