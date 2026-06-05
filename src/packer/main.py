@@ -578,6 +578,16 @@ class Packer():
         return done
 
 def main():
+    def packer_exception_handler(exc_type, exc_value, exc_traceback):
+
+        nonlocal packer
+
+        if packer is not None:
+            packer.revert_changes()
+        global_exception_handler(exc_type, exc_value, exc_traceback)
+
+    sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
+
     project_directory, project_configuration = tui()
 
     if Path().cwd() != Path(project_directory):
@@ -605,6 +615,8 @@ def main():
         case _:
             print('Unknown version! exiting...', [255, 0, 0])
             sys.exit()
+
+    packer = None
     try:
         packer = Packer(version, old_version,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
@@ -616,15 +628,6 @@ def main():
     except KeyboardInterrupt:
         packer.print_and_log('Process interrupted by user!', [255, 255, 0], level=30)
         packer.revert_changes()
-    except Exception as e:
-        packer.print_and_log(f'Encountered an error: {e}!', [255, 0, 0], level=50)
-        packer.revert_changes()
 
 if __name__ == '__main__':
-    try:
-        main()
-    except KeyboardInterrupt:
-        sys.exit()
-    except Exception as e:
-        print_colored_text(f'Something went wrong externally, please report this. | Error: {e}', [255, 0, 0])
-        sys.exit()
+    main()

@@ -3,6 +3,7 @@
 ### Added
 - A prompt at the end of `tui` configuration for a new project whether to open `projects.json` in a text editor.
 - `global_exception_handler` to handle any uncaught exceptions, generate a report and create an issue archive.
+- An exclusive exception handler for Packer itself to revert changes in case it was running, while the error occurred.
 
 ### Changed
 - 
