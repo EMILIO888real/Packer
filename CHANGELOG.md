@@ -1,4 +1,4 @@
-## [%new_version] - %date
+## [0.7.0] - 2026-06-06
 
 ### Added
 - A prompt at the end of `tui` configuration for a new project whether to open `projects.json` in a text editor.
