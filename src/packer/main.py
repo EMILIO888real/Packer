@@ -416,7 +416,8 @@ class Packer():
             self.git_repo.remotes.origin.push()
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
-            self.print_and_log(f'Social media post text has been saved to {data_dir}/social media post.md. You can use it to announce the new version on social media platforms!\nLog file has been saved to: {str(log_path.absolute())}')
+            self.print_and_log(f'Social media post text has been saved to {data_dir}/social media post.md. You can use it to announce the new version on social media platforms!')
+            self.print_and_log(f'Log file has been saved to: {str(log_path.absolute())}')
 
             if self.prompt_user('Do you want to revert', 'n'):
                 self.revert_changes()

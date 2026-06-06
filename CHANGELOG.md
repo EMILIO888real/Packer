@@ -5,6 +5,7 @@
 
 ### Changed
 - 
+- Log file location output at the end of the script to contain it's own line.
 
 ### Fixed
 - 
