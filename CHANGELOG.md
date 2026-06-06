@@ -18,6 +18,7 @@
 - Git branch logic to update the origin (Github's) version of those branches.
 - New version git tag landing on the same as the previous tag, now the tag is explicit attached to the latest commit vai sha.
 - Packer version to be a different version identifier than the project being updated.
+- `global_exception_handler` to manually cast Path to str, since json tries to serialize it, but doesn't know how to.
 
 ---
 

@@ -29,7 +29,7 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
                     'python version': sys.version,
                     'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\nInput: '),
                     'traceback': ''.join(format_exception(exc_type, exc_value, exc_traceback)),
-                    'associated log file': log_path}
+                    'associated log file': str(log_path)}
 
 
     with open(error_report_path, 'a') as f:
