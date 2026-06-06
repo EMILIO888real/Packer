@@ -592,6 +592,8 @@ class Packer():
         return done
 
 def main():
+    packer = None
+
     def packer_exception_handler(exc_type, exc_value, exc_traceback):
 
         nonlocal packer
@@ -630,7 +632,6 @@ def main():
             print('Unknown version! exiting...', [255, 0, 0])
             sys.exit()
 
-    packer = None
     try:
         packer = Packer(version, old_version,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
