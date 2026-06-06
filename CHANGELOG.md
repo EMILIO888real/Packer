@@ -5,6 +5,7 @@
 - `global_exception_handler` to handle any uncaught exceptions, generate a report and create an issue archive.
 - An exclusive exception handler for Packer itself to revert changes in case it was running, while the error occurred.
 - A way to write your own release notes template using $syntax, a default is available as well.
+- Documentation for project settings, how to set them and specific settings structure.
 
 ### Changed
 - The way `Packer` class checks modified, deleted and added files to use Git instead of utilizing the previous and new integrity.
