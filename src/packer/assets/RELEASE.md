@@ -6,20 +6,24 @@ $version_description
 
 Available via:
 
-- **GitHub**: [GitHub Repo](https://github.com/${github_repo_url})
-- **Third-party website (GoFile) as an archive**: [Archive]($gofile_download_url) and click the download button.
+* **GitHub:** [GitHub Releases](https://github.com/${github_repo_url}/releases/tag/${new_version})
+* **Third-party website (GoFile):** [Archive]($gofile_download_url) (click the download button).
+
+### Binary Downloads
+
+When downloading, please choose the correct build for your operating system:
+
+| File Name | Platform | Description |
+| --- | --- | --- |
+| `packer` | Linux/macOS | Executable for Unix-based systems. |
+| `packer.exe` | Windows | Executable for Windows systems. |
 
 ### To install:
 
-- **GitHub:**
-    Clone the repo using:
-
-    ```bash
-    git clone [https://github.com/$](https://github.com/$){github_repo_url}
-    ```
-
-- **Third-party website (GoFile):**
-    Simply head to the website [Archive]($gofile_download_url) and click the download button.
+* **GitHub:**
+Download the appropriate binary for your system from the [Releases page](https://github.com/${github_repo_url}/releases/tag/${new_version}).
+* **Third-party website (GoFile):**
+Head to the website [Archive]($gofile_download_url) and download the specific arhive with the appropriate version.
 
 After installing, continue following instructions via the README.
 
@@ -31,4 +35,36 @@ $latest_changelog
 
 ## Tips
 
-The difference between the two is that GitHub contains all versions (newest and older ones), which increases file size. The archive contains only the newest version. A nice upside to installing from GitHub is that you can easily update the program or, in the future, automatically update the software by simply pulling from the repo, since the GitHub URL doesn't change.
+If you prefer to build from source via **GitHub**, you can clone the repository using:
+
+```bash
+git clone https://github.com/${github_repo_url} --depth 1
+
+```
+
+Using `--depth 1` creates a "shallow clone," which only downloads the latest commit, saving you significant time and storage space compared to a full repository clone.
+
+While downloading the pre-compiled binaries (like `packer` or `packer.exe`) is usually the fastest way to get started, cloning the repository allows you to easily pull future updates with `git pull` as they are released.
+
+## Verification
+
+To ensure the integrity of the downloaded files, you can verify their SHA256 checksums.
+
+### How to verify:
+
+* **Windows (PowerShell):**
+Open PowerShell and run the following command:
+```powershell
+Get-FileHash .\packer.exe -Algorithm SHA256
+
+```
+
+
+* **Linux/macOS (Terminal):**
+Open your terminal and run:
+```bash
+sha256sum packer
+
+```
+
+Compare the resulting hash with the one provided in the GitHub release assets list to ensure it matches.
