@@ -18,6 +18,7 @@ from requests import post
 from git import GitCommandError, Repo
 import tomlkit
 import threading
+from string import Template
 
 from packer.custom_modules.et import bool_answer, hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.ui.tui import main as tui
@@ -86,7 +87,8 @@ class Packer():
                  input_queue: Queue = None, output_queue: Queue = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: Sequence[Sequence][str] = Project.model_fields['before_commands'].default, after_commands: Sequence[Sequence][str] = Project.model_fields['after_commands'].default,
-                 model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default
+                 model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
+                 release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default
                 ):
         self.input_queue = input_queue
         self.output_queue = output_queue
@@ -109,6 +111,8 @@ class Packer():
         self.chosen_description_path = Path(f'{data_dir}/chosen description.txt')
         self.chosen_title_path = Path(f'{data_dir}/chosen version title.txt')
         self.git_repo = Repo()
+        with open(release_notes_template_path) as f:
+            self.release_text = f.read()
 
         self.assets_dir = f'./src/{program_name}/assets'
 
@@ -319,7 +323,17 @@ class Packer():
                     self._run('sh', '-c', cmd)
 
             self.print_and_log('Generating social media post text...')
-            social_media_post_text = f'# {self.program_name} Update [{self.version}]\n\n{description}\n\n## Installation\n\nAvailable via:\n\n- **GitHub**: [GitHub Repo](https://github.com/{self.github_repo_url})\n- **Third-party website (GoFile) as an archive**: [Archive]({download_url}) and click the download button.\n\n### To install:\n\n- **GitHub:**\n\tClone the repo using:\n\n\t```bash\n\tgit clone https://github.com/{self.github_repo_url}\n\t```\n\n- **Third-party website (GoFile):**\n\tSimply head to the website [Archive]({download_url}) and click the download button.\n\nAfter installing, continue following instructions via the README.\n\n## Changes in v{self.version}\n\n{latest_changelog}\n\n[Full changelog](https://github.com/{self.github_repo_url}/blob/master/CHANGELOG.md)\n\n## Tips\n\nThe difference between the two is that GitHub contains all versions (newest and older ones), which increases file size. The archive contains only the newest version. A nice upside to installing from GitHub is that you can easily update the program or, in the future, automatically update the software by simply pulling from the repo, since the GitHub URL doesn\'t change.'
+
+            release_notes_template_data = {
+                'program_name': self.program_name,
+                'new_version': self.version,
+                'version_description': description,
+                'github_repo_url': self.github_repo_url,
+                'gofile_download_url': download_url,
+                'latest_changelog': latest_changelog
+            }
+
+            self.release_text = Template(self.release_text).substitute(release_notes_template_data)
 
             # Publish a github release
 
@@ -336,7 +350,7 @@ class Packer():
                     sleep(1)
             
             self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}',
-                                                            message=social_media_post_text, target_commitish=sha)
+                                                            message=self.release_text, target_commitish=sha)
 
             self.print_and_log('Uploading the compiled programs to the github release...')
 
@@ -366,7 +380,7 @@ class Packer():
 
             self.print_and_log('Writing social media post text to a file...')
             with open(f'{data_dir}/social media post.md', 'w') as f:
-                f.write(social_media_post_text)
+                f.write(self.release_text)
 
             if self.git_repo.active_branch.name == 'development':
                 self.print_and_log('Switching to master branch...')

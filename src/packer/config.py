@@ -55,6 +55,7 @@ class Project(BaseModel):
         {'role': 'system', 'content': 'You are a cryptic oracle. Your answer must be exactly 2 or 3 words. No quotes, no punctuation, no preamble.'},
         {'role': 'user', 'content': f'Create a mystical, indirect puzzle title for this update. Do not include version numbers.\n\nChangelog:%latest_changelog\n'}
     ]
+    release_notes_template_path: str | Path = Path(f'{assets_dir}/RELEASE.md')
 
 class Settings(BaseModel):
     text_editor: str = 'code'

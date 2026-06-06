@@ -4,9 +4,9 @@
 - A prompt at the end of `tui` configuration for a new project whether to open `projects.json` in a text editor.
 - `global_exception_handler` to handle any uncaught exceptions, generate a report and create an issue archive.
 - An exclusive exception handler for Packer itself to revert changes in case it was running, while the error occurred.
+- A way to write your own release notes template using $syntax, a default is available as well.
 
 ### Changed
-- 
 - The way `Packer` class checks modified, deleted and added files to use Git instead of utilizing the previous and new integrity.
 - `revert_changes` function, starts with `print_and_log`, since every use case was already manually doing it every time and also added to a call in case git didn't successfully commit.
 - All user tied paths to be handled in `paths.py` and then just be imported by all parts of the program that needs them.

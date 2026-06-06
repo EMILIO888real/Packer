@@ -173,7 +173,7 @@ def main() -> tuple[str, Project]:
             prompt_optional_setting('after commands', 'After committing commands', split_str)
             prompt_optional_setting('model', 'Enter the name of the ollama model you wish to use')
 
-            print(f'To customize description or title prompt edit the {config_dir}/projects.json file directly. And follow this structure: list[dict[str, str]]. \
+            print(f'To customize description or title prompt, or any other settings edit the {config_dir}/projects.json file directly. And follow settings structure, check . \
                   You can check out the defaults for examples via Project class documentation.')
             
             if simple_prompt('Open projects.json', 'n'):
