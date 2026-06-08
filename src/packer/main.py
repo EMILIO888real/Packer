@@ -620,18 +620,6 @@ class Packer():
         return done
 
 def main():
-    packer = None
-
-    def packer_exception_handler(exc_type, exc_value, exc_traceback):
-
-        nonlocal packer
-
-        if packer is not None:
-            packer.revert_changes()
-        global_exception_handler(exc_type, exc_value, exc_traceback)
-
-    sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
-
     project_directory, project_configuration = tui()
 
     if Path().cwd() != Path(project_directory):
@@ -667,6 +655,13 @@ def main():
                         None, None,
                         project_configuration.compile_command, project_configuration.before_commands, project_configuration.after_commands, 
                         project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)
+
+        def packer_exception_handler(exc_type, exc_value, exc_traceback):
+            packer.revert_changes()
+            global_exception_handler(exc_type, exc_value, exc_traceback)
+
+        sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
+        
         packer.run()
     except KeyboardInterrupt:
         packer.print_and_log('Process interrupted by user!', [255, 255, 0], level=30)

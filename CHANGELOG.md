@@ -9,6 +9,7 @@
 - Log file location output at the end of the script to contain it's own line.
 - `_just_log` to `_log_and_output_queue` to be able to easier see and if need parse output from packer by other programs, also disables verbosity automatically if using queues. [Day 08 13:53]
 - `Packer` to not add the empty list lines to the template or boilerplate for the next version changelog. [Day 08 15:30]
+- Packer's `main` function to use a simpler form of the packer's exclusive exception handler and to only assign it after packer's instance has been created. [Day 08 15:57]
 
 ### Fixed
 - `global_exception_handler` to now also handle external errors with grace, by checking if a log exists. [Day 08 13:53]
