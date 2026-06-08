@@ -15,6 +15,7 @@
 - `Packer` to not add the empty list lines to the template or boilerplate for the next version changelog.
 - Packer's `main` function to use a simpler form of the packer's exclusive exception handler and to only assign it after packer's instance has been created.
 - Removed the date part in changelog additions, it will be replace with short git hash and it will be at the beginning instead of the end. 
+- Changed error report name to only contain the the date part. 
 
 ### Fixed
 - `global_exception_handler` to now also handle external errors with grace, by checking if a log exists.
