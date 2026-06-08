@@ -6,6 +6,7 @@
 - Argument parsing for `main` function of packer using the ArgumentParser built-in module.
 - Paths or -p parameter to display all storage paths used by packer in case you want to delete, edit or view any of the files.
 - Automatic changelog entry association with appropriate git commits. *Adds shortened git hash to each changelog entry*. 
+- A setting to enable or disable automatic changelog entry association with the appropriate git commit, in case the users commits looks different than their changelog entries. 
 
 ### Changed
 - `change.py` completely to now, also allow multiple changes and in the future AI generation.

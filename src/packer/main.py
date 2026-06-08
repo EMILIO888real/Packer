@@ -90,7 +90,7 @@ class Packer():
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: Sequence[Sequence][str] = Project.model_fields['before_commands'].default, after_commands: Sequence[Sequence][str] = Project.model_fields['after_commands'].default,
                  model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
-                 release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default
+                 release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default
                 ):
         self.input_queue = input_queue
         self.output_queue = output_queue
@@ -107,6 +107,7 @@ class Packer():
         self.after_commands = after_commands
         self.description_prompt = description_prompt
         self.title_prompt = title_prompt
+        self.changelog_git_hash = changelog_git_hash
 
         self.terminal_width = get_terminal_size().columns
         self.logger = init_logger('packer', 'EMILIO')
@@ -158,7 +159,7 @@ class Packer():
         self.print_and_log('Getting the latest tag...')
         tags = sorted(self.git_repo.tags, key=lambda x: x.commit.committed_date, reverse=True)
 
-        if tags:
+        if tags and self.changelog_git_hash:
             latest_tag = tags[0]
 
             self.print_and_log('Fetching all commits from HEAD to latest tag...')
@@ -176,7 +177,6 @@ class Packer():
                 data_list = self._parse_commit(commit)
 
                 for data in data_list:
-
                     match data['category']:
                         case 'Added':
                             commit_sha_location = added_category.find(data['text'])

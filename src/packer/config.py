@@ -56,6 +56,7 @@ class Project(BaseModel):
         {'role': 'user', 'content': f'Create a mystical, indirect puzzle title for this update. Do not include version numbers.\n\nChangelog:%latest_changelog\n'}
     ]
     release_notes_template_path: str | Path = Path(f'{assets_dir}/RELEASE.md')
+    changelog_git_hash: bool = True
 
 class Settings(BaseModel):
     text_editor: str = 'code'
