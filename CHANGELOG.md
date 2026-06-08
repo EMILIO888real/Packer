@@ -1,32 +1,32 @@
-## [%new_version] - %date
+## [0.8.0] - 2026-06-08
 
 ### Added
-- Git commits now try to be signed and if that fails, because of missing credentials them the commit is signed without.
-- Git fetching to fetch the Github release created tag to also be available in local git history.
-- Argument parsing for `main` function of packer using the ArgumentParser built-in module.
-- Paths or -p parameter to display all storage paths used by packer in case you want to delete, edit or view any of the files.
-- Automatic changelog entry association with appropriate git commits. *Adds shortened git hash to each changelog entry*. 
-- A setting to enable or disable automatic changelog entry association with the appropriate git commit, in case the users commits looks different than their changelog entries. 
+- [792ddfb] Git commits now try to be signed and if that fails, because of missing credentials them the commit is signed without.
+- [e605790] Git fetching to fetch the Github release created tag to also be available in local git history.
+- [f0dc942] Argument parsing for `main` function of packer using the ArgumentParser built-in module.
+- [f0dc942] Paths or -p parameter to display all storage paths used by packer in case you want to delete, edit or view any of the files.
+- [003e04e] Automatic changelog entry association with appropriate git commits. *Adds shortened git hash to each changelog entry*. 
+- [032d98d] A setting to enable or disable automatic changelog entry association with the appropriate git commit, in case the users commits looks different than their changelog entries.
 
 ### Changed
-- `change.py` completely to now, also allow multiple changes and in the future AI generation.
-- Log file location output at the end of the script to contain it's own line.
-- `_just_log` to `_log_and_output_queue` to be able to easier see and if need parse output from packer by other programs, also disables verbosity automatically if using queues.
-- `Packer` to not add the empty list lines to the template or boilerplate for the next version changelog.
-- Packer's `main` function to use a simpler form of the packer's exclusive exception handler and to only assign it after packer's instance has been created.
-- Removed the date part in changelog additions, it will be replace with short git hash and it will be at the beginning instead of the end. 
-- Changed error report name to only contain the the date part. 
-- `change.py` module's `tui` function to lower all changes in case user enters them as capital letters. 
-- The name of a created issue to also only contain the date part. 
+- [f8dc718] `change.py` completely to now, also allow multiple changes and in the future AI generation.
+- [627d374] Log file location output at the end of the script to contain it's own line.
+- [f8dc718] `_just_log` to `_log_and_output_queue` to be able to easier see and if need parse output from packer by other programs, also disables verbosity automatically if using queues.
+- [bcdcf75] `Packer` to not add the empty list lines to the template or boilerplate for the next version changelog.
+- [eb71821] Packer's `main` function to use a simpler form of the packer's exclusive exception handler and to only assign it after packer's instance has been created.
+- [d384590] Removed the date part in changelog additions, it will be replace with short git hash and it will be at the beginning instead of the end. 
+- [04b77f6] Changed error report name to only contain the the date part. 
+- [33d0797] `change.py` module's `tui` function to lower all changes in case user enters them as capital letters. 
+- [33d0797] The name of a created issue to also only contain the date part.
 
 ### Fixed
-- `global_exception_handler` to now also handle external errors with grace, by checking if a log exists.
-- `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry.
-- `global_exception_handler` to allow weird states by checking if tmp_dir already exists.
-- Git status via git diff to not show changes, if not git tags are available (like for the first version of a new project).
-- Minor mistake in the implementation of the git hashes for changelog entries, to write out the updated changelog. 
-- Git tag fetching to use the wrapper. 
-- Correctly calculate the location of the start of the latest version's changelog. *But now I see, I could have done it in a much simpler way*. 
+- [f8dc718] `global_exception_handler` to now also handle external errors with grace, by checking if a log exists.
+- [3e38e04] `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry.
+- [792ddfb] `global_exception_handler` to allow weird states by checking if tmp_dir already exists.
+- [5f71e1f] Git status via git diff to not show changes, if not git tags are available (like for the first version of a new project).
+- [106a577] Minor mistake in the implementation of the git hashes for changelog entries, to write out the updated changelog. 
+- [33d0797] Git tag fetching to use the wrapper. 
+- [3dd001f] Correctly calculate the location of the start of the latest version's changelog. *But now I see, I could have done it in a much simpler way*.
 
 ---
 
