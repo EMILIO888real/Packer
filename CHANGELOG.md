@@ -3,6 +3,7 @@
 ### Added
 
 ### Changed
+- Latest changelog for git releases to use the updated one with git hashes if it's in use. 
 
 ### Fixed
 

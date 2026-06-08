@@ -392,7 +392,7 @@ class Packer():
                 'version_description': description,
                 'github_repo_url': self.github_repo_url,
                 'gofile_download_url': download_url,
-                'latest_changelog': latest_changelog
+                'latest_changelog': latest_updated_changelog if 'latest_updated_changelog' in locals() else latest_changelog
             }
 
             self.release_text = Template(self.release_text).substitute(release_notes_template_data)
