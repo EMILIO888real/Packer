@@ -344,20 +344,25 @@ class Packer():
 
             # Publish a github release
 
-            self.print_and_log('Publishing a new release on Github...')
+            self.print_and_log('Authorizing on Github...')
             self.repo = Github(auth=Auth.Token(self.GITHUB_REPO_TOKEN)).get_repo(self.github_repo_url)
 
             # Keeps polling the repo, until we good.
+            self.print_and_log('Waiting for Github to process the release...')
             while True:
                 try:
                     self.repo.get_commit(sha)
                     break
                 except UnknownObjectException:
-                    print('Waiting...')
+                    self.print_and_log('Waiting...')
                     sleep(1)
             
+            self.print_and_log('Publishing a new release on Github...')
             self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}',
                                                             message=self.release_text, target_commitish=sha)
+            
+            self.print_and_log('Fetching the git tag...')
+            self.git_repo.remotes.origin.fetch('--tags')
 
             self.print_and_log('Uploading the compiled programs to the github release...')
 

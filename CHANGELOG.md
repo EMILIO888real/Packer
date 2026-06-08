@@ -2,6 +2,7 @@
 
 ### Added
 - Git commits now try to be signed and if that fails, because of missing credentials them the commit is signed without. [Day 08 14:19]
+- Git fetching to fetch the Github release created tag to also be available in local git history. [Day 08 15:49]
 
 ### Changed
 - `change.py` completely to now, also allow multiple changes and in the future AI generation. [Day 08 13:53]
