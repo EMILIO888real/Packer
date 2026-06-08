@@ -1,24 +1,25 @@
 ## [%new_version] - %date
 
 ### Added
-- Git commits now try to be signed and if that fails, because of missing credentials them the commit is signed without. [Day 08 14:19]
-- Git fetching to fetch the Github release created tag to also be available in local git history. [Day 08 15:49]
-- Argument parsing for `main` function of packer using the ArgumentParser built-in module. [Day 08 16:20]
-- Paths or -p parameter to display all storage paths used by packer in case you want to delete, edit or view any of the files. [Day 08 16:21]
+- Git commits now try to be signed and if that fails, because of missing credentials them the commit is signed without.
+- Git fetching to fetch the Github release created tag to also be available in local git history.
+- Argument parsing for `main` function of packer using the ArgumentParser built-in module.
+- Paths or -p parameter to display all storage paths used by packer in case you want to delete, edit or view any of the files.
+- Automatic changelog entry association with appropriate git commits. *Adds shortened git hash to each changelog entry*. 
 
 ### Changed
-- `change.py` completely to now, also allow multiple changes and in the future AI generation. [Day 08 13:53]
+- `change.py` completely to now, also allow multiple changes and in the future AI generation.
 - Log file location output at the end of the script to contain it's own line.
-- `_just_log` to `_log_and_output_queue` to be able to easier see and if need parse output from packer by other programs, also disables verbosity automatically if using queues. [Day 08 13:53]
-- `Packer` to not add the empty list lines to the template or boilerplate for the next version changelog. [Day 08 15:30]
-- Packer's `main` function to use a simpler form of the packer's exclusive exception handler and to only assign it after packer's instance has been created. [Day 08 15:57]
+- `_just_log` to `_log_and_output_queue` to be able to easier see and if need parse output from packer by other programs, also disables verbosity automatically if using queues.
+- `Packer` to not add the empty list lines to the template or boilerplate for the next version changelog.
+- Packer's `main` function to use a simpler form of the packer's exclusive exception handler and to only assign it after packer's instance has been created.
 - Removed the date part in changelog additions, it will be replace with short git hash and it will be at the beginning instead of the end. 
 
 ### Fixed
-- `global_exception_handler` to now also handle external errors with grace, by checking if a log exists. [Day 08 13:53]
-- `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry. [Day 08 13:58]
-- `global_exception_handler` to allow weird states by checking if tmp_dir already exists. [Day 08 14:20]
-- Git status via git diff to not show changes, if not git tags are available (like for the first version of a new project). [Day 08 17:34]
+- `global_exception_handler` to now also handle external errors with grace, by checking if a log exists.
+- `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry.
+- `global_exception_handler` to allow weird states by checking if tmp_dir already exists.
+- Git status via git diff to not show changes, if not git tags are available (like for the first version of a new project).
 
 ---
 

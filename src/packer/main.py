@@ -5,6 +5,7 @@ This module contains the code for the packer, which is a script that creates an 
 from argparse import ArgumentParser
 from datetime import datetime
 from multiprocessing import Queue
+from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive
 from pathlib import Path
 from os import remove, chdir
@@ -116,6 +117,14 @@ class Packer():
             self.release_text = f.read()
 
         self.assets_dir = f'./src/{program_name}/assets'
+        self.ENTRY_RE = compile(
+                r"^- (Added|Changed|Fixed):\s*(.+)$",
+                MULTILINE
+            )
+
+        self.SINGLE_RE = compile(
+            r"^(Added|Changed|Fixed):\s*(.+)$"
+        )
 
         if input_queue:
             all_settings.verbose = False
@@ -144,6 +153,53 @@ class Packer():
 
         self.print_and_log('Updating changelog with the new version...')
         full_changelog = full_changelog.replace('%new_version', self.version).replace('%date', str(datetime.date(datetime.now())), 1)
+
+
+        self.print_and_log('Getting the latest tag...')
+        tags = sorted(self.git_repo.tags, key=lambda x: x.commit.committed_date, reverse=True)
+
+        if tags:
+            latest_tag = tags[0]
+
+            self.print_and_log('Fetching all commits from HEAD to latest tag...')
+            new_versions_commits = list(self.git_repo.iter_commits(
+                f"{latest_tag.commit.hexsha}..HEAD"
+            ))
+
+            self.print_and_log('Identifying changelog categories...')
+            added_category = f'{full_changelog[full_changelog.find('### Added') + 10: full_changelog.find('### Changed') - 2]}'
+            changed_category = f'{full_changelog[full_changelog.find('### Changed') + 12: full_changelog.find('### Fixed') - 2]}'
+            fixed_category = f'{full_changelog[full_changelog.find('### Fixed') + 10: full_changelog.find('---') - 2]}'
+
+            self.print_and_log('Parsing and updating changelog entries...')
+            for commit in new_versions_commits:
+                data_list = self._parse_commit(commit)
+                
+                for data in data_list:
+
+                    match data['category']:
+                        case 'Added':
+                            commit_sha_location = added_category.find(data['text'])
+                            added_category = f'{added_category[: commit_sha_location - 1]} [{data['hash']}] {added_category[commit_sha_location: ]}'
+                        case 'Changed':
+                            commit_sha_location = changed_category.find(data['text'])
+                            changed_category = f'{changed_category[: commit_sha_location - 1]} [{data['hash']}] {changed_category[commit_sha_location: ]}'
+                        case 'Fixed':
+                            commit_sha_location = fixed_category.find(data['text'])
+                            fixed_category = f'{fixed_category[: commit_sha_location - 1]} [{data['hash']}] {fixed_category[commit_sha_location: ]}'
+
+            self.print_and_log('Constructing updated latest changelog...')
+            latest_updated_changelog = (
+                f'### Added\n{added_category.strip()}\n\n'
+                f'### Changed\n{changed_category.strip()}\n\n'
+                f'### Fixed\n{fixed_category.strip()}'
+            )
+
+            self.print_and_log('Stitching the entire changelog with latest...')
+            new_full_changelog = f'{full_changelog[:27]}{latest_updated_changelog}'
+            new_full_changelog = f'{new_full_changelog}{full_changelog[full_changelog.find('---') - 2:]}'
+        
+        self.print_and_log('Writing out the updated changelog...')
         with open('CHANGELOG.md', 'w') as f:
             f.write(full_changelog)
 
@@ -240,10 +296,7 @@ class Packer():
             self.git_repo.archive(fp, format='zip')
 
 
-        tags = sorted(self.git_repo.tags, key=lambda x: x.commit.committed_date, reverse=True)
-
         if tags:
-            latest_tag = tags[0]
             latest_tag_commit = latest_tag.commit
             current_commit = self.git_repo.head.commit
 
@@ -465,6 +518,47 @@ class Packer():
             self.print_and_log('Deleting git release...', [255, 255, 0])
             self.git_release.delete_release()
             self.repo.get_git_ref(f'tags/{self.version}').delete()
+
+    def _parse_commit(self, commit) -> list[dict[str: str]]:
+        '''
+        Parses a commit object into a dictionary containing commit information.
+
+        :param commit: The commit object to parse.
+        :return: A list of dictionaries containing the 'category', 'text', and 'hash' of a commit.
+        :rtype: list[dict[str: str]]
+        '''
+
+        message = commit.message.strip()
+        results = []
+
+        # multi-entry format
+        matches = self.ENTRY_RE.findall(message)
+
+        if matches:
+            for category, text in matches:
+                results.append({
+                    'category': category,
+                    'text': text,
+                    'hash': commit.hexsha[:7],
+                })
+            return results
+
+        # single-entry format
+        first_line = message.splitlines()[0]
+
+        m = self.SINGLE_RE.match(first_line)
+
+        if m:
+            category, text = m.groups()
+
+            results.append({
+                'category': category,
+                'text': text,
+                'hash': commit.hexsha[:7],
+            })
+            return results
+        
+        return results
 
     def _print_and_log(self, text: str, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
             '''Prints the text and logs it to the packer log file.'''
