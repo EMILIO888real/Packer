@@ -10,6 +10,9 @@ from packer.paths import log_path, error_report_path, log_dir
 
 
 def global_exception_handler(exc_type, exc_value, exc_traceback):
+
+    global log_path
+
     '''
     Global exception handler for uncaught exceptions.
 
@@ -24,6 +27,10 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
     print_colored_text(f'An error has occurred: Type: {exc_type} | Value: {exc_value}\nPlease report this to a developer via Discord or Github!', [255, 0, 0])
 
     print('Generating an error report...')
+
+    if not log_path.exists():
+        log_path = None
+
     error_report = {'packer version': packer_version,
                     'platform': sys.platform,
                     'python version': sys.version,
@@ -40,7 +47,8 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
     tmp_dir = f'{log_dir}/temp dir'
     mkdir(tmp_dir)
     copy(error_report_path, f'{tmp_dir}/{error_report_path.name}')
-    copy(log_path, f'{tmp_dir}/{log_path.name}')
+    if log_path is not None:
+        copy(log_path, f'{tmp_dir}/{log_path.name}')
     make_archive(f'{log_dir}/issue {datetime.now()}', 'zip', tmp_dir)
     rmtree(tmp_dir)
 

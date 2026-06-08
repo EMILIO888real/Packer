@@ -116,7 +116,9 @@ class Packer():
 
         self.assets_dir = f'./src/{program_name}/assets'
 
-        self.print_and_log = self._print_and_log if all_settings.verbose else self._just_log
+        if input_queue:
+            all_settings.verbose = False
+        self.print_and_log = self._print_and_log if all_settings.verbose else self._log_and_output_queue
         self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
 
     def run(self):
@@ -533,6 +535,21 @@ class Packer():
         :type level: int
         '''
 
+        self.log_action(text, level)
+
+    def _log_and_output_queue(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+        '''
+        Logs text to the packer log file and outputs it to the queue.
+
+        :param text: The text to be logged and output.
+        :type text: str
+        :param color: The color to use for printing.
+        :type color: Optional[Sequence[int]]
+        :param level: The logging level to use.
+        :type level: int
+        '''
+
+        self.output_queue.put({'text': text, 'color': color, 'level': level})
         self.log_action(text, level)
 
     def log_action(self, action: str, level: int = 20):
