@@ -2,6 +2,7 @@
 This module contains the code for the packer, which is a script that creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.
 '''
 
+from argparse import ArgumentParser
 from datetime import datetime
 from multiprocessing import Queue
 from shutil import get_terminal_size, rmtree, make_archive
@@ -23,7 +24,7 @@ from string import Template
 from packer.custom_modules.et import bool_answer, hide_cursor, print_bg_colored_text, print_colored_text, read_json, show_cursor, stripped_input, tree, delete_upload, simple_prompt, init_logger
 from packer.ui.tui import main as tui
 from packer.config import all_settings, Project, packer_version
-from packer.paths import log_path, data_dir, cache_dir
+from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir
 from packer.exceptions import global_exception_handler
 
 def thread_excepthook(args):
@@ -620,6 +621,23 @@ class Packer():
         return done
 
 def main():
+    parser = ArgumentParser('packer', description='Packer CLI tool')
+    
+    parser.add_argument('-p', '--paths', action='store_true', help='Output all storage paths')
+
+    args = parser.parse_args()
+
+    if args.paths:
+        print(f'root_dir: {root_dir}')
+        print(f'assets_dir: {assets_dir}')
+        print(f'config_dir: {config_dir}')
+        print(f'log_dir: {log_dir}')
+        print(f'log_path: {log_path}')
+        print(f'error_report_path: {error_report_path}')
+        print(f'data_dir: {data_dir}')
+        print(f'cache_dir: {cache_dir}')
+        sys.exit()
+    
     project_directory, project_configuration = tui()
 
     if Path().cwd() != Path(project_directory):
