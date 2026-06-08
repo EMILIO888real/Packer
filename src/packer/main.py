@@ -196,7 +196,7 @@ class Packer():
             )
 
             self.print_and_log('Stitching the entire changelog with latest...')
-            new_full_changelog = f'{full_changelog[:27]}{latest_updated_changelog}'
+            new_full_changelog = f'{full_changelog[:full_changelog.find(f'{datetime.date(datetime.now())}') + len(f'{datetime.date(datetime.now())}') + 2]}{latest_updated_changelog}'
             full_changelog = f'{new_full_changelog}{full_changelog[full_changelog.find('---') - 2:]}'
         
         self.print_and_log('Writing out the updated changelog...')

@@ -26,6 +26,7 @@
 - Git status via git diff to not show changes, if not git tags are available (like for the first version of a new project).
 - Minor mistake in the implementation of the git hashes for changelog entries, to write out the updated changelog. 
 - Git tag fetching to use the wrapper. 
+- Correctly calculate the location of the start of the latest version's changelog. *But now I see, I could have done it in a much simpler way*. 
 
 ---
 
