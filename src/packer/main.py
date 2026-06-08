@@ -415,7 +415,7 @@ class Packer():
 
             self.print_and_log('Adding changelog template for next version...')
             with open('CHANGELOG.md', 'w') as f:
-                f.write(f'## [%new_version] - %date\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- \n\n---\n\n{full_changelog}')
+                f.write(f'## [%new_version] - %date\n\n### Added\n\n### Changed\n\n### Fixed\n\n---\n\n{full_changelog}')
 
             self.print_and_log('Committing next version preparation and updating origin...')
             added_items = self.git_repo.index.add(['CHANGELOG.md'])
