@@ -242,23 +242,24 @@ class Packer():
 
         tags = sorted(self.git_repo.tags, key=lambda x: x.commit.committed_date, reverse=True)
 
-        if not tags:
+        if tags:
+            latest_tag = tags[0]
+            latest_tag_commit = latest_tag.commit
+            current_commit = self.git_repo.head.commit
+
+            self.print_and_log(f'Comparing current HEAD ({current_commit.hexsha[:7]}) against latest tag: {latest_tag.name} ({latest_tag_commit.hexsha[:7]})')
+            diffs = latest_tag_commit.diff(current_commit)
+
+            for diff in diffs:
+                if diff.new_file:
+                    self.print_and_log(f'ADDED:    {diff.b_path}')
+                elif diff.deleted_file:
+                    self.print_and_log(f'REMOVED:  {diff.a_path}')
+                else:
+                    self.print_and_log(f'MODIFIED: {diff.a_path}')
+        else:
             self.print_and_log('No git tags found. Skipping file changes to latest version...')
 
-        latest_tag = tags[0]
-        latest_tag_commit = latest_tag.commit
-        current_commit = self.git_repo.head.commit
-
-        self.print_and_log(f'Comparing current HEAD ({current_commit.hexsha[:7]}) against latest tag: {latest_tag.name} ({latest_tag_commit.hexsha[:7]})')
-        diffs = latest_tag_commit.diff(current_commit)
-
-        for diff in diffs:
-            if diff.new_file:
-                self.print_and_log(f'ADDED:    {diff.b_path}')
-            elif diff.deleted_file:
-                self.print_and_log(f'REMOVED:  {diff.a_path}')
-            else:
-                self.print_and_log(f'MODIFIED: {diff.a_path}')
 
         self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):

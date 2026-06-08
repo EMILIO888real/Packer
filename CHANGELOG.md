@@ -17,6 +17,7 @@
 - `global_exception_handler` to now also handle external errors with grace, by checking if a log exists. [Day 08 13:53]
 - `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry. [Day 08 13:58]
 - `global_exception_handler` to allow weird states by checking if tmp_dir already exists. [Day 08 14:20]
+- Git status via git diff to not show changes, if not git tags are available (like for the first version of a new project). [Day 08 17:34]
 
 ---
 
