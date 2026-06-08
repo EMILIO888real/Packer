@@ -51,9 +51,9 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
     copy(error_report_path, f'{tmp_dir}/{error_report_path.name}')
     if log_path is not None:
         copy(log_path, f'{tmp_dir}/{log_path.name}')
-    make_archive(f'{log_dir}/issue {datetime.now()}', 'zip', tmp_dir)
+    make_archive(f'{log_dir}/issue {datetime.date(datetime.now())}', 'zip', tmp_dir)
     rmtree(tmp_dir)
 
     print(f'error report generated at: "{error_report_path.absolute()}"')
-    print_colored_text(f'Created an issue archive with the error report and log associated with it: "{log_dir}/issue {datetime.now()}.zip".\nPlease submit this to a developer!', [0, 255, 0])
+    print_colored_text(f'Created an issue archive with the error report and log associated with it: "{log_dir}/issue {datetime.date(datetime.now())}.zip".\nPlease submit this to a developer!', [0, 255, 0])
     sys.exit(1)

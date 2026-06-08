@@ -85,7 +85,7 @@ def tui():
 
     changes = []
     for _ in range(amount):
-        changes.append(input('Enter the modification type [a, c, f] '))
+        changes.append(input('Enter the modification type [a, c, f] ').lower())
     if len(changes) > 1:
         overall_description = input('High level description for all changes together: ')
     else:

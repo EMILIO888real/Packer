@@ -417,7 +417,7 @@ class Packer():
                                                             message=self.release_text, target_commitish=sha)
             
             self.print_and_log('Fetching the git tag...')
-            self.git_repo.remotes.origin.fetch('--tags')
+            self.git_repo.remotes.origin.fetch(tags=True)
 
             self.print_and_log('Uploading the compiled programs to the github release...')
 
