@@ -20,6 +20,7 @@
 - `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry.
 - `global_exception_handler` to allow weird states by checking if tmp_dir already exists.
 - Git status via git diff to not show changes, if not git tags are available (like for the first version of a new project).
+- Minor mistake in the implementation of the git hashes for changelog entries, to write out the updated changelog. 
 
 ---
 
