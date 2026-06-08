@@ -1,15 +1,15 @@
 ## [%new_version] - %date
 
 ### Added
-- 
 
 ### Changed
-- 
+- `change.py` completely to now, also allow multiple changes and in the future AI generation. [Day 08 13:53]
 - Log file location output at the end of the script to contain it's own line.
 - `_just_log` to `_log_and_output_queue` to be able to easier see and if need parse output from packer by other programs, also disables verbosity automatically if using queues. [Day 08 13:53]
 
 ### Fixed
-- 
+- `global_exception_handler` to now also handle external errors with grace, by checking if a log exists. [Day 08 13:53]
+- `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry. [Day 08 13:58]
 
 ---
 

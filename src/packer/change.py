@@ -56,8 +56,9 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', modificatio
         
         messages.append((modification_type, message))
 
+        full_changelog = f'{full_changelog[0: end]}\n- {message} [{datetime.now().strftime("Day %d %H:%M")}]{full_changelog[end:]}'
         with open(f'{git_directory}/CHANGELOG.md', 'w') as f:
-            f.write(f'{full_changelog[0: end]}\n- {message} [{datetime.now().strftime("Day %d %H:%M")}]{full_changelog[end:]}')
+            f.write(full_changelog)
 
     if len(messages) > 1:
         git_message = f'feat: {overall_description}\n\n'
