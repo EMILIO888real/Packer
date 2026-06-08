@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- Git commits now try to be signed and if that fails, because of missing credentials them the commit is signed without. [Day 08 14:19]
 
 ### Changed
 - `change.py` completely to now, also allow multiple changes and in the future AI generation. [Day 08 13:53]
@@ -10,6 +11,7 @@
 ### Fixed
 - `global_exception_handler` to now also handle external errors with grace, by checking if a log exists. [Day 08 13:53]
 - `change.py` to add all changes to changelog by updating it's internal changelog whenever it writes down a new entry. [Day 08 13:58]
+- `global_exception_handler` to allow weird states by checking if tmp_dir already exists. [Day 08 14:20]
 
 ---
 

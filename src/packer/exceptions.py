@@ -1,5 +1,6 @@
 from datetime import datetime
 from os import mkdir
+from pathlib import Path
 import sys
 from traceback import format_exception
 from json import dump
@@ -45,7 +46,8 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
 
     print('Creating issue archive...')
     tmp_dir = f'{log_dir}/temp dir'
-    mkdir(tmp_dir)
+    if not Path(tmp_dir).exists():
+        mkdir(tmp_dir)
     copy(error_report_path, f'{tmp_dir}/{error_report_path.name}')
     if log_path is not None:
         copy(log_path, f'{tmp_dir}/{log_path.name}')

@@ -306,12 +306,17 @@ class Packer():
             commit_message = f'{commit_subject}\n\n{commit_body}\n\n{commit_metadata}'
 
             try:
-                self.git_repo.index.commit(commit_message)
-                self.committed = True 
-            except GitCommandError as e:
-                self.committed = False
-                self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
-                self.revert_changes()
+                self.git_repo.git.commit('-S', '-m', commit_message)
+                self.committed = True
+            except GitCommandError:
+                try:
+                    self.print_and_log('Fallback to unsigned commit...')
+                    self.git_repo.git.commit('-m', commit_message)
+                    self.committed = True
+                except GitCommandError as e:
+                    self.committed = False
+                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
+                    self.revert_changes()
 
 
             sha = self.git_repo.head.commit.hexsha
