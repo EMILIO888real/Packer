@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "packer"
 version = "0.8.0"
-description = "A short description of my packer project"
+description = "A Python automation tool that streamlines python software release workflows"
 dependencies = [
     "ollama",
     "pygithub",
@@ -17,8 +17,15 @@ dependencies = [
     "tomlkit"
 ]
 
+[tool.setuptools]
+include-package-data = true
+package-dir = {"" = "src"}
+
 [tool.setuptools.packages.find]
-where = ["src"]  # This tells setuptools to look for packages inside 'src'
+where = ["src"]
+
+[tool.setuptools.package-data]
+packer = ["assets/*"]
 
 [project.scripts]
 packer = "packer.main:main"

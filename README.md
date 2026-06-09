@@ -34,7 +34,7 @@ Set up a python virtual environment and install the required dependencies:
 ```bash
 python -m venv .venv
 source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-pip install -e .
+pip install .
 ```
 
 Just run it in your project directory:
