@@ -6,6 +6,7 @@
 ### Changed
 - Latest changelog for git releases to use the updated one with git hashes if it's in use. 
 - `pyproject.toml` configuration to correctly build packer, now it functions with `pip install -e .` and `pip install .`. 
+- All file writing to utilize dedent with '''''' string blocks in `setup.py`, *not gonna lie, I prompted AI to change them*. 
 
 ### Fixed
 

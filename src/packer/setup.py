@@ -3,6 +3,7 @@ from os import chdir, mkdir
 from pathlib import Path
 from shutil import rmtree
 from subprocess import CalledProcessError, run
+from textwrap import dedent
 from typing import Sequence
 from json import dump
 from git import Repo
@@ -97,15 +98,48 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     
     print_and_log('Creating __init__.py file...')
     with open(f'{root_dir}/__init__.py', 'w') as f:
-        f.write('')
+        f.write(dedent('''\
+            # import here object that users will import.
+
+            __all__ = [] # populate this list with str names of all the objects.
+        '''))
 
     print_and_log('Creating paths.py file...')
     with open(f'{root_dir}/paths.py', 'w') as f:
-        f.write(f'from importlib import resources\n\nroot_dir = resources.files(\'{program_name}\') \nassets_dir = root_dir.joinpath(\'assets\')\n')
+        f.write(dedent(f'''\
+            from datetime import datetime
+            from importlib import resources
+            from pathlib import Path
+            from platformdirs import user_cache_dir, user_config_dir, user_data_dir, user_log_dir
+
+            root_dir = resources.files('{program_name}')
+            assets_dir = root_dir.joinpath('assets')
+            config_dir = user_config_dir('{program_name}', '{author_name}', ensure_exists=True)
+            log_dir = user_log_dir('{program_name}', '{author_name}', ensure_exists=True)
+            log_path = Path(f'{{log_dir}}/{{datetime.date(datetime.now())}}.log')
+
+            error_report_path = Path(f'{{log_dir}}/error report {{datetime.date(datetime.now())}}.json')
+            if not Path(error_report_path).exists():
+                with open(error_report_path, 'w') as f:
+                    f.write('')
+
+            data_dir = user_data_dir('{program_name}', '{author_name}', ensure_exists=True)
+            cache_dir = user_cache_dir('{program_name}', '{author_name}', ensure_exists=True)
+            '''))
 
     print_and_log('Creating main.py file...')
     with open(f'{root_dir}/main.py', 'w') as f:
-        f.write(f'from {program_name}.paths import assets_dir\n\n\ndef main():\n    print("Hello, world!")\n\nif __name__ == "__main__":\n    main()\n')
+        f.write(dedent(f'''\
+            from {program_name}.paths import assets_dir
+
+
+            def main():
+                print("Hello, world!")
+
+
+            if __name__ == "__main__":
+                main()
+        '''))
 
     print_and_log('Creating version.json file...')
     with open(f'{root_dir}/assets/version.json', 'w') as f:
@@ -119,35 +153,215 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating a todo.md file...')
     with open('docs/todo.md', 'w') as f:
-        f.write('# TODO\n\n- [ ] Write the README.md file\n- [ ] Write the CHANGELOG.md file\n- [ ] Write the ROADMAP.md file\nWrite the pyproject.toml file\n')
+        f.write(dedent('''\
+            # TODO
+
+            - [ ] Write the README.md file
+            - [ ] Write the CHANGELOG.md file
+            - [ ] Write the ROADMAP.md file
+            Write the pyproject.toml file
+        '''))
 
     print_and_log('Creating a SETTINGS.md file...')
     with open('docs/SETTINGS.md', 'w') as f:
-        f.write(f'# SETTINGS\n\nThis file contains detailed information on user-configurable settings for {program_name}.\n\n## Setting 1\n\nDescription of setting 1.\n\n## Setting 2\n\nDescription of setting 2.\n\n## Setting 3\n\nDescription of setting 3.\n')
+        f.write(dedent(f'''\
+            # SETTINGS
+
+            This file contains detailed information on user-configurable settings for {program_name}.
+
+            ## Setting 1
+
+            Description of setting 1.
+
+            ## Setting 2
+
+            Description of setting 2.
+
+            ## Setting 3
+
+            Description of setting 3.
+        '''))
 
     print_and_log('Creating a CONFIGURATION.md file...')
     with open('docs/CONFIGURATION.md', 'w') as f:
-        f.write(f'# CONFIGURATION\n\nThis file contains detailed information on game configuration parameters for {program_name}.\n\n## Parameter 1\n\nDescription of parameter 1.\n\n## Parameter 2\n\nDescription of parameter 2.\n\n## Parameter 3\n\nDescription of parameter 3.\n')
+        f.write(dedent(f'''\
+            # CONFIGURATION
+
+            This file contains detailed information on game configuration parameters for {program_name}.
+
+            ## Parameter 1
+
+            Description of parameter 1.
+
+            ## Parameter 2
+
+            Description of parameter 2.
+
+            ## Parameter 3
+
+            Description of parameter 3.
+        '''))
 
     print_and_log('Creating a CUSTOMIZATION.md file...')
     with open('docs/CUSTOMIZATION.md', 'w') as f:
-        f.write(f'# CUSTOMIZATION\n\nThis file contains detailed information on how to add custom assets and important notes about settings for {program_name}.\n\n## Custom Asset 1\n\nDescription of custom asset 1.\n\n## Custom Asset 2\n\nDescription of custom asset 2.\n\n## Custom Asset 3\n\nDescription of custom asset 3.\n')
+        f.write(dedent(f'''\
+            # CUSTOMIZATION
+
+            This file contains detailed information on how to add custom assets and important notes about settings for {program_name}.
+
+            ## Custom Asset 1
+
+            Description of custom asset 1.
+
+            ## Custom Asset 2
+
+            Description of custom asset 2.
+
+            ## Custom Asset 3
+
+            Description of custom asset 3.
+        '''))
 
     print_and_log('Creating a pyproject.toml file...')
     with open('pyproject.toml', 'w') as f:
-        f.write(f'[project]\nname = "{program_name}"\nversion = "0.0.0"\ndescription = ""\nreadme = "README.md"\nlicense = "MIT"\ndependencies = []\n\n[build-system]\nrequires = ["setuptools"]\nbuild-backend = "setuptools.build_meta"\n[tool.setuptools.packages.find]\nwhere = ["src"]  # This tells setuptools to look for packages inside \'src\'\n\n[project.scripts]\n{program_name} = "{program_name}.main:main"')
+        f.write(dedent(f'''\
+            [project]
+            name = "{program_name}"
+            version = "0.0.0"
+            description = ""
+            readme = "README.md"
+            license = "MIT"
+            dependencies = []
+
+            [build-system]
+            requires = ["setuptools"]
+            build-backend = "setuptools.build_meta"
+            [tool.setuptools.packages.find]
+            where = ["src"]  # This tells setuptools to look for packages inside 'src'
+
+            [project.scripts]
+            {program_name} = "{program_name}.main:main"
+        '''))
 
     print_and_log('Creating CHANGELOG.md...')
     with open('CHANGELOG.md', 'w') as f:
-        f.write(f'## [%new_version] - %date\n\n### Added\n- \n\n### Changed\n- \n\n### Fixed\n- \n\n')
+        f.write(dedent('''\
+            ## [%new_version] - %date
+
+            ### Added
+            - 
+
+            ### Changed
+            - 
+
+            ### Fixed
+            - 
+
+        '''))
 
     print_and_log('Creating README.md...')
     with open('README.md', 'w') as f:
-        f.write(f'# {program_name.capitalize()}\n\nA short description of the project.\n\n## Contents\n\n- [Installation](#Installation)\n- [Usage](#Usage)\n- [Configuration](#Configuration)\n\t- [Settings](#Settings)\n\t- [Config](#Config)\n\t- [Extra customization](#extra-customization)\n- [Extra notes](#extra-notes)\n- [Warning](#warning)\n- [Features](#features)\n- [Feedback and Suggestions](#feedback-and-suggestions)\n- [Honorable mentions](#honorable-mentions)\n- [Changelog](#changelog)\n- [In future updates](#in-future-updates)\n\n## Installation\n\nAvailable via Github or Gofile.\n\n1. Github\n\n- Download the latest release from the [releases page](%release_url)\n- Unzip the downloaded content if you installed the archive version\n- Run the executable file\n\n2. Gofile\n\n- Download the latest release from the [Gofile page](%gofile_url)\n- Unzip the downloaded content if you installed the archive version\n- Run the executable file\n\n## Usage\n\nInstructions on how to use the program.\n\n## Configuration\n\n### Settings\n\nSee [SETTINGS.md](docs/SETTINGS.md) for detailed information on user-configurable settings.\n\n### Config\n\nSee [CONFIGURATION.md](docs/CONFIGURATION.md) for detailed information on game configuration parameters.\n\n### Extra customization\n\nSee [CUSTOMIZATION.md](./docs/CUSTOMIZATION.md) for detailed information on how to add custom assets and important notes about settings.\n\n## Extra notes\n\nAny extra notes about the project.\n\n## Warning\n\nAny warnings about the project.\n\n## Features\n\nList of features in the project.\n\n## Feedback and Suggestions\n\nInstructions on how to provide feedback and suggestions for the project.\n\n## Honorable mentions\n\nAcknowledgment of any contributors or resources that were helpful in the development of the project.\n\n## Changelog\n\nSee the full history in [CHANGELOG.md](./CHANGELOG.md).\n\n## In future updates\nsee [ROADMAP.md](./docs/ROADMAP.md) for planned features and improvements.\n')
+        f.write(dedent(f'''\
+            # {program_name.capitalize()}
+
+            A short description of the project.
+
+            ## Contents
+
+            - [Installation](#Installation)
+            - [Usage](#Usage)
+            - [Configuration](#Configuration)
+            	- [Settings](#Settings)
+            	- [Config](#Config)
+            	- [Extra customization](#extra-customization)
+            - [Extra notes](#extra-notes)
+            - [Warning](#warning)
+            - [Features](#features)
+            - [Feedback and Suggestions](#feedback-and-suggestions)
+            - [Honorable mentions](#honorable-mentions)
+            - [Changelog](#changelog)
+            - [In future updates](#in-future-updates)
+
+            ## Installation
+
+            Available via Github or Gofile.
+
+            1. Github
+
+            - Download the latest release from the [releases page](%release_url)
+            - Unzip the downloaded content if you installed the archive version
+            - Run the executable file
+
+            2. Gofile
+
+            - Download the latest release from the [Gofile page](%gofile_url)
+            - Unzip the downloaded content if you installed the archive version
+            - Run the executable file
+
+            ## Usage
+
+            Instructions on how to use the program.
+
+            ## Configuration
+
+            ### Settings
+
+            See [SETTINGS.md](docs/SETTINGS.md) for detailed information on user-configurable settings.
+
+            ### Config
+
+            See [CONFIGURATION.md](docs/CONFIGURATION.md) for detailed information on game configuration parameters.
+
+            ### Extra customization
+
+            See [CUSTOMIZATION.md](./docs/CUSTOMIZATION.md) for detailed information on how to add custom assets and important notes about settings.
+
+            ## Extra notes
+
+            Any extra notes about the project.
+
+            ## Warning
+
+            Any warnings about the project.
+
+            ## Features
+
+            List of features in the project.
+
+            ## Feedback and Suggestions
+
+            Instructions on how to provide feedback and suggestions for the project.
+
+            ## Honorable mentions
+
+            Acknowledgment of any contributors or resources that were helpful in the development of the project.
+
+            ## Changelog
+
+            See the full history in [CHANGELOG.md](./CHANGELOG.md).
+
+            ## In future updates
+            see [ROADMAP.md](./docs/ROADMAP.md) for planned features and improvements.
+        '''))
 
     print_and_log('Creating ROADMAP.md...')
     with open('docs/ROADMAP.md', 'w') as f:
-        f.write('# Roadmap\n\n## Version 0.0.0\n\n- [ ] Initial release\n\n## Version 0.2.0\n\n- [ ] Add new features\n- [ ] Fix bugs\n\n## Version 1.0.0\n\n- [ ] Stable release with all planned features implemented and tested.\n')
+        f.write(dedent('''\
+            # Roadmap
+
+            ## Version 0.0.0
+
+            - [ ] Initial release
+
+            ## Version 0.2.0
+
+            - [ ] Add new features
+            - [ ] Fix bugs
+
+            ## Version 1.0.0
+
+            - [ ] Stable release with all planned features implemented and tested.
+        '''))
 
     print_and_log('Creating an MIT license...')
     with open('LICENSE', 'w') as f:
@@ -155,41 +369,40 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating .spec file...')
     with open(f'main.spec', 'w') as f:
-        f.write(
-f'''
-# -*- mode: python ; coding: utf-8 -*-
+        f.write(dedent(f'''\
+            # -*- mode: python ; coding: utf-8 -*-
 
-a = Analysis(
-    ['src/{program_name}/main.py'],
-    pathex=['src'],
-    binaries=[],
-    datas=[
-        ('src/{program_name}/assets', '{program_name}/assets'),
-    ],
-    hookspath=[],
-    hooksconfig={{}},
-    runtime_hooks=[],
-    excludes=[],
-    noarchive=False,
-)
+            a = Analysis(
+                ['src/{program_name}/main.py'],
+                pathex=['src'],
+                binaries=[],
+                datas=[
+                    ('src/{program_name}/assets', '{program_name}/assets'),
+                ],
+                hookspath=[],
+                hooksconfig={{}},
+                runtime_hooks=[],
+                excludes=[],
+                noarchive=False,
+            )
 
-pyz = PYZ(a.pure)
+            pyz = PYZ(a.pure)
 
-exe = EXE(
-    pyz,
-    a.scripts,
-    a.binaries,
-    a.datas,
-    [],
-    name='{program_name}',
-    debug=False,
-    bootloader_ignore_signals=False,
-    strip=False,
-    upx=True,
-    console=True,
-    onefile=True
-)
-''')
+            exe = EXE(
+                pyz,
+                a.scripts,
+                a.binaries,
+                a.datas,
+                [],
+                name='{program_name}',
+                debug=False,
+                bootloader_ignore_signals=False,
+                strip=False,
+                upx=True,
+                console=True,
+                onefile=True
+            )
+        '''))
         
     print_and_log('Verify main.spec via running it...')
 
@@ -204,20 +417,20 @@ exe = EXE(
 
     print_and_log('Creating .gitignore file...')
     with open('.gitignore', 'w') as f:
-        f.write(
-            f'# Virtual environment directory\n'
-            f'.venv/\n'
-            f'# VSCode settings\n'
-            f'.vscode/\n'
-            f'# Python cache files\n'
-            f'__pycache__/\n'
-            f'# Distribution archives\n'
-            f'dist/\n'
-            f'# Build directories\n'
-            f'build/\n'
-            f'# Package metadata\n'
-            f'{program_name}.egg-info/\n'
-        )
+        f.write(dedent(f'''\
+            # Virtual environment directory
+            .venv/
+            # VSCode settings
+            .vscode/
+            # Python cache files
+            __pycache__/
+            # Distribution archives
+            dist/
+            # Build directories
+            build/
+            # Package metadata
+            {program_name}.egg-info/
+        '''))
 
     print_and_log('Waiting for .venv to finish creating...')
     created_venv.wait()
@@ -267,10 +480,10 @@ exe = EXE(
 if __name__ == '__main__':
     try:
         print(f'github repo url: {main(input('Project directory (absolute path, leave empty for current directory): '),
-                      input('Author name of the program: '),
-                      input('Program name: '),
-                      input('Github repo token (leave empty to skip): '),
-                      input('Github repo url (username/repo, leave empty to skip): '))}')
+                                       input('Author name of the program: '),
+                                       input('Program name: '),
+                                       input('Github repo token (leave empty to skip): '),
+                                       input('Github repo url (username/repo, leave empty to skip): '))}')
     except KeyboardInterrupt:
         exit()
     except Exception as e:
