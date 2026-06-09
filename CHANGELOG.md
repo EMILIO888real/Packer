@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- Version output parameter to the CLI (-v, --version). 
 
 ### Changed
 - Latest changelog for git releases to use the updated one with git hashes if it's in use. 

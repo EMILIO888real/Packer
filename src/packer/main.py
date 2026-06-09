@@ -719,6 +719,7 @@ def main():
     parser = ArgumentParser('packer', description='Packer CLI tool')
     
     parser.add_argument('-p', '--paths', action='store_true', help='Output all storage paths')
+    parser.add_argument('-v', '--version', action='store_true', help='Display the software\'s version')
 
     args = parser.parse_args()
 
@@ -731,6 +732,10 @@ def main():
         print(f'error_report_path: {error_report_path}')
         print(f'data_dir: {data_dir}')
         print(f'cache_dir: {cache_dir}')
+        sys.exit()
+    
+    if args.version:
+        print(f'Packer version {packer_version}')
         sys.exit()
     
     project_directory, project_configuration = tui()
