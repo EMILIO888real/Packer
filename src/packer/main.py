@@ -13,7 +13,8 @@ from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 import sys
 from time import sleep
-from typing import Any, Optional, Sequence
+from typing import Any, Optional
+from collections.abc import Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
 from requests import post
