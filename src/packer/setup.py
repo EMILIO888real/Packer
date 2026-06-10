@@ -612,8 +612,7 @@ def tui() -> tuple[str]:
     project_directory.rstrip('/')
 
     github_pat = getpass('3. Github personal access token (with Administration permissions): ').strip() or None
-    if not github_pat:
-        github_repo_url = stripped_input('4. Github repo url (username/repo): ') or None
+    github_repo_url = not github_pat and stripped_input('4. Github repo url (username/repo): ') or None
 
     default_name = getuser()
 

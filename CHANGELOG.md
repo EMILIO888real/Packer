@@ -18,6 +18,7 @@
 ### Fixed
 - To utilize a different syntax for Sequence type notations: `Sequence[Sequence[str]]` instead of the old `Sequence[Sequence][str]`, because of the same user reported error. *If still ineffective will change to using a basic tuple*. 
 - The previous fix for the `Sequence` documentation didn't work, so it seems the library is flawed on some python env. in that case I have switched the 2 instances of Sequence using 2 notation to utilize tuples instead with the newer ellipsis syntax. 
+- Minor mistake in the clean up of `setup's` `tui`, if user enters the GitHub token for creating a Repo on Github, it would crash, because of flawed logic. 
 
 ---
 
