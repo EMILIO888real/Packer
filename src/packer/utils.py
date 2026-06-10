@@ -52,7 +52,7 @@ def simple_merge_settings(user_settings: dict[str, Any] | None, default_settings
     merging process ensures that user settings take precedence over defaults.
 
     :param user_settings: A dictionary of user-defined settings
-    :type user_settings: dict[str, Any] | None
+    :type user_settings: dict[str, Any]
     :param default_settings: A dictionary of default settings
     :type default_settings: dict[str, Any]
     :param default_config: An optional dictionary of default configuration values
@@ -61,17 +61,11 @@ def simple_merge_settings(user_settings: dict[str, Any] | None, default_settings
     :rtype: dict[str, Any]
     '''
 
-    merged_defaults = dict(default_settings or {})
+    default_settings = normalize_settings_keys(default_settings)
     if default_config:
-        merged_defaults.update(default_config)
+        default_settings.update(normalize_settings_keys(default_config))
 
-    normalized_defaults = normalize_settings_keys(merged_defaults)
-    normalized_user = normalize_settings_keys(user_settings or {})
-
-    merged = dict(normalized_defaults)
-    merged.update(normalized_user)
-
-    return merged
+    return merge_settings(normalize_settings_keys(user_settings), default_settings)
 
 def normalize_settings_keys(all_settings: dict[str: Any]) -> dict[str: Any]:
     '''
