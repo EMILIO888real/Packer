@@ -44,6 +44,7 @@ def main() -> tuple[str, Project]:
         print(f'Creating a new project profile!\nYou will need to set up some required settings[7] before we begin.')
 
         user_setup_data = tui()
+        project_directory = user_setup_data[0]
         program_name = user_setup_data[2]
         print('Starting setup...')
         github_repo_url = setup(*user_setup_data, True)
@@ -71,7 +72,7 @@ def main() -> tuple[str, Project]:
             }
 
 
-        if simple_prompt(f'Would you like to edit optional settings[1]', 'n'):
+        if simple_prompt(f'Would you like to edit optional settings', 'n'):
             def prompt_optional_setting(setting: str, text: str = None, key: Callable = lambda x:x) -> None:
                 if text is None:
                     text = setting
