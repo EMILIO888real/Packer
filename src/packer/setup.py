@@ -58,18 +58,21 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     │       ├── paths.py
     │       └── assets/
     ├── docs/
-    │   ├── todo.md
     │   ├── SETTINGS.md
     │   ├── CONFIGURATION.md
     │   ├── CUSTOMIZATION.md
     │   └── ROADMAP.md
     ├── tests/
     ├── dev/
+    |   └── todo.md
     ├── .gitignore
     ├── LICENSE
     ├── README.md
     ├── CHANGELOG.md
-    └── pyproject.toml
+    ├── pyproject.toml
+    └── .github/
+        └── workflows/
+            └── build.yaml
     ```
     The function also initializes a git repository, creates an initial commit, and optionally creates a remote repository on GitHub and pushes the initial commit to it.
 
@@ -117,6 +120,49 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     mkdir('docs')
     mkdir('tests')
     mkdir('dev')
+    mkdir('.github')
+    mkdir('.github/workflows')
+
+    print_and_log('Creating build.yaml file...')
+    with open(f'.github/workflows/build.yaml', 'w') as f:
+        f.write(dedent(f'''\
+            name: Build Windows EXE for Release
+
+            on:
+              release:
+                types: [created]
+
+            permissions:
+              contents: write
+
+            jobs:
+              build:
+                runs-on: windows-latest
+                # Opt-in to Node.js 24 as recommended by GitHub
+                env:
+                  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+                steps:
+                  - uses: actions/checkout@v4
+
+                  - name: Set up Python
+                    uses: actions/setup-python@v5
+                    with:
+                      python-version: "3.12"
+
+                  - name: Install dependencies
+                    run: pip install .
+
+                  - name: Install PyInstaller
+                    run: pip install pyinstaller
+
+                  - name: Build executable
+                    run: python -m PyInstaller main.spec
+
+                  - name: Upload to GitHub Release
+                    uses: softprops/action-gh-release@v2
+                    with:
+                      files: dist/{program_name}.exe
+        '''))
     
     print_and_log('Creating __init__.py file...')
     with open(f'{root_dir}/__init__.py', 'w') as f:
@@ -174,14 +220,16 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Starting outside src directory build process..')
 
     print_and_log('Creating a todo.md file...')
-    with open('docs/todo.md', 'w') as f:
+    with open('dev/TODO.md', 'w') as f:
         f.write(dedent('''\
             # TODO
 
             - [ ] Write the README.md file
             - [ ] Write the CHANGELOG.md file
             - [ ] Write the ROADMAP.md file
-            Write the pyproject.toml file
+            - [ ] Write the pyproject.toml file
+            - [ ] Check and update the .gitignore if necessary
+            - [ ] Remove the dist directory with the test executable
         '''))
 
     print_and_log('Creating a SETTINGS.md file...')
@@ -247,19 +295,27 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Creating a pyproject.toml file...')
     with open('pyproject.toml', 'w') as f:
         f.write(dedent(f'''\
+            [build-system]
+            requires = ["setuptools>=61.0"]
+            build-backend = "setuptools.build_meta"
+
             [project]
             name = "{program_name}"
             version = "0.0.0"
-            description = ""
+            description = "A short description about your program: {program_name}."
             readme = "README.md"
             license = "MIT"
             dependencies = []
 
-            [build-system]
-            requires = ["setuptools"]
-            build-backend = "setuptools.build_meta"
+            [tool.setuptools]
+            include-package-data = true
+            package-dir = {{"" = "src"}}
+
             [tool.setuptools.packages.find]
-            where = ["src"]  # This tells setuptools to look for packages inside 'src'
+            where = ["src"]
+
+            [tool.setuptools.package-data]
+            {program_name} = ["assets/*"]
 
             [project.scripts]
             {program_name} = "{program_name}.main:main"
@@ -271,13 +327,10 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             ## [%new_version] - %date
 
             ### Added
-            - 
 
             ### Changed
-            - 
 
             ### Fixed
-            - 
 
         '''))
 
@@ -290,12 +343,13 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
             ## Contents
 
-            - [Installation](#Installation)
-            - [Usage](#Usage)
-            - [Configuration](#Configuration)
-            	- [Settings](#Settings)
-            	- [Config](#Config)
-            	- [Extra customization](#extra-customization)
+            - [Installation](#installation)
+            - [Binary Downloads](#binary-downloads)
+            - [Usage](#usage)
+            - [Configuration](#configuration)
+              - [Settings](#settings)
+              - [Config](#config)
+              - [Extra customization](#extra-customization)
             - [Extra notes](#extra-notes)
             - [Warning](#warning)
             - [Features](#features)
@@ -306,23 +360,44 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
             ## Installation
 
-            Available via Github or Gofile.
+            Available via:
 
-            1. Github
+            * **GitHub Releases:** [GitHub Releases](%release_url)
+            * **Third-party website (GoFile):** [Archive](%gofile_url)
 
-            - Download the latest release from the [releases page](%release_url)
-            - Unzip the downloaded content if you installed the archive version
-            - Run the executable file
+            ### Binary Downloads
 
-            2. Gofile
+            When downloading, please choose the correct build for your operating system:
 
-            - Download the latest release from the [Gofile page](%gofile_url)
-            - Unzip the downloaded content if you installed the archive version
-            - Run the executable file
+            | File Name | Platform | Description |
+            | --- | --- | --- |
+            | `{program_name}` | Linux/macOS | Executable for Unix-based systems. |
+            | `{program_name}.exe` | Windows | Executable for Windows systems. |
+
+            ### To install:
+
+            * **GitHub:**
+              Download the appropriate binary for your system from the [Releases page](%release_url).
+            * **Third-party website (GoFile):**
+              Head to the website [Archive](%gofile_url) and download the specific archive with the appropriate version.
+
+            After installing, continue following instructions in this README.
 
             ## Usage
 
-            Instructions on how to use the program.
+            After installing the project, you can run it from the command line with the entry point defined in your pyproject.toml file.
+
+            ### Basic example
+
+            ```bash
+            python -m {program_name}.main
+            ```
+
+            If you installed the package in your environment, you can also run:
+
+            ```bash
+            {program_name}
+            ```
 
             ## Configuration
 
@@ -363,7 +438,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             See the full history in [CHANGELOG.md](./CHANGELOG.md).
 
             ## In future updates
-            see [ROADMAP.md](./docs/ROADMAP.md) for planned features and improvements.
+
+            See [ROADMAP.md](./docs/ROADMAP.md) for planned features and improvements.
         '''))
 
     print_and_log('Creating ROADMAP.md...')
@@ -440,18 +516,18 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Creating .gitignore file...')
     with open('.gitignore', 'w') as f:
         f.write(dedent(f'''\
-            # Virtual environment directory
-            .venv/
-            # VSCode settings
-            .vscode/
-            # Python cache files
-            __pycache__/
-            # Distribution archives
-            dist/
-            # Build directories
-            build/
-            # Package metadata
-            {program_name}.egg-info/
+            # Virtual Environments and settings
+            .venv
+            .vscode
+
+            # Developer related stuff
+            tests
+            dev
+            **/__pycache__/
+            *.py[cod]
+
+            # Distribution / Packaging
+            *.egg-info/
         '''))
 
     print_and_log('Waiting for .venv to finish creating...')
@@ -550,6 +626,6 @@ def tui() -> tuple[str]:
 if __name__ == '__main__':
     print('You will need to configure [4-5] settings.')
     try:
-        print(f'github repo url: {main(*tui())}')
+        print(f'github repo url: {main(*tui(), overwrite_existing=True)}')
     except KeyboardInterrupt:
         exit()

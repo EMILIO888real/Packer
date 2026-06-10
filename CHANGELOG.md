@@ -3,6 +3,7 @@
 ### Added
 - Version output parameter to the CLI (-v, --version). 
 - A new module etf.py for python objects to help with terminal and various tui handling and configuration. *Module will be expended in the future using functions from et, since et is for more general stuff.*. 
+- `build.yaml` file creation to `setup.py`, with the updated syntax for creating a Windows exe of your program using Github Virtual machines via Github actions. 
 
 ### Changed
 - Latest changelog for git releases to use the updated one with git hashes if it's in use. 
@@ -10,6 +11,8 @@
 - All file writing to utilize dedent with '''''' string blocks in `setup.py`, *not gonna lie, I prompted AI to change them*. 
 - Condensed the tui for setup into a function and moved it from tui.py to setup, since tui imports and setup can use it in case user chooses to run the module directly. 
 - Cleaned up the `tui` function in `setup.py` to be more flexible by allowing to create a project without a GitHub repo, just locally. 
+- Updated the `build.yaml` file to not utilize anymore, soon deprecated features, like the old asset uploading and the Node.js version. 
+- Updated all kinds of `setup.py` file creation and writing to use the latest packer tech for new projects, that includes upgrading the README, TODO.md and some other minor things. 
 
 ### Fixed
 

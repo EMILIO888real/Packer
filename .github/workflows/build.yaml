@@ -1,30 +1,36 @@
 name: Build Windows EXE for Release
+
 on:
   release:
     types: [created]
+
 permissions:
   contents: write
+
 jobs:
   build:
     runs-on: windows-latest
+    # Opt-in to Node.js 24 as recommended by GitHub
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-    - uses: actions/checkout@v4
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.12"
-    - name: Install dependencies
-      run: pip install .
-    - name: Install PyInstaller
-      run: pip install pyinstaller
-    - name: Build executable
-      run: python -m PyInstaller main.spec
-    - name: Upload to GitHub Release
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ github.event.release.upload_url }}
-        asset_path: "dist/packer.exe"
-        asset_name: "packer.exe"
-        asset_content_type: application/octet-stream
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install .
+
+      - name: Install PyInstaller
+        run: pip install pyinstaller
+
+      - name: Build executable
+        run: python -m PyInstaller main.spec
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/packer.exe
