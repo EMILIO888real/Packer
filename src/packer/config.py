@@ -43,15 +43,15 @@ class Project(BaseModel):
     program_name: str
     github_repo_url: str
 
-    before_commands: Sequence[Sequence[str]] | None = None
-    after_commands: Sequence[Sequence[str]] | None = None
+    before_commands: tuple[tuple[str, ...], ...] | None = None
+    after_commands: tuple[tuple[str, ...], ...] | None = None
     compile_command: Sequence[str] | None = None
     model: str = 'mistral'
-    description_prompt: list[dict[str, str]] = [
+    description_prompt: list[dict[str, str]] | None = [
         {'role': 'system', 'content': 'You are a senior developer writing professional release notes. Summarize the following changelog into one short sentence. Focus strictly on the high-level impact (e.g., \'This release introduces a new TUI and streamlines Windows builds.\') rather than listing individual functions or fixes. Use professional, active language. Output ONLY the summary text, no markdown block syntax, no intros, and no explanations.'},
         {'role': 'user', 'content': f'Summarize the following changelog into exactly one concise sentence. Group related technical changes (e.g., UI, Build Automation, Refactoring). Do not use bullet points. Do not mention specific function names unless they are major features. Ensure the tone is professional.\n\nChangelog:\n%latest_changelog'}
     ]
-    title_prompt: list[dict[str, str]] = [
+    title_prompt: list[dict[str, str]] | None = [
         {'role': 'system', 'content': 'You are a cryptic oracle. Your answer must be exactly 2 or 3 words. No quotes, no punctuation, no preamble.'},
         {'role': 'user', 'content': f'Create a mystical, indirect puzzle title for this update. Do not include version numbers.\n\nChangelog:%latest_changelog\n'}
     ]

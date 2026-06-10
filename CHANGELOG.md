@@ -20,6 +20,7 @@
 - The previous fix for the `Sequence` documentation didn't work, so it seems the library is flawed on some python env. in that case I have switched the 2 instances of Sequence using 2 notation to utilize tuples instead with the newer ellipsis syntax. 
 - Minor mistake in the clean up of `setup's` `tui`, if user enters the GitHub token for creating a Repo on Github, it would crash, because of flawed logic. 
 - Minor mistake in `tui` module's `main` function, when I had moved the `tui` logic for `setup` to `setup.py`, I forgot to extract project directory individually in case user was creating one. 
+- Updated documentation in `config.py` to allow not using prompts, to skip AI generation and the `Sequence` documentation to tuple. 
 
 ---
 
