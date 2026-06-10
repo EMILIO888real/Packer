@@ -1,4 +1,6 @@
 
+from getpass import getpass, getuser
+from importlib import import_module
 from os import chdir, mkdir
 from pathlib import Path
 from shutil import rmtree
@@ -9,12 +11,32 @@ from json import dump
 from git import Repo
 from github import Auth, Github
 from multiprocessing import Process, Event
-from sys import exit, platform
+from sys import exit, platform, builtin_module_names
+from re import match
+from keyword import iskeyword
+from platformdirs import user_documents_dir
 
-from packer.custom_modules.et import init_logger, print_colored_text, tree, read_json, format_version_text
+from packer.custom_modules.et import init_logger, print_colored_text, simple_prompt, stripped_input, tree, read_json, format_version_text
 from packer.config import packer_version
+from packer.custom_modules.etf import print_list
 
 logger = init_logger('packer setup', 'EMILIO')
+
+def check_module_conflict(program_name: str) -> bool:
+    '''
+    Check if a module name conflicts with Python built-in modules or keywords.
+
+    :param program_name: The name of the program/module to check
+    :type program_name: str
+    :return: True if there is a conflict, False otherwise
+    :rtype: bool
+    '''
+
+    try:
+        import_module(program_name)
+        return True
+    except ImportError:
+        return False
 
 def print_and_log(text: str, level: int = 20, color: Sequence[int] = [255, 255, 255], end: str = '\n') -> None:
     print_colored_text(text, color, end=end)
@@ -477,15 +499,57 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     
     return github_repo_url.lstrip('https://github.com/') if github_repo_url is not None else None
 
+def tui() -> tuple[str]:
+    '''
+    Interactive command-line user interface for collecting project setup information.
+
+    This function prompts the user for various project details such as the program name,
+    author name, and GitHub Personal Access Token (PAT). It ensures that required
+    information is provided and returns the collected data as a tuple.
+
+    :return: A tuple containing:
+        - program_name (str): The name of the program.
+        - author_name (str): The name of the author.
+        - github_pat (str or None): The GitHub PAT if provided, otherwise None.
+    :rtype: tuple[str]
+    '''
+
+    program_name = input('1. Program name: ')
+
+    while (program_name[:1].isdigit()) or (program_name.count(' ') > 0) or (not match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', program_name)) or (iskeyword(program_name)) or (program_name in builtin_module_names or (check_module_conflict(program_name))):
+        print('Name isn\'t acceptable since it doesn\'t follow restrictions:')
+        print_list(['Can\'t start with a number', 'Can\'t contain any spaces', 'Can\'t contain any special characters (Alphanumeric characters and underscores only)', 'Can\'t be a Python keyword', 'Can\'t be a built-in module name', 'Can\'t be in conflict with other existing modules'], start='\t* ')
+        program_name = input('Reenter the program name: ')
+
+
+    default_project_dir = f'{user_documents_dir()}/{program_name}'
+
+    project_directory = input(f'2. Project directory (absolute path, default to: {default_project_dir}): ')
+    if project_directory == '':
+        project_directory = default_project_dir
+
+    if Path(project_directory).exists():
+        if not simple_prompt('Directory already exists, overwrite it', 'n'):
+            print('Aborting setup')
+            return
+
+    project_directory.rstrip('/')
+
+    github_pat = getpass('3. Github personal access token (with Administration permissions): ').strip() or None
+    if not github_pat:
+        github_repo_url = stripped_input('4. Github repo url (username/repo): ') or None
+
+    default_name = getuser()
+
+    author_name = input(f'5. Author name of the program [default to: {default_name}]: ')
+    if author_name == '':
+        author_name = default_name
+
+    return (project_directory, author_name, program_name, github_pat, github_repo_url)
+
 if __name__ == '__main__':
+    print('You will need to configure [4-5] settings.')
     try:
-        print(f'github repo url: {main(input('Project directory (absolute path, leave empty for current directory): '),
-                                       input('Author name of the program: '),
-                                       input('Program name: '),
-                                       input('Github repo token (leave empty to skip): '),
-                                       input('Github repo url (username/repo, leave empty to skip): '))}')
+        print(f'github repo url: {main(*tui())}')
     except KeyboardInterrupt:
-        exit()
-    except Exception as e:
-        print_and_log(f'Something went wrong, please report this. | Error: {e}', color=[255, 0, 0])
         exit()
