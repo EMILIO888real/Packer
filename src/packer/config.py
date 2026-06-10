@@ -36,6 +36,7 @@ import json
 with open(f'{assets_dir}/version.json') as f:
     packer_version = format_version_text(json.load(f))
 
+
 class Project(BaseModel):
     gofile_user_token: str
     gofile_folder_id: str
@@ -58,10 +59,12 @@ class Project(BaseModel):
     release_notes_template_path: str | Path = Path(f'{assets_dir}/RELEASE.md')
     changelog_git_hash: bool = True
 
+
 class Settings(BaseModel):
     text_editor: str = 'code'
     verbose: bool = True
     skip_git_status: bool = False
+
 
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
 all_settings: Settings = Settings(**normalize_settings_keys(simple_merge_settings(user_settings, default_settings, default_config)))

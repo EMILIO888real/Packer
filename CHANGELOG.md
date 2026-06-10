@@ -21,6 +21,8 @@
 - Minor mistake in the clean up of `setup's` `tui`, if user enters the GitHub token for creating a Repo on Github, it would crash, because of flawed logic. 
 - Minor mistake in `tui` module's `main` function, when I had moved the `tui` logic for `setup` to `setup.py`, I forgot to extract project directory individually in case user was creating one. 
 - Updated documentation in `config.py` to allow not using prompts, to skip AI generation and the `Sequence` documentation to tuple. 
+- If the user settings file is missing it is created now instead of silently failing, by returning None value. 
+- Updated flawed configuration merge logic to actually convert all settings to python acceptable and merge them correctly. 
 
 ---
 

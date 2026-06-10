@@ -18,7 +18,7 @@ def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[
     :param config_dir: Path to the user configuration directory
     :type config_dir: str | Path
     :return: Tuple containing (user_settings, default_settings, default_config)
-             where default_config or user_settings may be None if not present. **Or a str for an error**.
+             where default_config or user_settings may be {} if not present. **Or a str for an error**.
     :rtype: tuple[dict, dict, dict | None] | str
     '''
 
@@ -33,7 +33,8 @@ def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[
             with open(f'{str(Path(config_dir).absolute())}/settings.json') as f:
                 user_settings = load(f)
         else:
-            user_settings = None
+            with open(f'{str(Path(config_dir).absolute())}/settings.json', 'w') as f:
+                f.write('{}')
 
     except JSONDecodeError:
         return 'Couldn\'t parse settings\nPlease make sure your settings uses the JSON (JavaScript Object Notation) https://json.org syntax (ECMA-262 3rd edition)'
@@ -42,7 +43,7 @@ def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[
 
     return (user_settings, default_settings, default_config if 'default_config' in locals() else None)
 
-def simple_merge_settings(user_settings: dict[str, Any], default_settings: dict[str, Any], default_config: dict[str, Any] | None = None) -> dict[str: Any]:
+def simple_merge_settings(user_settings: dict[str, Any] | None, default_settings: dict[str, Any], default_config: dict[str, Any] | None = None) -> dict[str, Any]:
     '''
     Merge user settings with default settings and optional default configuration.
 
@@ -51,7 +52,7 @@ def simple_merge_settings(user_settings: dict[str, Any], default_settings: dict[
     merging process ensures that user settings take precedence over defaults.
 
     :param user_settings: A dictionary of user-defined settings
-    :type user_settings: dict[str, Any]
+    :type user_settings: dict[str, Any] | None
     :param default_settings: A dictionary of default settings
     :type default_settings: dict[str, Any]
     :param default_config: An optional dictionary of default configuration values
@@ -60,7 +61,17 @@ def simple_merge_settings(user_settings: dict[str, Any], default_settings: dict[
     :rtype: dict[str, Any]
     '''
 
-    return merge_settings(user_settings, default_settings if default_config is None else default_settings.update(default_config))
+    merged_defaults = dict(default_settings or {})
+    if default_config:
+        merged_defaults.update(default_config)
+
+    normalized_defaults = normalize_settings_keys(merged_defaults)
+    normalized_user = normalize_settings_keys(user_settings or {})
+
+    merged = dict(normalized_defaults)
+    merged.update(normalized_user)
+
+    return merged
 
 def normalize_settings_keys(all_settings: dict[str: Any]) -> dict[str: Any]:
     '''
