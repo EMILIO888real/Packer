@@ -4,6 +4,7 @@
 - Version output parameter to the CLI (-v, --version). 
 - A new module etf.py for python objects to help with terminal and various tui handling and configuration. *Module will be expended in the future using functions from et, since et is for more general stuff.*. 
 - `build.yaml` file creation to `setup.py`, with the updated syntax for creating a Windows exe of your program using Github Virtual machines via Github actions. 
+- A user setting for specify the `wait_flag` for GUI text editors and the ability to not use it for terminal based, like `nvim`. 
 
 ### Changed
 - Latest changelog for git releases to use the updated one with git hashes if it's in use. 

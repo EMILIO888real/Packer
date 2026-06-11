@@ -224,7 +224,10 @@ class Packer():
         
         with open(self.chosen_description_path, 'w') as f:
             f.write(description)
-        self._run([all_settings.text_editor, '--wait', str(self.chosen_description_path)])
+        text_editor_description_cmd = [all_settings.text_editor, str(self.chosen_description_path)]
+        if all_settings.wait_flag:
+            text_editor_description_cmd.insert(1, all_settings.wait_flag)
+        self._run(text_editor_description_cmd)
         with open(self.chosen_description_path) as f:
             description = f.read()
 
@@ -249,7 +252,10 @@ class Packer():
     
         with open(self.chosen_title_path, 'w') as f:
             f.write(version_title)
-        self._run([all_settings.text_editor, '--wait', str(self.chosen_title_path)])
+        text_editor_title_cmd = [all_settings.text_editor, str(self.chosen_title_path)]
+        if all_settings.wait_flag:
+            text_editor_title_cmd.insert(1, all_settings.wait_flag)
+        self._run(text_editor_title_cmd)
         with open(self.chosen_title_path) as f:
             version_title = f.read()
 

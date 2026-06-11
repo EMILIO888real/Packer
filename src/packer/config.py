@@ -63,6 +63,7 @@ class Project(BaseModel):
 
 class Settings(BaseModel):
     text_editor: str = 'code'
+    wait_flag: str | None = '--wait'
     verbose: bool = True
     skip_git_status: bool = False
 
