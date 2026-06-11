@@ -25,6 +25,7 @@ Attributes:
 
 __all__ = 'user_settings, default_settings, default_config, all_settings, load, packer_version'
 
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Sequence
 from pydantic import BaseModel
@@ -44,8 +45,8 @@ class Project(BaseModel):
     program_name: str
     github_repo_url: str
 
-    before_commands: tuple[tuple[str, ...], ...] | None = None
-    after_commands: tuple[tuple[str, ...], ...] | None = None
+    before_commands: tuple[tuple[str, ...] | Callable, ...] | None = None
+    after_commands: tuple[tuple[str, ...], ...] | Callable | None = None
     compile_command: Sequence[str] | None = None
     model: str = 'mistral'
     description_prompt: list[dict[str, str]] | None = [

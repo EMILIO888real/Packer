@@ -14,7 +14,7 @@ from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 import sys
 from time import sleep
 from typing import Any, Optional
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
 from requests import post
@@ -89,7 +89,7 @@ class Packer():
                  GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str, program_name: str, github_repo_url: str,
                  input_queue: Queue = None, output_queue: Queue = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
-                 before_commands: tuple[tuple[str, ...], ...] = Project.model_fields['before_commands'].default, after_commands: tuple[tuple[str, ...], ...] = Project.model_fields['after_commands'].default,
+                 before_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['before_commands'].default, after_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['after_commands'].default,
                  model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
                  release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default
                 ):
@@ -342,9 +342,12 @@ class Packer():
             self.file_id = response['data']['id']
 
             if self.before_commands:
-                self.print_and_log('Running before commit commands...')
+                self.print_and_log('Running pre commit hooks...')
                 for cmd in self.before_commands:
-                    self._run('sh', '-c', cmd)
+                    if callable(cmd):
+                        cmd()
+                    else:
+                        self._run('sh', '-c', cmd)
 
 
             self.print_and_log('Staging changes...')
@@ -381,9 +384,12 @@ class Packer():
             self.git_repo.remotes.origin.push()
 
             if self.after_commands:
-                self.print_and_log('Running after commit commands...')
+                self.print_and_log('Running post commit hooks...')
                 for cmd in self.after_commands:
-                    self._run('sh', '-c', cmd)
+                    if callable(cmd):
+                        cmd()
+                    else:
+                        self._run('sh', '-c', cmd)
 
             self.print_and_log('Generating social media post text...')
 

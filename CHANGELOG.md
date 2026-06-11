@@ -15,6 +15,7 @@
 - Updated all kinds of `setup.py` file creation and writing to use the latest packer tech for new projects, that includes upgrading the README, TODO.md and some other minor things. 
 - Updated documentation standart for `Sequence` object to use the one from `collections.abc`, instead of `typing` to support newer version. User had a problem like so: "TypeError: typing.Sequence[typing.Sequence] is not a generic class". 
 - `simple_merge_settings` to not allow None values for `user_settings`, ensuring the developer writes code with less bugs *hopefully*. 
+- `before_commands` and `after_commands` to pre and post hooks, by allowing not only shell commands, but also callable object, like some function. 
 
 ### Fixed
 - To utilize a different syntax for Sequence type notations: `Sequence[Sequence[str]]` instead of the old `Sequence[Sequence][str]`, because of the same user reported error. *If still ineffective will change to using a basic tuple*. 
