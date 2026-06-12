@@ -46,7 +46,6 @@ def main():
         for target in targets:
             _clear_path(target)
 
-        exit()
 
     if args.paths:
         print(f'root_dir: {root_dir}')
@@ -57,8 +56,8 @@ def main():
         print(f'error_report_path: {error_report_path}')
         print(f'data_dir: {data_dir}')
         print(f'cache_dir: {cache_dir}')
-        exit()
 
     if args.version:
         print(f'Packer version {packer_version}')
-        exit()
+
+    exit()

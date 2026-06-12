@@ -11,6 +11,7 @@
 - Moved `exceptions.py` to `assets`, since it's a general purpose function for replacing the global_exception_handler, also won't probably change much. 
 - Moved logic to check whether bundled version functions as intended in `setup.py` to happen before committing, so it doesn't get committed. 
 - Added automatic removal for the `dist/` folder in a newly created project via `setup.py` and switched to an automatic only model, no human evaluation is needed anymore. 
+- Simplified `cli.py` `main` function to just exit at the end of the function, after running all possible commands for simpler architecture. 
 
 ### Fixed
 - {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
