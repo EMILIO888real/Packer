@@ -159,12 +159,12 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
                 if not log_path.exists():
                     log_path = None
 
-                error_report = {'packer version': packer_version,
+                error_report = {{'program version': {program_name}_version,
                                 'platform': sys.platform,
                                 'python version': sys.version,
                                 'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\nInput: '),
                                 'traceback': ''.join(format_exception(exc_type, exc_value, exc_traceback)),
-                                'associated log file': str(log_path)}
+                                'associated log file': str(log_path)}}
 
 
                 with open(error_report_path, 'a') as f:
@@ -582,8 +582,20 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log(f'Ran command: pyinstaller main.spec\nstdout: {verify_result.stdout.decode()}\nstderr: {verify_result.stderr.decode()}')
 
+
     print_and_log('Removing build directory...')
     rmtree('build')
+
+    print_and_log(f'We will start bundled version up for you automatically. It should just print out in the black box "Hello world!"')
+    try:
+        output = run([f'./dist/{program_name}{'.exe' if platform == 'win32' else ''}'], capture_output=True, text=True, check=True).stdout.rstrip('\n')
+        print_and_log(f'Successfully ran the build. The output: {output}', end=' ')
+        print_and_log(f'[{'valid' if output == 'Hello, world!' else 'invalid'}]', 30, [0, 255, 0] if output == 'Hello, world!' else [255, 0, 0])
+    except CalledProcessError as e:
+        print_and_log(f'Something went wrong in the built version: {e}', 30, [255, 0, 0])
+
+    print_and_log('Removing dist directory...')
+    rmtree('dist')
 
     repo = Repo.init(project_directory)
 
@@ -636,14 +648,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         except Exception as e:
             print_and_log(f'Warning: Push failed with error: {e}', 30, [255, 165, 0])
             print_and_log('You can push manually with: git push -u origin master', 20, [255, 165, 0])
-
-    print_and_log(f'Please check the {project_directory}/dist directory to verify that the .spec file was correctly processed.\nWe will start it up for you automatically. It should just print out in the black box "Hello world!"')
-    try:
-        output = run([f'./dist/{program_name}{'.exe' if platform == 'win32' else ''}'], capture_output=True, text=True, check=True).stdout.rstrip('\n')
-        print_and_log(f'Successfully ran the build. The output: {output}', end=' ')
-        print_and_log(f'[{'valid' if output == 'Hello, world!' else 'invalid'}]', 30, [0, 255, 0] if output == 'Hello, world!' else [255, 0, 0])
-    except CalledProcessError as e:
-        print_and_log(f'Something went wrong in the built version: {e}', 30, [255, 0, 0])
     
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
     

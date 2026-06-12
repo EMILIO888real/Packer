@@ -9,8 +9,11 @@
 - Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
 - Moved cli logic to a dedicated module `cli.py` in `ui` and import it into `main.py` as `tui`. 
 - Moved `exceptions.py` to `assets`, since it's a general purpose function for replacing the global_exception_handler, also won't probably change much. 
+- Moved logic to check whether bundled version functions as intended in `setup.py` to happen before committing, so it doesn't get committed. 
+- Added automatic removal for the `dist/` folder in a newly created project via `setup.py` and switched to an automatic only model, no human evaluation is needed anymore. 
 
 ### Fixed
+- {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
 
 ---
 
