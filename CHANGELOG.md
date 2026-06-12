@@ -2,10 +2,13 @@
 
 ### Added
 - `clear` command to clear user affected data by packer, like logs, cache, saves and so on. 
+- `exceptions.py` file creation to a new project's creation via `setup.py`. 
+- Rudimentary version of `config.py` to `setup` new project creation for `global_exception_handler` to work since it grabs the version of the project from there. 
 
 ### Changed
 - Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
 - Moved cli logic to a dedicated module `cli.py` in `ui` and import it into `main.py` as `tui`. 
+- Moved `exceptions.py` to `assets`, since it's a general purpose function for replacing the global_exception_handler, also won't probably change much. 
 
 ### Fixed
 

@@ -27,7 +27,7 @@ from packer.ui.tui import main as tui
 from packer.ui.cli import main as cli
 from packer.config import all_settings, Project, packer_version
 from packer.paths import log_path, data_dir, cache_dir
-from packer.exceptions import global_exception_handler
+from packer.assets.exceptions import global_exception_handler
 
 def thread_excepthook(args):
     sys.excepthook(args.exc_type, args.exc_value, args.exc_traceback)
