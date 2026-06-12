@@ -1,9 +1,11 @@
 ## [%new_version] - %date
 
 ### Added
+- `clear` command to clear user affected data by packer, like logs, cache, saves and so on. 
 
 ### Changed
 - Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
+- Moved cli logic to a dedicated module `cli.py` in `ui` and import it into `main.py` as `tui`. 
 
 ### Fixed
 
