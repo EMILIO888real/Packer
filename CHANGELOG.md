@@ -17,6 +17,7 @@
 - Updated documentation standart for `Sequence` object to use the one from `collections.abc`, instead of `typing` to support newer version. User had a problem like so: "TypeError: typing.Sequence[typing.Sequence] is not a generic class". 
 - `simple_merge_settings` to not allow None values for `user_settings`, ensuring the developer writes code with less bugs *hopefully*. 
 - `before_commands` and `after_commands` to pre and post hooks, by allowing not only shell commands, but also callable object, like some function. 
+- Text editor path doesn't require to be resolved via shell, instead packer finds the full path using `shutil.which`. 
 
 ### Fixed
 - To utilize a different syntax for Sequence type notations: `Sequence[Sequence[str]]` instead of the old `Sequence[Sequence][str]`, because of the same user reported error. *If still ineffective will change to using a basic tuple*. 
@@ -26,6 +27,7 @@
 - Updated documentation in `config.py` to allow not using prompts, to skip AI generation and the `Sequence` documentation to tuple. 
 - If the user settings file is missing it is created now instead of silently failing, by returning None value. 
 - Updated flawed configuration merge logic to actually convert all settings to python acceptable and merge them correctly. 
+- Updated user settings loading to not only create the user settings file if missing, but also immediately return an empty dict, since otherwise it would fail and start to work after a restart. 
 
 ---
 

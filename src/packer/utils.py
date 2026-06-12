@@ -35,6 +35,7 @@ def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[
         else:
             with open(f'{str(Path(config_dir).absolute())}/settings.json', 'w') as f:
                 f.write('{}')
+                user_settings = {}
 
     except JSONDecodeError:
         return 'Couldn\'t parse settings\nPlease make sure your settings uses the JSON (JavaScript Object Notation) https://json.org syntax (ECMA-262 3rd edition)'

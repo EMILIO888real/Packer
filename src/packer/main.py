@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
-from shutil import get_terminal_size, rmtree, make_archive
+from shutil import get_terminal_size, rmtree, make_archive, which
 from pathlib import Path
 from os import remove, chdir
 from json import dump
@@ -93,6 +93,7 @@ class Packer():
                  model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
                  release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default
                 ):
+        # parameter initialization
         self.input_queue = input_queue
         self.output_queue = output_queue
         self.version = version
@@ -110,6 +111,7 @@ class Packer():
         self.title_prompt = title_prompt
         self.changelog_git_hash = changelog_git_hash
 
+        # Actions needed to run once, (setup actions)
         self.terminal_width = get_terminal_size().columns
         self.logger = init_logger('packer', 'EMILIO')
         self.chosen_description_path = Path(f'{data_dir}/chosen description.txt')
@@ -117,16 +119,15 @@ class Packer():
         self.git_repo = Repo()
         with open(release_notes_template_path) as f:
             self.release_text = f.read()
-
         self.assets_dir = f'./src/{program_name}/assets'
         self.ENTRY_RE = compile(
                 r"^- (Added|Changed|Fixed):\s*(.+)$",
                 MULTILINE
             )
-
         self.SINGLE_RE = compile(
             r"^(Added|Changed|Fixed):\s*(.+)$"
         )
+        all_settings.text_editor = which(all_settings.text_editor)
 
         if input_queue:
             all_settings.verbose = False
