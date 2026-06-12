@@ -1,33 +1,33 @@
-## [%new_version] - %date
+## [0.9.0] - 2026-06-12
 
 ### Added
-- Version output parameter to the CLI (-v, --version). 
-- A new module etf.py for python objects to help with terminal and various tui handling and configuration. *Module will be expended in the future using functions from et, since et is for more general stuff.*. 
-- `build.yaml` file creation to `setup.py`, with the updated syntax for creating a Windows exe of your program using Github Virtual machines via Github actions. 
-- A user setting for specify the `wait_flag` for GUI text editors and the ability to not use it for terminal based, like `nvim`. 
+- [49a7212] Version output parameter to the CLI (-v, --version). 
+- [f764fdf] A new module etf.py for python objects to help with terminal and various tui handling and configuration. *Module will be expended in the future using functions from et, since et is for more general stuff.*. 
+- [056d2ac] `build.yaml` file creation to `setup.py`, with the updated syntax for creating a Windows exe of your program using Github Virtual machines via Github actions. 
+- [5ae243e] A user setting for specify the `wait_flag` for GUI text editors and the ability to not use it for terminal based, like `nvim`.
 
 ### Changed
-- Latest changelog for git releases to use the updated one with git hashes if it's in use. 
-- `pyproject.toml` configuration to correctly build packer, now it functions with `pip install -e .` and `pip install .`. 
-- All file writing to utilize dedent with '''''' string blocks in `setup.py`, *not gonna lie, I prompted AI to change them*. 
-- Condensed the tui for setup into a function and moved it from tui.py to setup, since tui imports and setup can use it in case user chooses to run the module directly. 
-- Cleaned up the `tui` function in `setup.py` to be more flexible by allowing to create a project without a GitHub repo, just locally. 
-- Updated the `build.yaml` file to not utilize anymore, soon deprecated features, like the old asset uploading and the Node.js version. 
-- Updated all kinds of `setup.py` file creation and writing to use the latest packer tech for new projects, that includes upgrading the README, TODO.md and some other minor things. 
-- Updated documentation standart for `Sequence` object to use the one from `collections.abc`, instead of `typing` to support newer version. User had a problem like so: "TypeError: typing.Sequence[typing.Sequence] is not a generic class". 
-- `simple_merge_settings` to not allow None values for `user_settings`, ensuring the developer writes code with less bugs *hopefully*. 
-- `before_commands` and `after_commands` to pre and post hooks, by allowing not only shell commands, but also callable object, like some function. 
-- Text editor path doesn't require to be resolved via shell, instead packer finds the full path using `shutil.which`. 
+- [b28a252] Latest changelog for git releases to use the updated one with git hashes if it's in use. 
+- [d5c7e09] `pyproject.toml` configuration to correctly build packer, now it functions with `pip install -e .` and `pip install .`. 
+- [ab5feef] All file writing to utilize dedent with '''''' string blocks in `setup.py`, *not gonna lie, I prompted AI to change them*. 
+- [f764fdf] Condensed the tui for setup into a function and moved it from tui.py to setup, since tui imports and setup can use it in case user chooses to run the module directly. 
+- [f764fdf] Cleaned up the `tui` function in `setup.py` to be more flexible by allowing to create a project without a GitHub repo, just locally. 
+- [056d2ac] Updated the `build.yaml` file to not utilize anymore, soon deprecated features, like the old asset uploading and the Node.js version. 
+- [056d2ac] Updated all kinds of `setup.py` file creation and writing to use the latest packer tech for new projects, that includes upgrading the README, TODO.md and some other minor things. 
+- [55e17fa] Updated documentation standart for `Sequence` object to use the one from `collections.abc`, instead of `typing` to support newer version. User had a problem like so: "TypeError: typing.Sequence[typing.Sequence] is not a generic class". 
+- [490a4d3] `simple_merge_settings` to not allow None values for `user_settings`, ensuring the developer writes code with less bugs *hopefully*. 
+- [44a9309] `before_commands` and `after_commands` to pre and post hooks, by allowing not only shell commands, but also callable object, like some function. 
+- [c4421a0] Text editor path doesn't require to be resolved via shell, instead packer finds the full path using `shutil.which`.
 
 ### Fixed
-- To utilize a different syntax for Sequence type notations: `Sequence[Sequence[str]]` instead of the old `Sequence[Sequence][str]`, because of the same user reported error. *If still ineffective will change to using a basic tuple*. 
-- The previous fix for the `Sequence` documentation didn't work, so it seems the library is flawed on some python env. in that case I have switched the 2 instances of Sequence using 2 notation to utilize tuples instead with the newer ellipsis syntax. 
-- Minor mistake in the clean up of `setup's` `tui`, if user enters the GitHub token for creating a Repo on Github, it would crash, because of flawed logic. 
-- Minor mistake in `tui` module's `main` function, when I had moved the `tui` logic for `setup` to `setup.py`, I forgot to extract project directory individually in case user was creating one. 
-- Updated documentation in `config.py` to allow not using prompts, to skip AI generation and the `Sequence` documentation to tuple. 
-- If the user settings file is missing it is created now instead of silently failing, by returning None value. 
-- Updated flawed configuration merge logic to actually convert all settings to python acceptable and merge them correctly. 
-- Updated user settings loading to not only create the user settings file if missing, but also immediately return an empty dict, since otherwise it would fail and start to work after a restart. 
+- [516a91f] To utilize a different syntax for Sequence type notations: `Sequence[Sequence[str]]` instead of the old `Sequence[Sequence][str]`, because of the same user reported error. *If still ineffective will change to using a basic tuple*. 
+- [2d1d720] The previous fix for the `Sequence` documentation didn't work, so it seems the library is flawed on some python env. in that case I have switched the 2 instances of Sequence using 2 notation to utilize tuples instead with the newer ellipsis syntax. 
+- [e0db2f4] Minor mistake in the clean up of `setup's` `tui`, if user enters the GitHub token for creating a Repo on Github, it would crash, because of flawed logic. 
+- [573d2d4] Minor mistake in `tui` module's `main` function, when I had moved the `tui` logic for `setup` to `setup.py`, I forgot to extract project directory individually in case user was creating one. 
+- [728c7dc] Updated documentation in `config.py` to allow not using prompts, to skip AI generation and the `Sequence` documentation to tuple. 
+- [b15e117] If the user settings file is missing it is created now instead of silently failing, by returning None value. 
+- [b15e117] Updated flawed configuration merge logic to actually convert all settings to python acceptable and merge them correctly. 
+- [c4421a0] Updated user settings loading to not only create the user settings file if missing, but also immediately return an empty dict, since otherwise it would fail and start to work after a restart.
 
 ---
 

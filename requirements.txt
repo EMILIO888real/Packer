@@ -15,7 +15,7 @@ httpx==0.28.1
 idna==3.18
 ollama==0.6.2
 packaging==26.2
--e git+https://github.com/EMILIO888real/Packer.git@3dd001fe7d8a6d59eb48d1116bf19b6fd421fb40#egg=packer
+-e git+https://github.com/EMILIO888real/Packer.git@c4421a04c869b6596dc1883204fad4986948f145#egg=packer
 pathspec==1.1.1
 platformdirs==4.10.0
 plyer==2.1.0
