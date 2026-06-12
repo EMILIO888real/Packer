@@ -3,6 +3,7 @@
 ### Added
 
 ### Changed
+- Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
 
 ### Fixed
 

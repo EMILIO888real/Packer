@@ -6,7 +6,7 @@ from argparse import ArgumentParser
 from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
-from shutil import get_terminal_size, rmtree, make_archive, which
+from shutil import get_terminal_size, rmtree, make_archive
 from pathlib import Path
 from os import remove, chdir
 from json import dump
@@ -127,7 +127,6 @@ class Packer():
         self.SINGLE_RE = compile(
             r"^(Added|Changed|Fixed):\s*(.+)$"
         )
-        all_settings.text_editor = which(all_settings.text_editor)
 
         if input_queue:
             all_settings.verbose = False

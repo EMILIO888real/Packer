@@ -27,6 +27,7 @@ __all__ = 'user_settings, default_settings, default_config, all_settings, load, 
 
 from collections.abc import Callable
 from pathlib import Path
+from shutil import which
 from typing import Any, Sequence
 from pydantic import BaseModel
 from packer.custom_modules.et import format_version_text
@@ -70,6 +71,10 @@ class Settings(BaseModel):
 
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
 all_settings: Settings = Settings(**normalize_settings_keys(simple_merge_settings(user_settings, default_settings, default_config)))
+
+# All setup for settings
+all_settings.text_editor = which(all_settings.text_editor)
+
 
 projects_configurations: dict[str, dict[str, Any]]
 if Path(f'{config_dir}/projects.json').exists():
