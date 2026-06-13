@@ -491,8 +491,16 @@ class Packer():
                 f.write(f'## [%new_version] - %date\n\n### Added\n\n### Changed\n\n### Fixed\n\n---\n\n{full_changelog}')
 
             self.print_and_log('Committing next version preparation and updating origin...')
-            added_items = self.git_repo.index.add(['CHANGELOG.md'])
-            self.git_repo.index.commit(f'Prepared next version development branch by updating: {added_items}')
+            self.git_repo.index.add(['CHANGELOG.md'])
+            next_versions_commit_message = 'Prepared next version development branch'
+            try:
+                self.git_repo.git.commit('-S', '-m', next_versions_commit_message)
+            except GitCommandError:
+                try:
+                    self.print_and_log('Fallback to unsigned commit...')
+                    self.git_repo.git.commit('-m', next_versions_commit_message)
+                except GitCommandError as e:
+                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
             self.git_repo.remotes.origin.push()
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')

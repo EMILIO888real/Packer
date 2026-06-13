@@ -12,6 +12,7 @@
 - Moved logic to check whether bundled version functions as intended in `setup.py` to happen before committing, so it doesn't get committed. 
 - Added automatic removal for the `dist/` folder in a newly created project via `setup.py` and switched to an automatic only model, no human evaluation is needed anymore. 
 - Simplified `cli.py` `main` function to just exit at the end of the function, after running all possible commands for simpler architecture. 
+- Next versions prepare commit to also utilize the same logic as the chore release commit, *sign it if possible*. 
 
 ### Fixed
 - {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
