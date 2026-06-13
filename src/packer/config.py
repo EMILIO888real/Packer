@@ -76,7 +76,7 @@ all_settings: Settings = Settings(**normalize_settings_keys(simple_merge_setting
 all_settings.text_editor = which(all_settings.text_editor)
 
 
-projects_configurations: dict[str, dict[str, Any]]
+projects_configurations: dict[str, dict[str, Any]] | None
 if Path(f'{config_dir}/projects.json').exists():
     with open(f'{config_dir}/projects.json') as f:
         projects_configurations = json.load(f)

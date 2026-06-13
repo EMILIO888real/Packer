@@ -4,6 +4,8 @@
 - `clear` command to clear user affected data by packer, like logs, cache, saves and so on. 
 - `exceptions.py` file creation to a new project's creation via `setup.py`. 
 - Rudimentary version of `config.py` to `setup` new project creation for `global_exception_handler` to work since it grabs the version of the project from there. 
+- `run` command to the `CLI` to able to run the project through just the CLI, without a TUI. 
+- `project_directory` parameter to the `Packer` class to be able to handle all directory changes and logic associated with like the git status command `Packer` itself. 
 
 ### Changed
 - Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
@@ -13,6 +15,9 @@
 - Added automatic removal for the `dist/` folder in a newly created project via `setup.py` and switched to an automatic only model, no human evaluation is needed anymore. 
 - Simplified `cli.py` `main` function to just exit at the end of the function, after running all possible commands for simpler architecture. 
 - Next versions prepare commit to also utilize the same logic as the chore release commit, *sign it if possible*. 
+- Main class of the entire project `Packer` has been moved to `core.py`, to be available to any module in this project. 
+- `saves` command to not use internal resources and handle cases of first time boot up. 
+- `Packer` classes documentation to be up to date. 
 
 ### Fixed
 - {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
