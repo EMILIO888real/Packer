@@ -15,6 +15,7 @@
 
 ### Fixed
 - {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
+- Program exiting after parsing all parameters no matter what, even if there aren't any, a check now has been added. 
 
 ---
 

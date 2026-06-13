@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from pathlib import Path
 from shutil import rmtree
-from sys import exit
+from sys import exit, argv
 
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir
 from packer.config import packer_version
@@ -59,5 +59,6 @@ def main():
 
     if args.version:
         print(f'Packer version {packer_version}')
-
-    exit()
+    
+    if len(argv) > 1:
+        exit()
