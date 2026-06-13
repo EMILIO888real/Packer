@@ -9,6 +9,7 @@ from packer.ui.tui import main as tui
 from packer.ui.cli import main as cli
 from packer.assets.exceptions import global_exception_handler
 from packer.core import Packer
+from packer.utils import resolve_version
 
 
 def main():
@@ -16,24 +17,13 @@ def main():
     project_directory, project_configuration = tui()
 
     version = read_json(f'{project_directory}/src/{project_configuration.program_name}/assets/version.json')
-    old_version = version.copy()
-    input_version = stripped_input('New version(M, m, P): ')
-    match input_version:
-        case 'M':
-            version['major'] = version['major'] + 1
-            version['minor'] = 0
-            version['patch'] = 0
-        case 'm':
-            version['minor'] = version['minor'] + 1
-            version['patch'] = 0
-        case 'P':
-            version['patch'] = version['patch'] + 1
-        case _:
-            print('Unknown version! exiting...', [255, 0, 0])
-            sys.exit()
+    try:
+        new_version = resolve_version(version, input_version = stripped_input('New version(M, m, P): '))
+    except ValueError as e:
+        print(f'Invalid version input: {e}')
 
     try:
-        packer = Packer(version, old_version, project_directory,
+        packer = Packer(new_version, version, project_directory,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
                         project_configuration.program_name, project_configuration.github_repo_url,
                         None, None,

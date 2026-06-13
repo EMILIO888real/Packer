@@ -1,5 +1,5 @@
 from packer.utils import load_config, simple_merge_settings, normalize_settings_keys
-from packer.main import Packer
+from packer.core import Packer
 from packer.setup import main as setup
 from packer.change import main as commit_change
 

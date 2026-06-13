@@ -18,6 +18,8 @@
 - Main class of the entire project `Packer` has been moved to `core.py`, to be available to any module in this project. 
 - `saves` command to not use internal resources and handle cases of first time boot up. 
 - `Packer` classes documentation to be up to date. 
+- `resolve_version` function has been moved to utils, since the same logic for input version str to be evaluated should work the same for `TUI` and `CLI`. 
+- `resolve_version` function to be a little less forgive and more flexible, but also strict. 
 
 ### Fixed
 - {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 

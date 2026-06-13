@@ -9,56 +9,13 @@ from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir
 from packer.config import Project, packer_version, projects_configurations
 from packer.core import Packer
-from packer.utils import normalize_settings_keys
+from packer.utils import normalize_settings_keys, resolve_version
 
 
 def _clear_path(path: str | Path) -> None:
     path = Path(path)
     rmtree(path, ignore_errors=True)
     print(f'Cleared {path}')
-
-
-def resolve_version(current_version: dict[str, int], version_input: str) -> dict[str, int]:
-    '''
-    Resolve a version bump token or explicit version string into a version dict.
-
-    :param current_version: The current version as a dictionary with keys 'major', 'minor', and 'patch'
-    :type current_version: dict[str, int]
-    :param version_input: A version bump token ('major', 'minor', 'patch') or explicit version string (e.g., '1.2.3')
-    :type version_input: str
-    :return: The resolved version as a dictionary with keys 'major', 'minor', and 'patch'
-    :rtype: dict[str, int]
-    '''
-
-    version = current_version.copy()
-    raw_value = version_input.strip()
-
-    if raw_value.count('.') == 2:
-        try:
-            major, minor, patch = (int(part) for part in raw_value.split('.'))
-        except ValueError as exc:
-            raise ValueError('Use either M, m, p or a full version like 0.10.1.') from exc
-
-        return {'major': major, 'minor': minor, 'patch': patch}
-
-    normalized = raw_value.lower()
-
-    if raw_value == 'M' or normalized == 'major':
-        version['major'] += 1
-        version['minor'] = 0
-        version['patch'] = 0
-        return version
-
-    if raw_value == 'm' or normalized == 'minor':
-        version['minor'] += 1
-        version['patch'] = 0
-        return version
-
-    if raw_value == 'p' or normalized == 'patch':
-        version['patch'] += 1
-        return version
-
-    raise ValueError('Use either M, m, p or a full version like 0.10.1.')
 
 
 def main():
