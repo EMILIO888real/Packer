@@ -5,6 +5,7 @@
 
 ### Changed
 - `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
+- `revert_changes` method of the `Packer` class in `core.py` to handle cases where the user wants to revert after the entire run method has already ran, by cleaning up the git environment and now in a clean way. 
 
 ### Fixed
 

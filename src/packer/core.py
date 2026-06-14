@@ -519,10 +519,12 @@ class Packer():
             next_versions_commit_message = 'Prepared next version development branch'
             try:
                 self.git_repo.git.commit('-S', '-m', next_versions_commit_message)
+                self.prep_committed = True
             except GitCommandError:
                 try:
                     self.print_and_log('Fallback to unsigned commit...')
                     self.git_repo.git.commit('-m', next_versions_commit_message)
+                    self.prep_committed = True
                 except GitCommandError as e:
                     self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
             self.git_repo.remotes.origin.push()
@@ -539,7 +541,8 @@ class Packer():
             self.revert_changes()
     
     def revert_changes(self) -> None:
-        '''Reverts the version to the previous one, deletes the uploaded copy and git release if they exist, and resets the git directory to the previous commit. Also restores the integrity file.'''
+        '''Rollback the release process by removing the generated archive, deleting the uploaded Gofile copy and GitHub release when present, and resetting the Git repository to its previous state.'''
+
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
         if Path(f'{cache_dir}/{self.program_name} {self.version}.zip').exists():
@@ -551,18 +554,44 @@ class Packer():
             delete_upload(self.file_id, self.GOFILE_USER_TOKEN)
 
         self.print_and_log('Reverting git changes...', [255, 255, 0])
+
+        self.print_and_log('Counting commits...')
+        commit_count = 0
         if hasattr(self, 'committed') and self.committed:
-            self.git_repo.head.reset(commit='HEAD~1', working_tree=True)
-            self.git_repo.git.clean('-fd')
-            self.git_repo.remotes.origin.push(force=True) # In case we pushed it to github already!
+            commit_count += 1
+        if hasattr(self, 'prep_committed') and self.prep_committed:
+            commit_count += 1
+
+        if commit_count > 0:
+            self.print_and_log('Cleaning up git environment...')
+            self._revert_git_head(commit_count)
+            if commit_count == 2:
+                self.print_and_log('Switching to master branch...')
+                self.git_repo.heads['master'].checkout()
+                self._revert_git_head(commit_count)
         else:
             self.git_repo.head.reset(working_tree=True)
-            self.git_repo.git.clean('-fd')
 
         if hasattr(self, 'git_release'):
             self.print_and_log('Deleting git release...', [255, 255, 0])
             self.git_release.delete_release()
-            self.repo.get_git_ref(f'tags/{self.version}').delete()
+
+            self.print_and_log('Deleting git tag...')
+            self.git_repo.delete_tag(self.version)
+            self.print_and_log('Updating origin...')
+            self.git_repo.remotes.origin.push(refspec=f':refs/tags/{self.version}')
+
+    def _revert_git_head(self, commit_count: int):
+        '''
+        Reverts the git repository head by the specified number of commits.
+
+        :param commit_count: The number of commits to revert.
+        :type commit_count: int
+        '''
+
+        self.print_and_log(f'Reverting HEAD {commit_count} commits back...')
+        self.git_repo.head.reset(commit=f'HEAD~{commit_count}', working_tree=True)
+        self.git_repo.remotes.origin.push(force=True) # In case we pushed it to github already!
 
     def _parse_commit(self, commit) -> list[dict[str: str]]:
         '''
