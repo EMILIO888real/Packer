@@ -1,35 +1,35 @@
-## [%new_version] - %date
+## [0.10.0] - 2026-06-14
 
 ### Added
-- `clear` command to clear user affected data by packer, like logs, cache, saves and so on. 
-- `exceptions.py` file creation to a new project's creation via `setup.py`. 
-- Rudimentary version of `config.py` to `setup` new project creation for `global_exception_handler` to work since it grabs the version of the project from there. 
-- `run` command to the `CLI` to able to run the project through just the CLI, without a TUI. 
-- `project_directory` parameter to the `Packer` class to be able to handle all directory changes and logic associated with like the git status command `Packer` itself. 
-- `edit` command to open `settings.json` and `projects.json` from the `CLI` if wanted. 
-- Display commands for displaying both configurations saved by `Packer` `--config` and `--projects`. For `Packer` settings and for Packer saved projects. 
+- [8655170] `clear` command to clear user affected data by packer, like logs, cache, saves and so on. 
+- [65c1af8] `exceptions.py` file creation to a new project's creation via `setup.py`. 
+- [65c1af8] Rudimentary version of `config.py` to `setup` new project creation for `global_exception_handler` to work since it grabs the version of the project from there. 
+- [48ad94e] `run` command to the `CLI` to able to run the project through just the CLI, without a TUI. 
+- [48ad94e] `project_directory` parameter to the `Packer` class to be able to handle all directory changes and logic associated with like the git status command `Packer` itself. 
+- [f07b4e8] `edit` command to open `settings.json` and `projects.json` from the `CLI` if wanted. 
+- [9eb1001] Display commands for displaying both configurations saved by `Packer` `--config` and `--projects`. For `Packer` settings and for Packer saved projects.
 
 ### Changed
-- Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
-- Moved cli logic to a dedicated module `cli.py` in `ui` and import it into `main.py` as `tui`. 
-- Moved `exceptions.py` to `assets`, since it's a general purpose function for replacing the global_exception_handler, also won't probably change much. 
-- Moved logic to check whether bundled version functions as intended in `setup.py` to happen before committing, so it doesn't get committed. 
-- Added automatic removal for the `dist/` folder in a newly created project via `setup.py` and switched to an automatic only model, no human evaluation is needed anymore. 
-- Simplified `cli.py` `main` function to just exit at the end of the function, after running all possible commands for simpler architecture. 
-- Next versions prepare commit to also utilize the same logic as the chore release commit, *sign it if possible*. 
-- Main class of the entire project `Packer` has been moved to `core.py`, to be available to any module in this project. 
-- `saves` command to not use internal resources and handle cases of first time boot up. 
-- `Packer` classes documentation to be up to date. 
-- `resolve_version` function has been moved to utils, since the same logic for input version str to be evaluated should work the same for `TUI` and `CLI`. 
-- `resolve_version` function to be a little less forgive and more flexible, but also strict. 
-- `run` command project specification to not be mandatory, if it isn't entered TUI launches. 
-- `run` commands `-n` `new_versions` parameter to not be mandatory, if missing launches TUI. 
-- Shorthand flags and the log flags for the `run` command to be simpler using the `dest` parameter for correct saving. 
-- All `edit` commands parameters shorthand and normal to be simpler with the `dest` parameter. 
+- [b2f287b] Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
+- [8655170] Moved cli logic to a dedicated module `cli.py` in `ui` and import it into `main.py` as `tui`. 
+- [65c1af8] Moved `exceptions.py` to `assets`, since it's a general purpose function for replacing the global_exception_handler, also won't probably change much. 
+- [2c4d428] Moved logic to check whether bundled version functions as intended in `setup.py` to happen before committing, so it doesn't get committed. 
+- [2c4d428] Added automatic removal for the `dist/` folder in a newly created project via `setup.py` and switched to an automatic only model, no human evaluation is needed anymore. 
+- [b8327eb] Simplified `cli.py` `main` function to just exit at the end of the function, after running all possible commands for simpler architecture. 
+- [5616db3] Next versions prepare commit to also utilize the same logic as the chore release commit, *sign it if possible*. 
+- [48ad94e] Main class of the entire project `Packer` has been moved to `core.py`, to be available to any module in this project. 
+- [48ad94e] `saves` command to not use internal resources and handle cases of first time boot up. 
+- [48ad94e] `Packer` classes documentation to be up to date. 
+- [c431d3c] `resolve_version` function has been moved to utils, since the same logic for input version str to be evaluated should work the same for `TUI` and `CLI`. 
+- [c431d3c] `resolve_version` function to be a little less forgive and more flexible, but also strict. 
+- [644a298] `run` command project specification to not be mandatory, if it isn't entered TUI launches. 
+- [644a298] `run` commands `-n` `new_versions` parameter to not be mandatory, if missing launches TUI. 
+- [9eb1001] Shorthand flags and the log flags for the `run` command to be simpler using the `dest` parameter for correct saving. 
+- [9eb1001] All `edit` commands parameters shorthand and normal to be simpler with the `dest` parameter.
 
 ### Fixed
-- {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
-- Program exiting after parsing all parameters no matter what, even if there aren't any, a check now has been added. 
+- [2c4d428] {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
+- [4f89972] Program exiting after parsing all parameters no matter what, even if there aren't any, a check now has been added.
 
 ---
 
