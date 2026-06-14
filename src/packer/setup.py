@@ -624,7 +624,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Committing files...')
     repo.index.commit(f'Initial commit\nProject structure created by packer\'s setup.py v{packer_version}')
 
-    if github_pat is not None:
+    if github_pat:
         print_and_log('Creating remote repository on GitHub...')
         github_repo_url = Github(auth=Auth.Token(github_pat)).get_user().create_repo(
             program_name,
@@ -632,7 +632,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             private=False
         ).clone_url
 
-    if github_repo_url is not None:
+    if github_repo_url:
         print_and_log('Creating remote repository...')
         origin = repo.create_remote('origin', github_repo_url)
 

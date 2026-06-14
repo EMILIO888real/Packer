@@ -12,7 +12,7 @@ from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, er
 from packer.config import Project, packer_version, projects_configurations, all_settings
 from packer.core import Packer
 from packer.utils import normalize_settings_keys, resolve_version
-
+from packer.setup import main as setup
 
 def _clear_path(path: str | Path) -> None:
     path = Path(path)
@@ -46,9 +46,15 @@ def main():
     edit_command_parser.add_argument('-t', '--text_editor', help='Specify the text editor to use over the one saved in settings')
     edit_command_parser.add_argument('-w', '--wait_flag', help='Specify the wait flag for the text editor to use over the one saved in settings')
 
+    setup_command_parser = subparsers.add_parser('setup', help='Runs the packer new project setup function')
+    setup_command_parser.add_argument('-p', '--path', dest='setup_path', help='Project directory to use for setup')
+    setup_command_parser.add_argument('-a', '--author-name', dest='setup_author_name', help='Author name for the new project')
+    setup_command_parser.add_argument('-n', '--program-name', dest='setup_program_name', help='Program name for the new project')
+    setup_command_parser.add_argument('-t', '--pat', dest='setup_github_pat', help='GitHub personal access token')
+    setup_command_parser.add_argument('-u', '--github-url', dest='setup_github_repo_url', help='GitHub repository URL')
+    setup_command_parser.add_argument('-o', '--overwrite', action='store_true', dest='setup_overwrite', help='Overwrite existing project')
 
     args = parser.parse_args()
-
 
     match args.command:
         case 'clear':
@@ -68,7 +74,8 @@ def main():
 
             for target in targets:
                 _clear_path(target)
-        
+
+
         case 'run':
             user_chosen_project = args.project if args.project else stripped_input('Enter the project to update: ')
             project_config = None
@@ -108,6 +115,7 @@ def main():
             sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
 
             packer.run()
+
         
         case 'edit':
             text_editor = args.text_editor if args.text_editor else all_settings.text_editor
@@ -124,6 +132,15 @@ def main():
             if not args.edit_project and not args.settings:
                 run(open_settings_cmd)
                 run(open_projects_cmd)
+            
+            
+        case 'setup':
+                setup(args.setup_path if args.setup_path else input('Path: '),
+                      args.setup_author_name if args.setup_author_name else input('Author name: '),
+                      args.setup_program_name if args.setup_program_name else input('Program name: '),
+                      args.setup_github_pat if args.setup_github_pat else input('Github PAT: '),
+                      args.setup_github_repo_url if args.setup_github_repo_url else input('Github repo URL: '),
+                      args.setup_overwrite if args.setup_overwrite else False)
             
 
 

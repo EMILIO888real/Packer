@@ -1,8 +1,10 @@
 ## [%new_version] - %date
 
 ### Added
+- `setup` command for the `CLI` to run the `setup` portion of Packer to create a new project, doesn't save it as a configuration mind you. 
 
 ### Changed
+- `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
 
 ### Fixed
 
