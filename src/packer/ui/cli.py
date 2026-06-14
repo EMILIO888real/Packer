@@ -3,12 +3,13 @@ from json import load
 from pathlib import Path
 from shutil import rmtree
 import sys
+from subprocess import run
 
 from packer.assets.exceptions import global_exception_handler
 from packer.custom_modules.et import stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir
-from packer.config import Project, packer_version, projects_configurations
+from packer.config import Project, packer_version, projects_configurations, all_settings
 from packer.core import Packer
 from packer.utils import normalize_settings_keys, resolve_version
 
@@ -36,6 +37,12 @@ def main():
     run_command_parser = subparsers.add_parser('run', help='Runs packer release and update process on the specified project')
     run_command_parser.add_argument('-p', '--project', help='Specify the project to release an update on')
     run_command_parser.add_argument('-n', '--new_version', help='Specify the new version to update to')
+
+    edit_command_parser = subparsers.add_parser('edit', help='Edits user related data, like configurations, projects and so on')
+    edit_command_parser.add_argument('--settings', action='store_true', help='Open to edit the settings.json in the user preferred text editor')
+    edit_command_parser.add_argument('--projects', action='store_true', help='Open to edit the projects.json in the user preferred text editor')
+    edit_command_parser.add_argument('--text_editor', help='Specify the text editor to use over the one saved in settings')
+    edit_command_parser.add_argument('--wait_flag', help='Specify the wait flag for the text editor to use over the one saved in settings')
 
 
     args = parser.parse_args()
@@ -99,6 +106,22 @@ def main():
             sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
 
             packer.run()
+        
+        case 'edit':
+            text_editor = args.text_editor if args.text_editor else all_settings.text_editor
+            wait_flag = args.wait_flag if args.wait_flag else all_settings.wait_flag
+            open_cmd = [f'{text_editor}', f'{wait_flag}']
+
+            open_settings_cmd = [*open_cmd, f'{config_dir}/settings.json']
+            open_projects_cmd = [*open_cmd, f'{config_dir}/projects.json']
+            if args.settings:
+                run(open_settings_cmd)
+            if args.projects:
+                run(open_projects_cmd)
+
+            if not args.projects and not args.settings:
+                run(open_settings_cmd)
+                run(open_projects_cmd)
             
 
 

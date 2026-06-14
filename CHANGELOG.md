@@ -6,6 +6,7 @@
 - Rudimentary version of `config.py` to `setup` new project creation for `global_exception_handler` to work since it grabs the version of the project from there. 
 - `run` command to the `CLI` to able to run the project through just the CLI, without a TUI. 
 - `project_directory` parameter to the `Packer` class to be able to handle all directory changes and logic associated with like the git status command `Packer` itself. 
+- `edit` command to open `settings.json` and `projects.json` from the `CLI` if wanted. 
 
 ### Changed
 - Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
