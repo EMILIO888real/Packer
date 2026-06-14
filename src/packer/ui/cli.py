@@ -27,6 +27,8 @@ def main():
     parser.add_argument('-p', '--paths', action='store_true', help='Output all storage paths')
     parser.add_argument('-v', '--version', action='store_true', help='Display the software\'s version')
     parser.add_argument('-s', '--saves', action='store_true', help='Displays all saved projects')
+    parser.add_argument('-c', '--config', action='store_true', help='Displays the saved configuration or packer settings')
+    parser.add_argument('--projects', action='store_true', help='Displays the saved configurations of projects')
 
     clear_command_parser = subparsers.add_parser('clear', help='Clear data produced (cache, saves and so on)')
     clear_command_parser.add_argument('-c', '--cache', action='store_true', help='Clear cache data')
@@ -36,13 +38,13 @@ def main():
 
     run_command_parser = subparsers.add_parser('run', help='Runs packer release and update process on the specified project')
     run_command_parser.add_argument('-p', '--project', help='Specify the project to release an update on')
-    run_command_parser.add_argument('-n', '--new_version', help='Specify the new version to update to')
+    run_command_parser.add_argument('-v', '--version', dest='run_version', help='Specify the new version to update to')
 
     edit_command_parser = subparsers.add_parser('edit', help='Edits user related data, like configurations, projects and so on')
-    edit_command_parser.add_argument('--settings', action='store_true', help='Open to edit the settings.json in the user preferred text editor')
-    edit_command_parser.add_argument('--projects', action='store_true', help='Open to edit the projects.json in the user preferred text editor')
-    edit_command_parser.add_argument('--text_editor', help='Specify the text editor to use over the one saved in settings')
-    edit_command_parser.add_argument('--wait_flag', help='Specify the wait flag for the text editor to use over the one saved in settings')
+    edit_command_parser.add_argument('-s', '--settings', action='store_true', help='Open to edit the settings.json in the user preferred text editor')
+    edit_command_parser.add_argument('-p', '--projects', dest='edit_project', action='store_true', help='Open to edit the projects.json in the user preferred text editor')
+    edit_command_parser.add_argument('-t', '--text_editor', help='Specify the text editor to use over the one saved in settings')
+    edit_command_parser.add_argument('-w', '--wait_flag', help='Specify the wait flag for the text editor to use over the one saved in settings')
 
 
     args = parser.parse_args()
@@ -86,7 +88,7 @@ def main():
                 current_version = load(version_handle)
 
             try:
-                next_version = resolve_version(current_version, args.new_version if args.new_version else stripped_input('New version(M, m, P): '))
+                next_version = resolve_version(current_version, args.run_version if args.run_version else stripped_input('New version(M, m, P): '))
             except ValueError as exc:
                 print(f'Invalid version input: {exc}')
                 sys.exit(1)
@@ -116,10 +118,10 @@ def main():
             open_projects_cmd = [*open_cmd, f'{config_dir}/projects.json']
             if args.settings:
                 run(open_settings_cmd)
-            if args.projects:
+            if args.edit_project:
                 run(open_projects_cmd)
 
-            if not args.projects and not args.settings:
+            if not args.edit_project and not args.settings:
                 run(open_settings_cmd)
                 run(open_projects_cmd)
             
@@ -144,5 +146,15 @@ def main():
         else:
             print('No projects saved!')
     
+    if args.config:
+        print(all_settings)
+
+    if args.projects:
+        SENSITIVE_CONTENT = ('gofile user token', 'gofile folder id', 'github repo token')
+        for project, project_settings in projects_configurations.items():
+            print(f'Project: {Path(project).name}')
+            for setting_key, settings_value in project_settings.items():
+                print(f'\t{setting_key}: {f'{(len(settings_value) - 4) * '*'}{settings_value[-4:]}' if setting_key in SENSITIVE_CONTENT else settings_value}')
+
     if len(sys.argv) > 1:
         sys.exit()

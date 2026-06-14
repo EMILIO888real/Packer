@@ -7,6 +7,7 @@
 - `run` command to the `CLI` to able to run the project through just the CLI, without a TUI. 
 - `project_directory` parameter to the `Packer` class to be able to handle all directory changes and logic associated with like the git status command `Packer` itself. 
 - `edit` command to open `settings.json` and `projects.json` from the `CLI` if wanted. 
+- Display commands for displaying both configurations saved by `Packer` `--config` and `--projects`. For `Packer` settings and for Packer saved projects. 
 
 ### Changed
 - Moved updating the text editor setting with it's full path to config.py, so everyone(all modules in packer) can benefit from the update. 
@@ -23,6 +24,8 @@
 - `resolve_version` function to be a little less forgive and more flexible, but also strict. 
 - `run` command project specification to not be mandatory, if it isn't entered TUI launches. 
 - `run` commands `-n` `new_versions` parameter to not be mandatory, if missing launches TUI. 
+- Shorthand flags and the log flags for the `run` command to be simpler using the `dest` parameter for correct saving. 
+- All `edit` commands parameters shorthand and normal to be simpler with the `dest` parameter. 
 
 ### Fixed
 - {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
