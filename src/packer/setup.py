@@ -123,6 +123,13 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     mkdir('.github')
     mkdir('.github/workflows')
 
+    print_and_log('Creating core.py...')
+    with open(f'{root_dir}/core.py', 'w') as f:
+        f.write(dedent(f'''\
+            def {program_name}():
+                print('Hello, world!')
+        '''))
+
     print_and_log('Creating exceptions.py...')
     with open(f'{root_dir}/assets/exceptions.py', 'w') as f:
         f.write(dedent(f'''\
@@ -152,7 +159,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
                 if issubclass(exc_type, KeyboardInterrupt) or issubclass(exc_type, SystemExit): # Ignore any errors when quitting the program.
                     return
                 
-                print(f'An error has occurred: Type: {{exc_type}} | Value: {{exc_value}}\nPlease report this to a developer via Discord or Github!')
+                print(f'An error has occurred: Type: {{exc_type}} | Value: {{exc_value}}\\nPlease report this to a developer via Discord or Github!')
 
                 print('Generating an error report...')
 
@@ -162,14 +169,14 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
                 error_report = {{'program version': {program_name}_version,
                                 'platform': sys.platform,
                                 'python version': sys.version,
-                                'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\nInput: '),
+                                'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\\nInput: '),
                                 'traceback': ''.join(format_exception(exc_type, exc_value, exc_traceback)),
                                 'associated log file': str(log_path)}}
 
 
                 with open(error_report_path, 'a') as f:
                     dump(error_report, f)
-                    f.write('\n') # For the next errors, so it's possible to compound them.
+                    f.write('\\n') # For the next errors, so it's possible to compound them.
 
                 print('Creating issue archive...')
                 tmp_dir = f'{{log_dir}}/temp dir'
@@ -182,7 +189,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
                 rmtree(tmp_dir)
 
                 print(f'error report generated at: "{{error_report_path.absolute()}}"')
-                print(f'Created an issue archive with the error report and log associated with it: "{{log_dir}}/issue {{datetime.date(datetime.now())}}.zip".\nPlease submit this to a developer!')
+                print(f'Created an issue archive with the error report and log associated with it: "{{log_dir}}/issue {{datetime.date(datetime.now())}}.zip".\\nPlease submit this to a developer!')
                 sys.exit(1)
         '''))
     
@@ -273,10 +280,11 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     with open(f'{root_dir}/main.py', 'w') as f:
         f.write(dedent(f'''\
             from {program_name}.paths import assets_dir
+            from {program_name}.core import {program_name}
 
 
             def main():
-                print('Hello, world!')
+                {program_name}()
 
 
             if __name__ == '__main__':
@@ -293,7 +301,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Starting outside src directory build process..')
 
-    print_and_log('Creating a todo.md file...')
+    print_and_log('Creating a TODO.md file...')
     with open('dev/TODO.md', 'w') as f:
         f.write(dedent('''\
             # TODO
@@ -595,7 +603,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         print_and_log(f'Something went wrong in the built version: {e}', 30, [255, 0, 0])
 
     print_and_log('Removing dist directory...')
-    rmtree('dist')
+    #rmtree('dist')
 
     repo = Repo.init(project_directory)
 

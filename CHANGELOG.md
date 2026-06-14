@@ -2,12 +2,15 @@
 
 ### Added
 - `setup` command for the `CLI` to run the `setup` portion of Packer to create a new project, doesn't save it as a configuration mind you. 
+- `core.py` to `setup` creation process for keeping all of user created packages main code. 
 
 ### Changed
 - `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
 - `revert_changes` method of the `Packer` class in `core.py` to handle cases where the user wants to revert after the entire run method has already ran, by cleaning up the git environment and now in a clean way. 
+- `main.py` to import `core.py` main code to run in by calling it inside it's own `main` function, so that other parts of the software have access to it as well. 
 
 ### Fixed
+- `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
 
 ---
 
