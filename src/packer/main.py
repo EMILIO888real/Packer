@@ -18,7 +18,7 @@ def main():
 
     version = read_json(f'{project_directory}/src/{project_configuration.program_name}/assets/version.json')
     try:
-        new_version = resolve_version(version, input_version = stripped_input('New version(M, m, P): '))
+        new_version = resolve_version(version, stripped_input('New version(M, m, P): '))
     except ValueError as e:
         print(f'Invalid version input: {e}')
 

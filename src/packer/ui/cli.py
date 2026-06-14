@@ -5,6 +5,7 @@ from shutil import rmtree
 import sys
 
 from packer.assets.exceptions import global_exception_handler
+from packer.custom_modules.et import stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir
 from packer.config import Project, packer_version, projects_configurations
@@ -33,8 +34,8 @@ def main():
     clear_command_parser.add_argument('-u', '--user', action='store_true', help='Clear user directory')
 
     run_command_parser = subparsers.add_parser('run', help='Runs packer release and update process on the specified project')
-    run_command_parser.add_argument('-p', '--project', required=True, help='Specify the project to release an update on')
-    run_command_parser.add_argument('-n', '--new_version', required=True, help='Specify the new version to update to')
+    run_command_parser.add_argument('-p', '--project', help='Specify the project to release an update on')
+    run_command_parser.add_argument('-n', '--new_version', help='Specify the new version to update to')
 
 
     args = parser.parse_args()
@@ -60,24 +61,25 @@ def main():
                 _clear_path(target)
         
         case 'run':
+            user_chosen_project = args.project if args.project else stripped_input('Enter the project to update: ')
             project_config = None
             project_path = None
 
             for candidate_path in projects_configurations.keys():
-                if Path(candidate_path).name == args.project:
+                if Path(candidate_path).name == user_chosen_project:
                     project_path = Path(candidate_path)
                     project_config = Project(**normalize_settings_keys(projects_configurations[candidate_path]))
                     break
 
             if not project_path:
-                print(f'No such project found: {args.project}')
+                print(f'No such project found: {user_chosen_project}')
                 sys.exit(1)
 
             with open(f'{project_path}/src/{project_config.program_name}/assets/version.json') as version_handle:
                 current_version = load(version_handle)
 
             try:
-                next_version = resolve_version(current_version, args.new_version)
+                next_version = resolve_version(current_version, args.new_version if args.new_version else stripped_input('New version(M, m, P): '))
             except ValueError as exc:
                 print(f'Invalid version input: {exc}')
                 sys.exit(1)

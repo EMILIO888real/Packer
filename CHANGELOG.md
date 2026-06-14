@@ -20,6 +20,8 @@
 - `Packer` classes documentation to be up to date. 
 - `resolve_version` function has been moved to utils, since the same logic for input version str to be evaluated should work the same for `TUI` and `CLI`. 
 - `resolve_version` function to be a little less forgive and more flexible, but also strict. 
+- `run` command project specification to not be mandatory, if it isn't entered TUI launches. 
+- `run` commands `-n` `new_versions` parameter to not be mandatory, if missing launches TUI. 
 
 ### Fixed
 - {} to {{}}, since otherwise they were accidentally being evaluated as f-string variables to inject during runtime. 
