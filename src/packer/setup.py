@@ -48,15 +48,24 @@ def create_venv(created_venv) -> None:
     created_venv.set()
 
 def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, overwrite_existing: bool = False) -> str:
-    '''Sets up a new project with the following structure:
-    ```
+    '''Set up a new project scaffold and initialize its local Git history.
+
+    The generated layout currently looks like this:
+
+    ```text
     project_directory/
     ├── src/
     │   └── program_name/
     │       ├── __init__.py
+    │       ├── core.py
     │       ├── main.py
+    │       ├── config.py
     │       ├── paths.py
-    │       └── assets/
+    │       ├── assets/
+    │       │   ├── exceptions.py
+    │       │   ├── integrity.json
+    │       │   └── version.json
+    │       └── ui/
     ├── docs/
     │   ├── SETTINGS.md
     │   ├── CONFIGURATION.md
@@ -64,17 +73,20 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     │   └── ROADMAP.md
     ├── tests/
     ├── dev/
-    |   └── todo.md
+    │   └── TODO.md
+    ├── .github/
+    │   └── workflows/
+    │       └── build.yaml
     ├── .gitignore
+    ├── CHANGELOG.md
     ├── LICENSE
     ├── README.md
-    ├── CHANGELOG.md
-    ├── pyproject.toml
-    └── .github/
-        └── workflows/
-            └── build.yaml
+    ├── main.spec
+    └── pyproject.toml
     ```
-    The function also initializes a git repository, creates an initial commit, and optionally creates a remote repository on GitHub and pushes the initial commit to it.
+
+    The function also initializes a Git repository, creates an initial commit,
+    and optionally creates and pushes a remote repository on GitHub.
 
     :param project_directory: The absolute path to the project directory. If it already exists, the user will be prompted to delete it and create a new one.
     :type project_directory: str | Path
@@ -122,6 +134,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     mkdir('dev')
     mkdir('.github')
     mkdir('.github/workflows')
+    mkdir(f'{root_dir}/ui')
 
     print_and_log('Creating core.py...')
     with open(f'{root_dir}/core.py', 'w') as f:

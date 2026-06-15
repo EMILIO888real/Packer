@@ -13,6 +13,7 @@
 - `--config` flag for the packer's CLI to look a bit better it's now a list with ": ", separating values with keys with each pair being on it's own line. 
 - GoFile upload logic to be more robust, handle SSL verification errors and any other that arise with retry logic and pauses the release process after 3 retries, handles automatic reversion process. 
 - `upload_gofile_file` function of `Packer` to not check errors on it's own, but simply raise an Exception if one occurs, since Packer already check for these. 
+- `setup` `main` function's doctype to be more accurate to current state and added `ui` folder to it's creation. 
 
 ### Fixed
 - `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
