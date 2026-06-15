@@ -164,7 +164,7 @@ def main():
             print('No projects saved!')
     
     if args.config:
-        print(all_settings)
+        print_list([setting.replace('=', ': ') for setting in str(all_settings).split(' ')])
 
     if args.projects:
         SENSITIVE_CONTENT = ('gofile user token', 'gofile folder id', 'github repo token')

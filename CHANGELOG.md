@@ -8,6 +8,7 @@
 - `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
 - `revert_changes` method of the `Packer` class in `core.py` to handle cases where the user wants to revert after the entire run method has already ran, by cleaning up the git environment and now in a clean way. 
 - `main.py` to import `core.py` main code to run in by calling it inside it's own `main` function, so that other parts of the software have access to it as well. 
+- `--config` flag for the packer's CLI to look a bit better it's now a list with ": ", separating values with keys with each pair being on it's own line. 
 
 ### Fixed
 - `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
