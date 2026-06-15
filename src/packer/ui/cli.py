@@ -55,9 +55,13 @@ def main():
     setup_command_parser.add_argument('-u', '--github-url', dest='setup_github_repo_url', help='GitHub repository URL')
     setup_command_parser.add_argument('-o', '--overwrite', action='store_true', dest='setup_overwrite', help='Overwrite existing project')
 
-    export_command_parser = subparsers.add_parser('export', help='Export all config saved by packer in an archive')
+    export_command_parser = subparsers.add_parser('export', help='Export all config saved by Packer in an archive')
     export_command_parser.add_argument('-p', '--path', dest='export_path', help='Path to export archive to')
     export_command_parser.add_argument('-s', '--safe', dest='export_safe', help='Password to the archive')
+
+    import_command_parser = subparsers.add_parser('import', help='Import Packer config from an archive')
+    import_command_parser.add_argument('-p', '--path', dest='import_path', required=True, help='Path to the archive to import')
+    import_command_parser.add_argument('-s', '--safe', dest='import_safe', help='Password to the archive')
 
 
     args = parser.parse_args()
@@ -166,6 +170,11 @@ def main():
                 for file in files:
                     zf.write(f'{config_dir}/{file}', arcname=file)
             print(f'Archive saved at: "{archive_path}"')
+        
+        case 'import':
+            with AESZipFile(args.import_path) as zf:
+                zf.setpassword(args.import_safe.encode() if args.import_safe else None)
+                zf.extractall(config_dir)
 
     if args.paths:
         print(f'root_dir: {root_dir}')
