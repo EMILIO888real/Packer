@@ -11,7 +11,7 @@ from typing import Any, Optional
 from collections.abc import Callable, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
-from requests import post
+from requests import post, exceptions
 from git import GitCommandError, Repo
 import tomlkit
 import threading
@@ -43,18 +43,28 @@ def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     :rtype: dict
     '''
 
-    files = {
-        'file': (file_path.name, open(file_path, 'rb'))
-    }
+    with open(file_path, 'rb') as file_handle:
+        files = {
+            'file': (file_path.name, file_handle)
+        }
 
-    data = {
-        'token': token,
-        'folderId': folder_id
-    }
+        data = {
+            'token': token,
+            'folderId': folder_id
+        }
 
-    response = post('https://upload.gofile.io/uploadfile', files=files, data=data)
+        response = post('https://upload.gofile.io/uploadfile', files=files, data=data, timeout=60)
+        response.raise_for_status()
 
-    return response.json()
+        payload = response.json()
+
+        if not isinstance(payload, dict) or payload.get('status') != 'ok':
+            raise ValueError(f'GoFile upload reported an error: {payload}')
+
+        if not isinstance(payload.get('data'), dict) or not payload['data'].get('downloadPage') or not payload['data'].get('id'):
+            raise ValueError(f'GoFile upload returned an incomplete response: {payload}')
+
+        return payload
 
 class Packer():
     '''
@@ -366,7 +376,31 @@ class Packer():
                          '--workpath', f'{cache_dir}/build'], waiting_for_pyinstaller_bundling)
 
             self.print_and_log('Uploading archive to Gofile...')
-            response = upload_gofile_file(Path(f'{cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
+            retry_gofile = True
+            retry_gofile_count = -1
+            while retry_gofile:
+                try:
+                    retry_gofile_count += 1
+                    if retry_gofile_count > 2:
+                        self.print_and_log(f'After {retry_gofile_count} unsuccessful attempts the release has been paused')
+                        self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no')
+                        if not self.prompt_user('Has the problem been resolved'):
+                            self.revert_changes()
+
+                    response = upload_gofile_file(Path(f'{cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
+                    if response.get('status') != 'ok' or not response.get('data'):
+                        self.print_and_log(f'GoFile upload returned an invalid response: {response}')
+                        self.revert_changes()
+                    retry_gofile = False
+                except exceptions.SSLError:
+                    self.print_and_log('Encountered an SSL (verification) error when uploading to GoFile')
+                except Exception as e:
+                    self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}')
+
+                if retry_gofile:
+                    self.print_and_log('retrying in 3 seconds...')
+                    sleep(3)
+
 
             download_url = response['data']['downloadPage']
             self.file_id = response['data']['id']
@@ -580,6 +614,7 @@ class Packer():
             self.git_repo.delete_tag(self.version)
             self.print_and_log('Updating origin...')
             self.git_repo.remotes.origin.push(refspec=f':refs/tags/{self.version}')
+        sys.exit()
 
     def _revert_git_head(self, commit_count: int):
         '''
