@@ -4,6 +4,7 @@ from pathlib import Path
 from shutil import rmtree
 import sys
 from subprocess import run
+from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 
 from packer.assets.exceptions import global_exception_handler
 from packer.custom_modules.et import stripped_input
@@ -53,6 +54,11 @@ def main():
     setup_command_parser.add_argument('-t', '--pat', dest='setup_github_pat', help='GitHub personal access token')
     setup_command_parser.add_argument('-u', '--github-url', dest='setup_github_repo_url', help='GitHub repository URL')
     setup_command_parser.add_argument('-o', '--overwrite', action='store_true', dest='setup_overwrite', help='Overwrite existing project')
+
+    export_command_parser = subparsers.add_parser('export', help='Export all config saved by packer in an archive')
+    export_command_parser.add_argument('-p', '--path', dest='export_path', help='Path to export archive to')
+    export_command_parser.add_argument('-s', '--safe', dest='export_safe', help='Password to the archive')
+
 
     args = parser.parse_args()
 
@@ -141,8 +147,25 @@ def main():
                       args.setup_github_pat if args.setup_github_pat else input('Github PAT: '),
                       args.setup_github_repo_url if args.setup_github_repo_url else input('Github repo URL: '),
                       args.setup_overwrite if args.setup_overwrite else False)
-            
+        
+        case 'export':
+            files = [
+                f'projects.json',
+                f'settings.json',
+            ]
 
+            archive_path = f'{args.export_path.rstrip('/') if args.export_path else '.'}/Packer config.zip'
+            with AESZipFile(
+                archive_path,
+                'w',
+                compression=ZIP_DEFLATED,
+                encryption=WZ_AES if args.export_safe else None
+            ) as zf:
+                if args.export_safe:
+                    zf.setpassword(args.export_safe.encode())
+                for file in files:
+                    zf.write(f'{config_dir}/{file}', arcname=file)
+            print(f'Archive saved at: "{archive_path}"')
 
     if args.paths:
         print(f'root_dir: {root_dir}')

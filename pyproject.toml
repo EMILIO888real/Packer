@@ -14,7 +14,8 @@ dependencies = [
     "GitPython",
     "dirhash",
     "pyinstaller",
-    "tomlkit"
+    "tomlkit",
+    "pyzipper"
 ]
 
 [tool.setuptools]

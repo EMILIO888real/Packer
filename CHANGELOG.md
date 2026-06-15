@@ -3,6 +3,7 @@
 ### Added
 - `setup` command for the `CLI` to run the `setup` portion of Packer to create a new project, doesn't save it as a configuration mind you. 
 - `core.py` to `setup` creation process for keeping all of user created packages main code. 
+- `export` command to the CLI, which exports config saved by Packer to an archive, with the option to set a password, `--safe` and the path, `--path` to where. 
 
 ### Changed
 - `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
