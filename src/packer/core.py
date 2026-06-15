@@ -56,15 +56,7 @@ def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
         response = post('https://upload.gofile.io/uploadfile', files=files, data=data, timeout=60)
         response.raise_for_status()
 
-        payload = response.json()
-
-        if not isinstance(payload, dict) or payload.get('status') != 'ok':
-            raise ValueError(f'GoFile upload reported an error: {payload}')
-
-        if not isinstance(payload.get('data'), dict) or not payload['data'].get('downloadPage') or not payload['data'].get('id'):
-            raise ValueError(f'GoFile upload returned an incomplete response: {payload}')
-
-        return payload
+        return response.json()
 
 class Packer():
     '''
