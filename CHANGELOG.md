@@ -8,6 +8,7 @@
 - The function now generates an AI summary of the changes using an ollama model before writing it to a temporary file for user review. 
 - 2 new prompts for generating the AI summaries have been added to `config.py`. 
 - `CLI.md` for documenting various CLI commands and their uses cases as well as flags, more info available for each command using the --help or -h flag. 
+- `SETTINGS.md` file to explain and showcase some `Packer` user related settings that aren't related to any specific project. 
 
 ### Changed
 - `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
@@ -22,6 +23,7 @@
 - ompletely overhauled the README to use the same kind of structure that the `setup` generates as a README template. 
 - `Project.md` file to also display the new `changelog_git_hash` settings field. 
 - `changes_summary_prompt` to not include a negative prompt to not utilize multi level lists. 
+- Modified README.md: Updates the link to the settings documentation from "docs/PROJECT.md" and "docs/CLI.md" to "docs/SETTINGS.md". The new link includes both global Packer settings and project-specific settings, while the old links only covered project-specific settings. 
 
 ### Fixed
 - `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 

@@ -72,7 +72,7 @@ For interactive CLI usage see [src/packer/ui/cli.py](src/packer/ui/cli.py#L1).
 
 ### Settings
 
-See [docs/PROJECT.md](docs/PROJECT.md#L1) and [docs/CLI.md](docs/CLI.md#L1) for detailed information on user-configurable settings and CLI options.
+See [docs/SETTINGS.md](docs/SETTINGS.md#L1) for global Packer settings and [docs/PROJECT.md](docs/PROJECT.md#L1) for project-specific settings. For CLI options, see [docs/CLI.md](docs/CLI.md#L1).
 
 ### Config
 
