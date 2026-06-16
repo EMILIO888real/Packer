@@ -7,7 +7,7 @@ from os import chdir, remove
 from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
-from typing import Any, Optional
+from typing import Any, NoReturn, Optional
 from collections.abc import Callable, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
@@ -566,7 +566,7 @@ class Packer():
             self.print_and_log('Canceled going further!')
             self.revert_changes()
     
-    def revert_changes(self) -> None:
+    def revert_changes(self) -> NoReturn:
         '''Rollback the release process by removing the generated archive, deleting the uploaded Gofile copy and GitHub release when present, and resetting the Git repository to its previous state.'''
 
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
@@ -595,6 +595,8 @@ class Packer():
                 self.print_and_log('Switching to master branch...')
                 self.git_repo.heads['master'].checkout()
                 self._revert_git_head(commit_count)
+                self.print_and_log('Switching back to development branch...')
+                self.git_repo.heads['master'].checkout()
         else:
             self.git_repo.head.reset(working_tree=True)
 
