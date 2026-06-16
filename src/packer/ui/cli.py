@@ -1,7 +1,7 @@
 from argparse import ArgumentParser
 from json import load
 from pathlib import Path
-from shutil import rmtree
+from shutil import rmtree, which
 import sys
 from subprocess import run
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
@@ -128,7 +128,7 @@ def main():
 
         
         case 'edit':
-            text_editor = args.text_editor if args.text_editor else all_settings.text_editor
+            text_editor = which(args.text_editor if args.text_editor else all_settings.text_editor)
             wait_flag = args.wait_flag if args.wait_flag else all_settings.wait_flag
             open_cmd = [f'{text_editor}', f'{wait_flag}']
 

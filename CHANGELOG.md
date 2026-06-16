@@ -17,6 +17,7 @@
 - `upload_gofile_file` function of `Packer` to not check errors on it's own, but simply raise an Exception if one occurs, since Packer already check for these. 
 - `setup` `main` function's doctype to be more accurate to current state and added `ui` folder to it's creation. 
 - Function `main` now accepts additional arguments: wait_flag, modification_types (default is ['c']), ai_summary (default is True), and verbose (default is True). 
+- Function `which` is imported and used for finding the executable path of a text editor in the `CLI` module. 
 
 ### Fixed
 - `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
