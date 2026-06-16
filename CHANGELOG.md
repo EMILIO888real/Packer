@@ -1,35 +1,35 @@
-## [%new_version] - %date
+## [0.11.0] - 2026-06-16
 
 ### Added
-- `setup` command for the `CLI` to run the `setup` portion of Packer to create a new project, doesn't save it as a configuration mind you. 
-- `core.py` to `setup` creation process for keeping all of user created packages main code. 
-- `export` command to the CLI, which exports config saved by Packer to an archive, with the option to set a password, `--safe` and the path, `--path` to where. 
-- Added an `import` command to the `CLI` to import archives that are the same style as the exported ones. 
-- The function now generates an AI summary of the changes using an ollama model before writing it to a temporary file for user review. 
-- 2 new prompts for generating the AI summaries have been added to `config.py`. 
-- `CLI.md` for documenting various CLI commands and their uses cases as well as flags, more info available for each command using the --help or -h flag. 
-- `SETTINGS.md` file to explain and showcase some `Packer` user related settings that aren't related to any specific project. 
+- [465c528] `setup` command for the `CLI` to run the `setup` portion of Packer to create a new project, doesn't save it as a configuration mind you. 
+- [5ced744] `core.py` to `setup` creation process for keeping all of user created packages main code. 
+- [deafd54] `export` command to the CLI, which exports config saved by Packer to an archive, with the option to set a password, `--safe` and the path, `--path` to where. 
+- [85024f6] Added an `import` command to the `CLI` to import archives that are the same style as the exported ones. 
+- [8f1e377] The function now generates an AI summary of the changes using an ollama model before writing it to a temporary file for user review. 
+- [8f1e377] 2 new prompts for generating the AI summaries have been added to `config.py`. 
+- [2fbf590] `CLI.md` for documenting various CLI commands and their uses cases as well as flags, more info available for each command using the --help or -h flag. 
+- [ea29623] `SETTINGS.md` file to explain and showcase some `Packer` user related settings that aren't related to any specific project.
 
 ### Changed
-- `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
-- `revert_changes` method of the `Packer` class in `core.py` to handle cases where the user wants to revert after the entire run method has already ran, by cleaning up the git environment and now in a clean way. 
-- `main.py` to import `core.py` main code to run in by calling it inside it's own `main` function, so that other parts of the software have access to it as well. 
-- `--config` flag for the packer's CLI to look a bit better it's now a list with ": ", separating values with keys with each pair being on it's own line. 
-- GoFile upload logic to be more robust, handle SSL verification errors and any other that arise with retry logic and pauses the release process after 3 retries, handles automatic reversion process. 
-- `upload_gofile_file` function of `Packer` to not check errors on it's own, but simply raise an Exception if one occurs, since Packer already check for these. 
-- `setup` `main` function's doctype to be more accurate to current state and added `ui` folder to it's creation. 
-- Function `main` now accepts additional arguments: wait_flag, modification_types (default is ['c']), ai_summary (default is True), and verbose (default is True). 
-- Function `which` is imported and used for finding the executable path of a text editor in the `CLI` module. 
-- ompletely overhauled the README to use the same kind of structure that the `setup` generates as a README template. 
-- `Project.md` file to also display the new `changelog_git_hash` settings field. 
-- `changes_summary_prompt` to not include a negative prompt to not utilize multi level lists. 
-- Modified README.md: Updates the link to the settings documentation from "docs/PROJECT.md" and "docs/CLI.md" to "docs/SETTINGS.md". The new link includes both global Packer settings and project-specific settings, while the old links only covered project-specific settings. 
-- `revert changes` method of the `Packer` class now switches back to development branch, if it had switched to the master branch for git reversion. 
-- Packer class's `revert_changes` method now accepts an optional parameter `exit` (default: True) to let the developer choose if they will exit them selves later after some clean up. 
+- [465c528] `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
+- [cc401d0] `revert_changes` method of the `Packer` class in `core.py` to handle cases where the user wants to revert after the entire run method has already ran, by cleaning up the git environment and now in a clean way. 
+- [5ced744] `main.py` to import `core.py` main code to run in by calling it inside it's own `main` function, so that other parts of the software have access to it as well. 
+- [75152a0] `--config` flag for the packer's CLI to look a bit better it's now a list with ": ", separating values with keys with each pair being on it's own line. 
+- [482fca0] GoFile upload logic to be more robust, handle SSL verification errors and any other that arise with retry logic and pauses the release process after 3 retries, handles automatic reversion process. 
+- [c305428] `upload_gofile_file` function of `Packer` to not check errors on it's own, but simply raise an Exception if one occurs, since Packer already check for these. 
+- [f72f99c] `setup` `main` function's doctype to be more accurate to current state and added `ui` folder to it's creation. 
+- [8f1e377] Function `main` now accepts additional arguments: wait_flag, modification_types (default is ['c']), ai_summary (default is True), and verbose (default is True). 
+- [ecf3e4f] Function `which` is imported and used for finding the executable path of a text editor in the `CLI` module. 
+- [2fbf590] ompletely overhauled the README to use the same kind of structure that the `setup` generates as a README template. 
+- [2fbf590] `Project.md` file to also display the new `changelog_git_hash` settings field. 
+- [2fbf590] `changes_summary_prompt` to not include a negative prompt to not utilize multi level lists. 
+- [ea29623] Modified README.md: Updates the link to the settings documentation from "docs/PROJECT.md" and "docs/CLI.md" to "docs/SETTINGS.md". The new link includes both global Packer settings and project-specific settings, while the old links only covered project-specific settings. 
+- [f068cd7] `revert changes` method of the `Packer` class now switches back to development branch, if it had switched to the master branch for git reversion. 
+- [c78dc8d] Packer class's `revert_changes` method now accepts an optional parameter `exit` (default: True) to let the developer choose if they will exit them selves later after some clean up.
 
 ### Fixed
-- `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
-- The `revert_changes` function now handles deleting local git tag after updating origin (deleting remote tag) instead of the other way around. 
+- [5ced744] `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
+- [c78dc8d] The `revert_changes` function now handles deleting local git tag after updating origin (deleting remote tag) instead of the other way around.
 
 ---
 
