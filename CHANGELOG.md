@@ -7,6 +7,7 @@
 - Added an `import` command to the `CLI` to import archives that are the same style as the exported ones. 
 - The function now generates an AI summary of the changes using an ollama model before writing it to a temporary file for user review. 
 - 2 new prompts for generating the AI summaries have been added to `config.py`. 
+- `CLI.md` for documenting various CLI commands and their uses cases as well as flags, more info available for each command using the --help or -h flag. 
 
 ### Changed
 - `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
@@ -18,6 +19,9 @@
 - `setup` `main` function's doctype to be more accurate to current state and added `ui` folder to it's creation. 
 - Function `main` now accepts additional arguments: wait_flag, modification_types (default is ['c']), ai_summary (default is True), and verbose (default is True). 
 - Function `which` is imported and used for finding the executable path of a text editor in the `CLI` module. 
+- ompletely overhauled the README to use the same kind of structure that the `setup` generates as a README template. 
+- `Project.md` file to also display the new `changelog_git_hash` settings field. 
+- `changes_summary_prompt` to not include a negative prompt to not utilize multi level lists. 
 
 ### Fixed
 - `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 

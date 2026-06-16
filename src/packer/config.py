@@ -74,7 +74,7 @@ class Settings(BaseModel):
                 'Focus on the main intent and the most important behavioral or structural changes, '
                 'not minor formatting, whitespace, or line-by-line details. '
                 'Keep the explanation concise. '
-                'Respond with an unordered list only using "-" bullets. '
+                'Respond with an unordered single level list only using "-" bullets. '
                 'Do not include an introduction, conclusion, or any extra commentary.'
         )},
             {'role': 'user', 'content': (
