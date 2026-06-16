@@ -25,9 +25,11 @@
 - `changes_summary_prompt` to not include a negative prompt to not utilize multi level lists. 
 - Modified README.md: Updates the link to the settings documentation from "docs/PROJECT.md" and "docs/CLI.md" to "docs/SETTINGS.md". The new link includes both global Packer settings and project-specific settings, while the old links only covered project-specific settings. 
 - `revert changes` method of the `Packer` class now switches back to development branch, if it had switched to the master branch for git reversion. 
+- Packer class's `revert_changes` method now accepts an optional parameter `exit` (default: True) to let the developer choose if they will exit them selves later after some clean up. 
 
 ### Fixed
 - `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
+- The `revert_changes` function now handles deleting local git tag after updating origin (deleting remote tag) instead of the other way around. 
 
 ---
 

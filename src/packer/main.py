@@ -31,7 +31,7 @@ def main():
                         project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)
 
         def packer_exception_handler(exc_type, exc_value, exc_traceback):
-            packer.revert_changes()
+            packer.revert_changes(False)
             global_exception_handler(exc_type, exc_value, exc_traceback)
 
         sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.

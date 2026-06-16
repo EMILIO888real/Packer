@@ -566,7 +566,7 @@ class Packer():
             self.print_and_log('Canceled going further!')
             self.revert_changes()
     
-    def revert_changes(self) -> NoReturn:
+    def revert_changes(self, exit: bool = True) -> None | NoReturn:
         '''Rollback the release process by removing the generated archive, deleting the uploaded Gofile copy and GitHub release when present, and resetting the Git repository to its previous state.'''
 
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
@@ -604,11 +604,14 @@ class Packer():
             self.print_and_log('Deleting git release...', [255, 255, 0])
             self.git_release.delete_release()
 
-            self.print_and_log('Deleting git tag...')
-            self.git_repo.delete_tag(self.version)
-            self.print_and_log('Updating origin...')
+            # Delete from GitHub first while the local ref is fully intact
+            self.print_and_log('Updating origin (deleting remote tag)...')
             self.git_repo.remotes.origin.push(refspec=f':refs/tags/{self.version}')
-        sys.exit()
+
+            self.print_and_log('Deleting local git tag...')
+            self.git_repo.delete_tag(self.version)
+        if exit:
+            sys.exit()
 
     def _revert_git_head(self, commit_count: int):
         '''
