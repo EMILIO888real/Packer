@@ -1,12 +1,15 @@
-from datetime import datetime
 from os import remove
+from shutil import which
+from string import Template
 from subprocess import run
 from tempfile import NamedTemporaryFile
 from pathlib import Path
+from git import Repo
+from ollama import chat
 
 from packer.config import all_settings
 
-def main(git_directory: str | Path = '.', text_editor: str = 'code', modification_types: list[str] = ['a'], overall_description: str = None):
+def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: str = '--wait', modification_types: list[str] = ['c'], overall_description: str = None, ai_summary: bool = True, verbose: bool = True):
     '''
     Opens a temporary file in the specified text editor for describing the project's modification
 
@@ -18,26 +21,74 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', modificatio
     :type git_directory: str | Path
     :param text_editor: The text editor to use for opening the file (default is 'code')
     :type text_editor: str
-    :param modification_types: The types of modifications to record (a = added, c = changed, f = fixed) (default is ['a'])
+    :param wait_flag: The flag to pass to the editor to wait for it to close (default is '--wait')
+    :type wait_flag: str
+    :param modification_types: The types of modifications to record (a = added, c = changed, f = fixed) (default is ['c'])
     :type modification_types: list[str]
     :param overall_description: The overall description of the modifications, if there are multiple (default is None)
     :type overall_description: str
+    :param ai_summary: Whether to generate an AI summary of the changes (default is True)
+    :type ai_summary: bool
+    :param verbose: Whether to print verbose output (default is True)
+    :type verbose: bool
     '''
-    
+
+    text_editor = which(text_editor)
+
+    if ai_summary:
+        repo = Repo(git_directory)
+
+        diff_text = repo.git.diff(unified=3)
+
+        # Update prompts with runtime data
+        summary_data = {
+                'diff': diff_text,
+                'changes': ','.join(modification_types)
+            }
+
+        all_settings.changes_summary_prompt[1]['content'] = Template(all_settings.changes_summary_prompt[1 if all_settings.changes_summary_prompt[1]['role'] == 'user' else 0]['content']).substitute(summary_data)
+        if verbose:
+            print('Generating bullet summary...')
+        bullet_summary = chat(
+        model=all_settings.model,
+        messages=all_settings.changes_summary_prompt,
+        )['message']['content'].strip()
+
+
+        high_level_summary_data = {
+            'bullet_summary': bullet_summary
+        }
+
+        all_settings.high_level_summary_prompt[1]['content'] = Template(all_settings.high_level_summary_prompt[1 if all_settings.high_level_summary_prompt[1]['role'] == 'user' else 0]['content']).substitute(high_level_summary_data)
+        if verbose:
+            print('Generating high level summary...')
+        high_level_summary = chat(
+        model='mistral',
+        messages=all_settings.high_level_summary_prompt,
+        )['message']['content'].strip()
+
+
 
     with open(f'{git_directory}/CHANGELOG.md', 'r') as f:
         full_changelog = f.read()
 
     messages = []
+    bullet_summary_list = bullet_summary.splitlines()
 
-    for modification_type in modification_types:
+    for i, modification_type in enumerate(modification_types):
         with NamedTemporaryFile('r', delete=False) as tf:
             temp_path = tf.name
-        run([text_editor, '--wait', temp_path])
+        
+        if ai_summary:
+            with open(temp_path, 'w') as f:
+                f.write(bullet_summary_list[i])
+
+        run([text_editor, wait_flag, temp_path])
 
         with open(temp_path) as f:
             message = f.read().strip()
-            message = f'{message[:1].capitalize()}{message[1:]}'
+
+        message = f'{message[:1].capitalize()}{message[1:]}'
         remove(temp_path)
 
         if not message.endswith('.'):
@@ -53,22 +104,36 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', modificatio
             case 'f':
                 end = full_changelog.find('---') - 2
                 modification_type = 'Fixed'
-        
-        messages.append((modification_type, message))
+
+        message = message.lstrip('-')
+        message = message.lstrip()
+        message = message.lstrip(modification_type)
+        message = message.strip()
+
+        messages.append([modification_type, message])
 
         full_changelog = f'{full_changelog[0: end]}\n- {message} {full_changelog[end:]}'
         with open(f'{git_directory}/CHANGELOG.md', 'w') as f:
             f.write(full_changelog)
 
     if len(messages) > 1:
-        git_message = f'feat: {overall_description}\n\n'
+        with NamedTemporaryFile('r', delete=False) as tf:
+            temp_path = tf.name
+        with open(temp_path, 'w') as f:
+            f.write(high_level_summary)
+        run([text_editor, wait_flag, temp_path])
+        with open(temp_path, 'r') as f:
+            high_level_summary = f.read().strip()
+        remove(temp_path)
+
+        git_message = f'feat: {high_level_summary if ai_summary else overall_description}\n\n'
         for message in messages:
             git_message += f'- {message[0]}: {message[1]}\n'
     else:
         git_message = f'{messages[0][0]}: {messages[0][1]}'
 
     run(['git', 'add', '.'])
-    run(['git', 'commit', '-m', git_message])
+    run(['git', 'commit', '-m', git_message.strip()])
     run(['git', 'push'])
 
 def tui():
@@ -85,12 +150,12 @@ def tui():
 
     changes = []
     for _ in range(amount):
-        changes.append(input('Enter the modification type [a, c, f] ').lower())
+        changes.append(input('Enter the modification type [a, c, f] ').strip().lower())
     if len(changes) > 1:
-        overall_description = input('High level description for all changes together: ')
+        overall_description = input('High level description for all changes together [None]: ').strip()
     else:
         overall_description = None
-    main(text_editor=all_settings.text_editor, modification_types=changes, overall_description=overall_description)
+    main(text_editor=all_settings.text_editor, wait_flag=all_settings.wait_flag, modification_types=changes, overall_description=overall_description)
 
 if __name__ == '__main__':
     tui()

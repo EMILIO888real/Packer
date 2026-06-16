@@ -67,6 +67,35 @@ class Settings(BaseModel):
     wait_flag: str | None = '--wait'
     verbose: bool = True
     skip_git_status: bool = False
+    changes_summary_prompt: list[dict[str, str]] = [
+            {'role': 'system', 'content': (
+                'You are a careful code-review assistant. '
+                'Summarize the provided git diff at a high level only. '
+                'Focus on the main intent and the most important behavioral or structural changes, '
+                'not minor formatting, whitespace, or line-by-line details. '
+                'Keep the explanation concise. '
+                'Respond with an unordered list only using "-" bullets. '
+                'Do not include an introduction, conclusion, or any extra commentary.'
+        )},
+            {'role': 'user', 'content': (
+                'Summarize the changes in this git diff at a high level only. '
+                'Ignore minor formatting or whitespace tweaks and focus on the main impact of the update. '
+                'Return the result as an unordered list using "-" bullets only.\n\n'
+                'Only consider modifications of these types: $changes.\n'
+                'Map types using the project TUI: a=added, c=changed, f=fixed.\n\n'
+                '$diff'
+        )},
+    ]
+    high_level_summary_prompt: list[dict[str, str]] = [
+        {'role': 'system', 'content': (
+    'You are a concise reviewer. '
+    'Take the bullet list below and write one short high-level summary sentence. '
+    'Do not repeat every item. Focus on the overall change and its impact. '
+    'Return only the summary sentence, with no bullets or extra commentary.'
+)},
+        {'role': 'user', 'content': '$bullet_summary'},
+    ]
+    model: str = 'mistral'
 
 
 user_settings, default_settings, default_config = load_config(assets_dir, config_dir)

@@ -5,6 +5,8 @@
 - `core.py` to `setup` creation process for keeping all of user created packages main code. 
 - `export` command to the CLI, which exports config saved by Packer to an archive, with the option to set a password, `--safe` and the path, `--path` to where. 
 - Added an `import` command to the `CLI` to import archives that are the same style as the exported ones. 
+- The function now generates an AI summary of the changes using an ollama model before writing it to a temporary file for user review. 
+- 2 new prompts for generating the AI summaries have been added to `config.py`. 
 
 ### Changed
 - `setup.py` logic for detecting whether the user has provided Github PAT or Github repo URL to be more flexible. 
@@ -14,6 +16,7 @@
 - GoFile upload logic to be more robust, handle SSL verification errors and any other that arise with retry logic and pauses the release process after 3 retries, handles automatic reversion process. 
 - `upload_gofile_file` function of `Packer` to not check errors on it's own, but simply raise an Exception if one occurs, since Packer already check for these. 
 - `setup` `main` function's doctype to be more accurate to current state and added `ui` folder to it's creation. 
+- Function `main` now accepts additional arguments: wait_flag, modification_types (default is ['c']), ai_summary (default is True), and verbose (default is True). 
 
 ### Fixed
 - `setup`'s `exceptions.py` creation to write out ran \n characters inside the code instead of writing them out as actual new line chars. 
