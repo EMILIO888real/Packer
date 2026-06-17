@@ -617,7 +617,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         print_and_log(f'Something went wrong in the built version: {e}', 30, [255, 0, 0])
 
     print_and_log('Removing dist directory...')
-    #rmtree('dist')
+    rmtree('dist')
 
     repo = Repo.init(project_directory)
 
