@@ -3,6 +3,7 @@
 ### Added
 
 ### Changed
+- Significantly upgraded the documentation for the configuration module (`config.py`) by adding simple documentation for the 2 pydantic modules and upgraded the main modules documentation. 
 
 ### Fixed
 

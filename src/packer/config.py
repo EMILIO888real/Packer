@@ -1,26 +1,30 @@
 '''
-This module provides configuration settings for the packer package. When using the `load` function,
-it is required to modify the source and read it from source, so you should use `import packer.config`
-to import the module. However, if you are not using `load` and just need to access the configuration
-settings, you can use `from packer.config import all_settings` to directly import the settings.
+Configuration module for the packer package.
+
+This module manages all configuration settings for packer, including project-specific configurations
+and user global settings. It provides a unified interface to access merged configurations from multiple
+sources (user settings, defaults, and project-specific configs).
+
+For detailed documentation on project and user settings, see:
+- Project Configuration: https://github.com/EMILIO888real/Packer/blob/master/docs/PROJECT.md
+- User Settings: https://github.com/EMILIO888real/Packer/blob/master/docs/SETTINGS.md
 
 Example usage:
 ```
-    # For load function (requires source modification)
-    import packer.config as config
-
-    config.load(project_dir)
-    config.all_settings # Now this contains the new settings, after running the above line.
-
-    # For direct settings access
-    from packer.config import all_settings
+    from packer.config import all_settings, projects_configurations, Project
+    from packer.utils import normalize_settings_keys
+    
+    all_settings.text_editor # Access a global setting
+    packer_config = projects_configurations['packer'] # Access the dict containing the settings to that project, in this case the packer project.
+    project = Project(**packer_config) # or you can also first call the normalize_settings_keys function to replace ' ' with '_', to create snake case words.
 
 Attributes:
-    load: To create the Settings object, merge all settings.
-    all_settings: A dictionary containing all configuration settings for the selected project.
+    all_settings: A Settings object containing all merged configuration for the selected project.
     user_settings: A dictionary containing user-defined configuration settings for all projects.
-    default_settings: A dictionary containing the default configuration settings for any packer style projects.
-    default_config: A dictionary containing the default configuration config for any packer style projects.
+    default_settings: A dictionary containing default configuration settings for packer projects.
+    default_config: A dictionary containing the default configuration structure.
+    projects_configurations: Optional dictionary of project-specific configurations from projects.json.
+    packer_version: The current version of the packer package.
 '''
 
 __all__ = 'user_settings, default_settings, default_config, all_settings, load, packer_version'
@@ -40,6 +44,32 @@ with open(f'{assets_dir}/version.json') as f:
 
 
 class Project(BaseModel):
+    '''
+    Project configuration model for packer.
+
+    Defines all project-specific settings required for building, packaging, and releasing a project.
+    This includes credentials for external services, build commands, and LLM prompts for generating
+    release notes and metadata.
+
+    For complete project configuration documentation, see:
+    https://github.com/EMILIO888real/Packer/blob/master/docs/PROJECT.md
+
+    Attributes:
+        gofile_user_token (str): Authentication token for GoFile API.
+        gofile_folder_id (str): Target folder ID on GoFile for uploads.
+        github_repo_token (str): GitHub personal access token for repository operations.
+        program_name (str): Name of the program/project.
+        github_repo_url (str): URL of the GitHub repository.
+        before_commands (tuple | None): Commands to execute before the build process.
+        after_commands (tuple | None): Commands to execute after the build process.
+        compile_command (Sequence[str] | None): Command sequence to compile/build the project.
+        model (str): LLM model to use for generating descriptions (default: 'mistral').
+        description_prompt (list[dict] | None): Prompt template for generating release descriptions.
+        title_prompt (list[dict] | None): Prompt template for generating release titles.
+        release_notes_template_path (str | Path): Path to the release notes template file.
+        changelog_git_hash (bool): Whether to include git hash in changelog (default: True).
+    '''
+
     gofile_user_token: str
     gofile_folder_id: str
     github_repo_token: str
@@ -63,6 +93,27 @@ class Project(BaseModel):
 
 
 class Settings(BaseModel):
+    '''
+    Global settings model for packer.
+
+    Defines user-level settings that apply across all packer projects. This includes editor preferences,
+    output verbosity, LLM model selection, and prompt templates for generating change summaries and
+    high-level release notes.
+
+    For complete settings documentation, see:
+    https://github.com/EMILIO888real/Packer/blob/master/docs/SETTINGS.md
+
+    Attributes:
+        text_editor (str): Name or path of the text editor to use (default: 'code' for VS Code).
+        wait_flag (str | None): Flag to pass to the text editor (default: '--wait').
+        verbose (bool): Enable verbose output logging (default: True).
+        skip_git_status (bool): Skip git status checks before operations (default: False).
+        model (str): LLM model to use for summaries (default: 'mistral').
+        changes_summary_prompt (list[dict]): Prompt template for summarizing git diffs at a high level.
+        high_level_summary_prompt (list[dict]): Prompt template for creating a single summary sentence
+                                                  from a bullet-point list of changes.
+    '''
+
     text_editor: str = 'code'
     wait_flag: str | None = '--wait'
     verbose: bool = True
