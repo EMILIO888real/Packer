@@ -18,7 +18,8 @@ import threading
 from string import Template
 import sys
 
-from packer.custom_modules.et import bool_answer, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor, tree, delete_upload, simple_prompt, init_logger
+from packer.custom_modules.et import tree, delete_upload, init_logger
+from packer.custom_modules.etf import bool_answer, simple_prompt, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
 from packer.config import all_settings, Project, packer_version
 from packer.paths import log_path, data_dir, cache_dir
 from packer.assets.exceptions import global_exception_handler

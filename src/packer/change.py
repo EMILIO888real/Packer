@@ -73,13 +73,13 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
         full_changelog = f.read()
 
     messages = []
-    bullet_summary_list = bullet_summary.splitlines()
 
     for i, modification_type in enumerate(modification_types):
         with NamedTemporaryFile('r', delete=False) as tf:
             temp_path = tf.name
         
         if ai_summary:
+            bullet_summary_list = bullet_summary.splitlines()
             with open(temp_path, 'w') as f:
                 f.write(bullet_summary_list[i])
 
@@ -119,8 +119,9 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
     if len(messages) > 1:
         with NamedTemporaryFile('r', delete=False) as tf:
             temp_path = tf.name
-        with open(temp_path, 'w') as f:
-            f.write(high_level_summary)
+        if ai_summary:
+            with open(temp_path, 'w') as f:
+                f.write(high_level_summary)
         run([text_editor, wait_flag, temp_path])
         with open(temp_path, 'r') as f:
             high_level_summary = f.read().strip()

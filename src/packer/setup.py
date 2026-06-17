@@ -16,7 +16,8 @@ from re import match
 from keyword import iskeyword
 from platformdirs import user_documents_dir
 
-from packer.custom_modules.et import init_logger, print_colored_text, simple_prompt, stripped_input, tree, read_json, format_version_text
+from packer.custom_modules.et import init_logger, tree
+from packer.custom_modules.etf import print_colored_text, simple_prompt, stripped_input
 from packer.config import packer_version
 from packer.custom_modules.etf import print_list
 

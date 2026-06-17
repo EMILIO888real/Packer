@@ -5,7 +5,7 @@ import sys
 from traceback import format_exception
 from json import dump
 from shutil import make_archive, copy, rmtree
-from packer.custom_modules.et import print_colored_text
+from packer.custom_modules.etf import print_colored_text
 from packer.config import packer_version
 from packer.paths import log_path, error_report_path, log_dir
 

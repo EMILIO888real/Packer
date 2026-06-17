@@ -7,7 +7,8 @@ from subprocess import run
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 
 from packer.assets.exceptions import global_exception_handler
-from packer.custom_modules.et import stripped_input, resolve_version, normalize_settings_keys
+from packer.custom_modules.et import resolve_version, normalize_settings_keys
+from packer.custom_modules.etf import stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir
 from packer.config import Project, packer_version, projects_configurations, all_settings

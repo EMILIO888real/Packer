@@ -4,12 +4,12 @@ This module contains the code for the packer, which is a script that creates an 
 
 import sys
 
-from packer.custom_modules.et import read_json, stripped_input
+from packer.custom_modules.et import read_json, resolve_version
 from packer.ui.tui import main as tui
 from packer.ui.cli import main as cli
 from packer.assets.exceptions import global_exception_handler
 from packer.core import Packer
-from packer.custom_modules.et import resolve_version
+from packer.custom_modules.etf import stripped_input
 
 
 def main():

@@ -6,7 +6,8 @@ from subprocess import run
 
 from packer.setup import main as setup, tui
 from packer.paths import config_dir
-from packer.custom_modules.et import stripped_input, create_go_file_folder, simple_prompt, normalize_settings_keys
+from packer.custom_modules.et import create_go_file_folder, normalize_settings_keys
+from packer.custom_modules.etf import stripped_input, simple_prompt
 from packer.config import Project, projects_configurations, all_settings
 
 def main() -> tuple[str, Project]:
