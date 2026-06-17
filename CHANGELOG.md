@@ -4,6 +4,9 @@
 
 ### Changed
 - Significantly upgraded the documentation for the configuration module (`config.py`) by adding simple documentation for the 2 pydantic modules and upgraded the main modules documentation. 
+- The codebase has moved all functions that could be relevant for many projects to the `et` module. This includes loading and merging settings, normalizing settings keys, and resolving versions, `utils module`, becomes empty for the time being. 
+- The default settings JSON file in assets directory has been removed, since the logic for loading global packer settings has changed in `config.py` to rely on the pydantic module, there is no need for 2 copies of the settings. 
+- s have been made to the `load_config`, `simple_merge_settings`, and `normalize_settings_keys` functions in the `utils.py` module to import these new functions from the `et` module. 
 
 ### Fixed
 

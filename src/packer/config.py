@@ -34,9 +34,8 @@ from pathlib import Path
 from shutil import which
 from typing import Any, Sequence
 from pydantic import BaseModel
-from packer.custom_modules.et import format_version_text
+from packer.custom_modules.et import format_version_text, normalize_settings_keys
 from packer.paths import assets_dir, config_dir
-from packer.utils import load_config, normalize_settings_keys, simple_merge_settings
 import json
 
 with open(f'{assets_dir}/version.json') as f:
@@ -148,9 +147,16 @@ class Settings(BaseModel):
     ]
     model: str = 'mistral'
 
+settings_path = f'{config_dir}/settings.json'
 
-user_settings, default_settings, default_config = load_config(assets_dir, config_dir)
-all_settings: Settings = Settings(**normalize_settings_keys(simple_merge_settings(user_settings, default_settings, default_config)))
+if not Path(settings_path).exists():
+    with open(settings_path, 'w') as f:
+        f.write('{}')
+
+with open(settings_path) as f:
+    user_settings = json.load(f)
+
+all_settings: Settings = Settings(**normalize_settings_keys(user_settings))
 
 # All setup for settings
 all_settings.text_editor = which(all_settings.text_editor)

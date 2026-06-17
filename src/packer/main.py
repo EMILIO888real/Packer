@@ -9,7 +9,7 @@ from packer.ui.tui import main as tui
 from packer.ui.cli import main as cli
 from packer.assets.exceptions import global_exception_handler
 from packer.core import Packer
-from packer.utils import resolve_version
+from packer.custom_modules.et import resolve_version
 
 
 def main():
