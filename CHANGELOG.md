@@ -22,6 +22,7 @@
 - Added the overwrite field as an extra return field for the `tui` in the `setup`, for the obvious reasons, before the software would crash, because of a bad design. 
 - TUI now returns the GitHub repo URL no matter if the project `setup` was aborted or not. 
 - Migrated from using `open()` and `dump()` to `Path.write_text()` with `dumps()` and `loads()` for handling project configuration in tui.py, while fixing the problem with just overwriting the entire projects file every time a new project was added. 
+- Removed always unnecessarily updating the projects.json file, instead it only gets updated when actually a new project has been added. 
 
 ---
 

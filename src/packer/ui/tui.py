@@ -95,12 +95,12 @@ def main() -> tuple[str, Project]:
                 run([all_settings.text_editor, '--wait', f'{config_dir}/projects.json'])
         
 
-    if not projects_file_path.exists():
-        projects_file_path.write_text(dumps(projects_configurations, indent=4))
-    else:
-        existing_projects_configurations = loads(projects_file_path.read_text())
-        existing_projects_configurations.update(projects_configurations)
-        projects_file_path.write_text(dumps(existing_projects_configurations, indent=4))
+        if not projects_file_path.exists():
+            projects_file_path.write_text(dumps(projects_configurations, indent=4))
+        else:
+            existing_projects_configurations = loads(projects_file_path.read_text())
+            existing_projects_configurations.update(projects_configurations)
+            projects_file_path.write_text(dumps(existing_projects_configurations, indent=4))
 
         print(f'Project configuration saved at: {config_dir}/projects.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
