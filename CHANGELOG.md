@@ -12,6 +12,7 @@
 - Updated all imports in the entire project that were using `et.py` to also use `etf.py` if the object was moved to that module. 
 - ompletely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
 - Updated all imports in the entire project to utilize both modules `et` and `etf` to handle the new python object locations gracefully. 
+- Introduced `projects_file_path` and `settings_file_path` in paths.py. 
 
 ### Fixed
 - Mistake in `change.py` to work even without AI summary. 
@@ -20,6 +21,7 @@
 - Removed the read_json function which is removed at this point and switched to just reading json using the standart json library. 
 - Added the overwrite field as an extra return field for the `tui` in the `setup`, for the obvious reasons, before the software would crash, because of a bad design. 
 - TUI now returns the GitHub repo URL no matter if the project `setup` was aborted or not. 
+- Migrated from using `open()` and `dump()` to `Path.write_text()` with `dumps()` and `loads()` for handling project configuration in tui.py, while fixing the problem with just overwriting the entire projects file every time a new project was added. 
 
 ---
 

@@ -1,11 +1,11 @@
 from getpass import getpass
-from json import dump
+from json import dumps, loads
 from pathlib import Path
 from typing import Callable
 from subprocess import run
 
 from packer.setup import main as setup, tui
-from packer.paths import config_dir
+from packer.paths import config_dir, projects_file_path
 from packer.custom_modules.et import create_go_file_folder, normalize_settings_keys
 from packer.custom_modules.etf import stripped_input, simple_prompt
 from packer.config import Project, projects_configurations, all_settings
@@ -93,11 +93,14 @@ def main() -> tuple[str, Project]:
             
             if simple_prompt('Open projects.json', 'n'):
                 run([all_settings.text_editor, '--wait', f'{config_dir}/projects.json'])
-                    
+        
 
-
-        with open(f'{config_dir}/projects.json', 'w') as f:
-            dump(projects_configurations, f, indent=4)
+    if not projects_file_path.exists():
+        projects_file_path.write_text(dumps(projects_configurations, indent=4))
+    else:
+        existing_projects_configurations = loads(projects_file_path.read_text())
+        existing_projects_configurations.update(projects_configurations)
+        projects_file_path.write_text(dumps(existing_projects_configurations, indent=4))
 
         print(f'Project configuration saved at: {config_dir}/projects.json! You can change them later by editing the file or deleting it to go through the setup again.')
 
