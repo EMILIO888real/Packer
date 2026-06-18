@@ -19,6 +19,7 @@
 - Changed the comment for removing 'dist' directory from a multi-line comment to a single line function call (`rmtree('dist')`) in `setup.py` file of packer project. 
 - Removed the read_json function which is removed at this point and switched to just reading json using the standart json library. 
 - Added the overwrite field as an extra return field for the `tui` in the `setup`, for the obvious reasons, before the software would crash, because of a bad design. 
+- TUI now returns the GitHub repo URL no matter if the project `setup` was aborted or not. 
 
 ---
 

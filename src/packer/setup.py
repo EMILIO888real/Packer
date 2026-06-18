@@ -114,7 +114,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             rmtree(project_directory)
         else:
             print_and_log('Aborting setup...')
-            return
+            return github_repo_url.lstrip('https://github.com/')
 
     print_and_log('Creating project directory...')
     mkdir(project_directory)
@@ -673,7 +673,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
     
-    return github_repo_url.lstrip('https://github.com/') if github_repo_url is not None else None
+    return github_repo_url.lstrip('https://github.com/')
 
 def tui() -> tuple[str]:
     '''
