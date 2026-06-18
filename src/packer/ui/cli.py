@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
-from json import load
+from json import dump, load
+from os import mkdir
 from pathlib import Path
 from shutil import rmtree, which
 import sys
@@ -10,7 +11,7 @@ from packer.assets.exceptions import global_exception_handler
 from packer.custom_modules.et import resolve_version, normalize_settings_keys
 from packer.custom_modules.etf import stripped_input
 from packer.custom_modules.etf import print_list
-from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir
+from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path
 from packer.config import Project, packer_version, projects_configurations, all_settings
 from packer.core import Packer
 from packer.setup import main as setup
@@ -172,9 +173,35 @@ def main():
             print(f'Archive saved at: "{archive_path}"')
         
         case 'import':
+            tmp_dir = f'{cache_dir}/tmp import'
+            mkdir(tmp_dir)
+
             with AESZipFile(args.import_path) as zf:
                 zf.setpassword(args.import_safe.encode() if args.import_safe else None)
-                zf.extractall(config_dir)
+                zf.extractall(tmp_dir)
+            
+            if projects_file_path.exists():
+                print('Found existing saved projects, merging with imports...')
+                with open(projects_file_path) as f:
+                    existing_projects = load(f)
+                with open(f'{tmp_dir}/projects.json') as f:
+                    imported_projects = load(f)
+
+                existing_projects.update(imported_projects)
+                with open(projects_file_path) as f:
+                    dump(existing_projects)
+            
+            # Settings file is always created, even if just an empty dict
+            with open(settings_file_path) as f:
+                existing_settings = load(f)
+            with open(f'{tmp_dir}/settings.json') as f:
+                imported_settings = load(f)
+
+            existing_settings.update(imported_settings)
+            with open(settings_file_path) as f:
+                dump(existing_settings)
+            
+            rmtree(tmp_dir)
 
     if args.paths:
         print(f'root_dir: {root_dir}')

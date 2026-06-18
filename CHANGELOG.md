@@ -23,6 +23,7 @@
 - TUI now returns the GitHub repo URL no matter if the project `setup` was aborted or not. 
 - Migrated from using `open()` and `dump()` to `Path.write_text()` with `dumps()` and `loads()` for handling project configuration in tui.py, while fixing the problem with just overwriting the entire projects file every time a new project was added. 
 - Removed always unnecessarily updating the projects.json file, instead it only gets updated when actually a new project has been added. 
+- `CLI` `import` command to merge saved projects if there are any and merge settings, also to store or extract the files to the configuration directory tied to the user and the software instead of CWD. 
 
 ---
 
