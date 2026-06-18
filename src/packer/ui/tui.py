@@ -47,7 +47,7 @@ def main() -> tuple[str, Project]:
         project_directory = user_setup_data[0]
         program_name = user_setup_data[2]
         print('Starting setup...')
-        github_repo_url = setup(*user_setup_data, True)
+        github_repo_url = setup(*user_setup_data)
         print('Setup complete. Continuing with configuration...')
 
 

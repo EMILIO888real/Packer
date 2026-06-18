@@ -18,6 +18,7 @@
 - Completely overhauled the `et.py` module to now contain primarily just functions that could be used as general tools for various other packer style projects. 
 - Changed the comment for removing 'dist' directory from a multi-line comment to a single line function call (`rmtree('dist')`) in `setup.py` file of packer project. 
 - Removed the read_json function which is removed at this point and switched to just reading json using the standart json library. 
+- Added the overwrite field as an extra return field for the `tui` in the `setup`, for the obvious reasons, before the software would crash, because of a bad design. 
 
 ---
 

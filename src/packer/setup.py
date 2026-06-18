@@ -687,6 +687,7 @@ def tui() -> tuple[str]:
         - program_name (str): The name of the program.
         - author_name (str): The name of the author.
         - github_pat (str or None): The GitHub PAT if provided, otherwise None.
+        - overwrite (bool): Whether to overwrite the existing project
     :rtype: tuple[str]
     '''
 
@@ -704,10 +705,10 @@ def tui() -> tuple[str]:
     if project_directory == '':
         project_directory = default_project_dir
 
+    overwrite = True
     if Path(project_directory).exists():
         if not simple_prompt('Directory already exists, overwrite it', 'n'):
-            print('Aborting setup')
-            return
+            overwrite = False
 
     project_directory.rstrip('/')
 
@@ -720,11 +721,11 @@ def tui() -> tuple[str]:
     if author_name == '':
         author_name = default_name
 
-    return (project_directory, author_name, program_name, github_pat, github_repo_url)
+    return (project_directory, author_name, program_name, github_pat, github_repo_url, overwrite)
 
 if __name__ == '__main__':
     print('You will need to configure [4-5] settings.')
     try:
-        print(f'github repo url: {main(*tui(), overwrite_existing=True)}')
+        print(f'github repo url: {main(*tui())}')
     except KeyboardInterrupt:
         exit()
