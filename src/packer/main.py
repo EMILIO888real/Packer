@@ -3,8 +3,9 @@ This module contains the code for the packer, which is a script that creates an 
 '''
 
 import sys
+from json import load
 
-from packer.custom_modules.et import read_json, resolve_version
+from packer.custom_modules.et import resolve_version
 from packer.ui.tui import main as tui
 from packer.ui.cli import main as cli
 from packer.assets.exceptions import global_exception_handler
@@ -16,7 +17,8 @@ def main():
     cli()
     project_directory, project_configuration = tui()
 
-    version = read_json(f'{project_directory}/src/{project_configuration.program_name}/assets/version.json')
+    with open(f'{project_directory}/src/{project_configuration.program_name}/assets/version.json') as f:
+        version = load(f)
     try:
         new_version = resolve_version(version, stripped_input('New version(M, m, P): '))
     except ValueError as e:
