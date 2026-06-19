@@ -646,6 +646,11 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Committing files...')
     repo.index.commit(f'Initial commit\nProject structure created by packer\'s setup.py v{packer_version}')
 
+    master_branch = repo.active_branch
+
+    print_and_log('Creating a new branch and switching to it...')
+    repo.create_head('development').checkout()
+
     if github_pat:
         print_and_log('Creating remote repository on GitHub...')
         github_repo_url = Github(auth=Auth.Token(github_pat)).get_user().create_repo(
@@ -658,18 +663,15 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         print_and_log('Creating remote repository...')
         origin = repo.create_remote('origin', github_repo_url)
 
-        # This ensures 'git push' or 'git pull' knows where to go by default
-        print_and_log('Registering the master branch with the remote repository...')
-        with repo.config_writer() as writer:
-            writer.set_value('branch "master"', 'remote', 'origin')
-            writer.set_value('branch "master"', 'merge', 'refs/heads/master')
-
-        print_and_log('Pushing initial commit to remote repository...')
         try:
-            origin.push()
+            print_and_log(f'Pushing {master_branch.name} branch to origin...')
+            repo.git.push('-u', 'origin', master_branch.name)
+
+            print_and_log('Pushing the development branch to origin...')
+            repo.git.push('-u', 'origin', 'development')
         except Exception as e:
             print_and_log(f'Warning: Push failed with error: {e}', 30, [255, 165, 0])
-            print_and_log('You can push manually with: git push -u origin master', 20, [255, 165, 0])
+            print_and_log(f'You can push manually with: git push -u origin {master_branch.name}', 20, [255, 165, 0])
     
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
     
