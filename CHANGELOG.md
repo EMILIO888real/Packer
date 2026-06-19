@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- automatic Github origin URL updating to using a Personal Access Token (PAT) to authenticate. 
 
 ### Changed
 - Significantly upgraded the documentation for the configuration module (`config.py`) by adding simple documentation for the 2 pydantic modules and upgraded the main modules documentation. 

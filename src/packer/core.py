@@ -165,6 +165,14 @@ class Packer():
 
         self.print_and_log('Starting packer...')
 
+        self.print_and_log('Updating Github origin URL with PAT...')
+
+        authenticated_url = f'https://{self.GITHUB_REPO_TOKEN}@github.com/{self.github_repo_url}.git'
+        if 'origin' in self.git_repo.remotes:
+            origin = self.git_repo.remotes.origin
+            origin.set_url(authenticated_url)
+        else:
+            origin = self.git_repo.create_remote('origin', authenticated_url)
 
         self.print_and_log('Updating version...')
         with open(f'{self.assets_dir}/version.json', 'w') as f:
