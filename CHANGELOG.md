@@ -1,38 +1,38 @@
-## [%new_version] - %date
+## [0.12.0] - 2026-06-19
 
 ### Added
-- automatic Github origin URL updating to using a Personal Access Token (PAT) to authenticate. 
-- s creation of a new 'development' branch and switch to it before pushing the initial commit to GitHub in `setup` of a new project. 
-- `global_exception_handler` to `main.py` of newly created projects by `setup` to automatic set the `sys.excepthook` to use the exception handler. 
+- [486e103] automatic Github origin URL updating to using a Personal Access Token (PAT) to authenticate. 
+- [0608c16] s creation of a new 'development' branch and switch to it before pushing the initial commit to GitHub in `setup` of a new project. 
+- [cafeb70] `global_exception_handler` to `main.py` of newly created projects by `setup` to automatic set the `sys.excepthook` to use the exception handler.
 
 ### Changed
-- Significantly upgraded the documentation for the configuration module (`config.py`) by adding simple documentation for the 2 pydantic modules and upgraded the main modules documentation. 
-- The codebase has moved all functions that could be relevant for many projects to the `et` module. This includes loading and merging settings, normalizing settings keys, and resolving versions, `utils module`, becomes empty for the time being. 
-- The default settings JSON file in assets directory has been removed, since the logic for loading global packer settings has changed in `config.py` to rely on the pydantic module, there is no need for 2 copies of the settings. 
-- s have been made to the `load_config`, `simple_merge_settings`, and `normalize_settings_keys` functions in the `utils.py` module to import these new functions from the `et` module. 
-- completely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
-- Updated all imports in the entire project to utilize both modules `et` and `etf` to handle the new python object locations gracefully. 
-- Introduced `projects_file_path` and `settings_file_path` in paths.py. 
-- Overall description or high level summary to write out to the tmp file if AI summary isn't in use. 
-- Git branches syncing logic with local git directory and Github to use the native `GitPython` implementation. 
-- Significantly improved and updated the TODO.md file of newly created projects by `setup` to include more preset TODO's and some tips on maximizing the projects layout effectiveness. 
-- Some minor things to make the project cleaner, *like switching to from keyword imports and such*. 
-- Dropped requirements file (`requirements.txt`), since it was leaking secrets and is just outdated and not used method of installing this package anyways. 
+- [51fdee5] Significantly upgraded the documentation for the configuration module (`config.py`) by adding simple documentation for the 2 pydantic modules and upgraded the main modules documentation. 
+- [d41a836] The codebase has moved all functions that could be relevant for many projects to the `et` module. This includes loading and merging settings, normalizing settings keys, and resolving versions, `utils module`, becomes empty for the time being. 
+- [d41a836] The default settings JSON file in assets directory has been removed, since the logic for loading global packer settings has changed in `config.py` to rely on the pydantic module, there is no need for 2 copies of the settings. 
+- [d41a836] s have been made to the `load_config`, `simple_merge_settings`, and `normalize_settings_keys` functions in the `utils.py` module to import these new functions from the `et` module. 
+-  [d5d9928] ompletely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
+- [d5d9928] Updated all imports in the entire project to utilize both modules `et` and `etf` to handle the new python object locations gracefully. 
+- [def6e30] Introduced `projects_file_path` and `settings_file_path` in paths.py. 
+- [3483c8a] Overall description or high level summary to write out to the tmp file if AI summary isn't in use. 
+- [0608c16] Git branches syncing logic with local git directory and Github to use the native `GitPython` implementation. 
+- [cafeb70] Significantly improved and updated the TODO.md file of newly created projects by `setup` to include more preset TODO's and some tips on maximizing the projects layout effectiveness. 
+- [cafeb70] Some minor things to make the project cleaner, *like switching to from keyword imports and such*. 
+- [2d1fc5c] Dropped requirements file (`requirements.txt`), since it was leaking secrets and is just outdated and not used method of installing this package anyways [d5d9928]
 
 ### Fixed
 - Mistake in `change.py` to work even without AI summary. 
-- Completely overhauled the `et.py` module to now contain primarily just functions that could be used as general tools for various other packer style projects. 
-- Changed the comment for removing 'dist' directory from a multi-line comment to a single line function call (`rmtree('dist')`) in `setup.py` file of packer project. 
-- Removed the read_json function which is removed at this point and switched to just reading json using the standart json library. 
-- Added the overwrite field as an extra return field for the `tui` in the `setup`, for the obvious reasons, before the software would crash, because of a bad design. 
-- TUI now returns the GitHub repo URL no matter if the project `setup` was aborted or not. 
-- Migrated from using `open()` and `dump()` to `Path.write_text()` with `dumps()` and `loads()` for handling project configuration in tui.py, while fixing the problem with just overwriting the entire projects file every time a new project was added. 
-- Removed always unnecessarily updating the projects.json file, instead it only gets updated when actually a new project has been added. 
-- `CLI` `import` command to merge saved projects if there are any and merge settings, also to store or extract the files to the configuration directory tied to the user and the software instead of CWD. 
-- Typo in the changelog. 
-- Removed the unknown orphaned changelog entries, they weren't associated with any git commits, so most likely they were accidental duplicates. 
-- Changed the behavior of `pip freeze` command in creating `requirements.txt` file to exclude installation URLs, since they were exposing secrets. 
-- Removed 'requirements.txt' to staging changes for git to not look for it, since it's removed now. 
+- [d5d9928] Completely overhauled the `et.py` module to now contain primarily just functions that could be used as general tools for various other packer style projects. 
+- [f279ee7] Changed the comment for removing 'dist' directory from a multi-line comment to a single line function call (`rmtree('dist')`) in `setup.py` file of packer project. 
+- [5ab04a0] Removed the read_json function which is removed at this point and switched to just reading json using the standart json library. 
+- [fe4afe8] Added the overwrite field as an extra return field for the `tui` in the `setup`, for the obvious reasons, before the software would crash, because of a bad design. 
+- [b2e8f0e] TUI now returns the GitHub repo URL no matter if the project `setup` was aborted or not. 
+- [def6e30] Migrated from using `open()` and `dump()` to `Path.write_text()` with `dumps()` and `loads()` for handling project configuration in tui.py, while fixing the problem with just overwriting the entire projects file every time a new project was added. 
+- [3873deb] Removed always unnecessarily updating the projects.json file, instead it only gets updated when actually a new project has been added. 
+- [57c4e89] `CLI` `import` command to merge saved projects if there are any and merge settings, also to store or extract the files to the configuration directory tied to the user and the software instead of CWD. 
+- [741fa77] Typo in the changelog. 
+- [43baaaf] Removed the unknown orphaned changelog entries, they weren't associated with any git commits, so most likely they were accidental duplicates. 
+- [ac5b180] Changed the behavior of `pip freeze` command in creating `requirements.txt` file to exclude installation URLs, since they were exposing secrets. 
+- [ab456e8] Removed 'requirements.txt' to staging changes for git to not look for it, since it's removed now.
 
 ---
 
