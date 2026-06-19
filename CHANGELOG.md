@@ -7,9 +7,6 @@
 - The codebase has moved all functions that could be relevant for many projects to the `et` module. This includes loading and merging settings, normalizing settings keys, and resolving versions, `utils module`, becomes empty for the time being. 
 - The default settings JSON file in assets directory has been removed, since the logic for loading global packer settings has changed in `config.py` to rely on the pydantic module, there is no need for 2 copies of the settings. 
 - s have been made to the `load_config`, `simple_merge_settings`, and `normalize_settings_keys` functions in the `utils.py` module to import these new functions from the `et` module. 
-- `et.py` by moving any and all functions and other python objects to different modules that weren't general tools that could be used by any and all my type of projects, a lot of TUI based functions went to `etf.py`. 
-- `etf.py` module to contain just functions for managing and creation immersive TUI's, mostly moved a lot of python Objects for handling various terminal states from the `et.py` module. 
-- Updated all imports in the entire project that were using `et.py` to also use `etf.py` if the object was moved to that module. 
 - completely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
 - Updated all imports in the entire project to utilize both modules `et` and `etf` to handle the new python object locations gracefully. 
 - Introduced `projects_file_path` and `settings_file_path` in paths.py. 
@@ -25,6 +22,7 @@
 - Removed always unnecessarily updating the projects.json file, instead it only gets updated when actually a new project has been added. 
 - `CLI` `import` command to merge saved projects if there are any and merge settings, also to store or extract the files to the configuration directory tied to the user and the software instead of CWD. 
 - Typo in the changelog. 
+- Removed the unknown orphaned changelog entries, they weren't associated with any git commits, so most likely they were accidental duplicates. 
 
 ---
 
