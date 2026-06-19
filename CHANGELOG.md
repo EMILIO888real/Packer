@@ -32,6 +32,7 @@
 - Typo in the changelog. 
 - Removed the unknown orphaned changelog entries, they weren't associated with any git commits, so most likely they were accidental duplicates. 
 - Changed the behavior of `pip freeze` command in creating `requirements.txt` file to exclude installation URLs, since they were exposing secrets. 
+- Removed 'requirements.txt' to staging changes for git to not look for it, since it's removed now. 
 
 ---
 

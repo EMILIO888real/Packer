@@ -410,7 +410,7 @@ class Packer():
 
 
             self.print_and_log('Staging changes...')
-            self.log_action(f'Entries added: {self.git_repo.index.add(['pyproject.toml', 'requirements.txt', 'CHANGELOG.md',
+            self.log_action(f'Entries added: {self.git_repo.index.add(['pyproject.toml', 'CHANGELOG.md',
                                                                        f'src/{self.program_name}/assets/version.json',
                                                                        f'src/{self.program_name}/assets/integrity.json'])}')
 
