@@ -298,7 +298,7 @@ class Packer():
         self.print_and_log('Creating requirements.txt...')
         pip_path = Path('.venv/bin/pip') if sys.platform != 'win32' else Path('.venv/Scripts/pip.exe')
         with open('requirements.txt', 'w') as f:
-            run([pip_path, 'freeze', '--require-virtualenv', '-l'], stdout=f)
+            run([pip_path, 'freeze', '--require-virtualenv', '-l', '--format=freeze'], stdout=f)
 
 
         self.print_and_log('Updating pyproject.toml...')

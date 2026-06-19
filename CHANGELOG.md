@@ -30,6 +30,7 @@
 - `CLI` `import` command to merge saved projects if there are any and merge settings, also to store or extract the files to the configuration directory tied to the user and the software instead of CWD. 
 - Typo in the changelog. 
 - Removed the unknown orphaned changelog entries, they weren't associated with any git commits, so most likely they were accidental duplicates. 
+- Changed the behavior of `pip freeze` command in creating `requirements.txt` file to exclude installation URLs, since they were exposing secrets. 
 
 ---
 
