@@ -11,6 +11,7 @@
 - completely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
 - Updated all imports in the entire project to utilize both modules `et` and `etf` to handle the new python object locations gracefully. 
 - Introduced `projects_file_path` and `settings_file_path` in paths.py. 
+- Overall description or high level summary to write out to the tmp file if AI summary isn't in use. 
 
 ### Fixed
 - Mistake in `change.py` to work even without AI summary. 

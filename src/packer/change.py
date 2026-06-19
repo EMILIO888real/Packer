@@ -122,6 +122,9 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
         if ai_summary:
             with open(temp_path, 'w') as f:
                 f.write(high_level_summary)
+        else:
+            with open(temp_path, 'w') as f:
+                f.write(overall_description)
         run([text_editor, wait_flag, temp_path])
         with open(temp_path, 'r') as f:
             high_level_summary = f.read().strip()
