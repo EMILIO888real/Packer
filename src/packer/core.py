@@ -295,12 +295,6 @@ class Packer():
             version_title = f.read()
 
 
-        self.print_and_log('Creating requirements.txt...')
-        pip_path = Path('.venv/bin/pip') if sys.platform != 'win32' else Path('.venv/Scripts/pip.exe')
-        with open('requirements.txt', 'w') as f:
-            run([pip_path, 'freeze', '--require-virtualenv', '-l', '--format=freeze'], stdout=f)
-
-
         self.print_and_log('Updating pyproject.toml...')
         with open('pyproject.toml', 'r', encoding='utf-8') as f:
             config = tomlkit.load(f)

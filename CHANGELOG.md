@@ -17,6 +17,7 @@
 - Git branches syncing logic with local git directory and Github to use the native `GitPython` implementation. 
 - Significantly improved and updated the TODO.md file of newly created projects by `setup` to include more preset TODO's and some tips on maximizing the projects layout effectiveness. 
 - Some minor things to make the project cleaner, *like switching to from keyword imports and such*. 
+- Dropped requirements file (`requirements.txt`), since it was leaking secrets and is just outdated and not used method of installing this package anyways. 
 
 ### Fixed
 - Mistake in `change.py` to work even without AI summary. 
