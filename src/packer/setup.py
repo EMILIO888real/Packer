@@ -210,12 +210,12 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Creating config.py')
     with open(f'{root_dir}/config.py', 'w') as f:
         f.write(dedent(f'''
-            import json
+            from json import load
 
             from {program_name}.paths import assets_dir
                        
             with open(f'{{assets_dir}}/version.json') as f:
-                {program_name}_version = format_version_text(json.load(f))
+                {program_name}_version = format_version_text(load(f))
         '''))
 
     print_and_log('Creating build.yaml file...')
@@ -295,7 +295,11 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         f.write(dedent(f'''\
             from {program_name}.paths import assets_dir
             from {program_name}.core import {program_name}
+            from {program_name}.assets.exceptions import global_exception_handler
 
+            import sys
+
+            sys.excepthook = global_exception_handler # Update python's default exception handler with our own
 
             def main():
                 {program_name}()
@@ -320,12 +324,28 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         f.write(dedent('''\
             # TODO
 
-            - [ ] Write the README.md file
-            - [ ] Write the CHANGELOG.md file
-            - [ ] Write the ROADMAP.md file
-            - [ ] Write the pyproject.toml file
+            - [ ] Update the README.md file
+            - [ ] Update the CHANGELOG.md file, if not using packer's change.py.
+            - [ ] Update the ROADMAP.md file
+            - [ ] Update the pyproject.toml file
             - [ ] Check and update the .gitignore if necessary
-            - [ ] Remove the dist directory with the test executable
+            - [ ] Checkout docs folder and remove or update the files that will be in use
+            - [ ] Remove the paths.py file, if you won't need user tied paths to your software, *useful to remove for a library for example*
+            - [ ] Update the main `__init__.py` module if you are going to have your python package importable
+            - [ ] Remove the `UI` folder if you don't plan on building UI for your package, *useful to remove for a library for example*
+            
+            ## Tips
+            
+            Some tips on how to maximize this project layout for your python packages.
+
+            - Write you core or main logic of your project in core.py as individual python objects even if you aren't going to utilize them in multiple places or multiple times, since you can import them from in the tests folder and run unit tests or other test isolating individual pieces of you project.
+            - You should try to leave main.py as small as possible, splitting your projects functionality into as many files as possible, if you got UI's create files and write them in the `UI` folder, other logic that doesn't quite fit with core.py then a new module just for it and if you got extra python objects that might come in handy in other projects as well, write them in utils.py and maybe in the future create a new project by moving utils as core.py in the new project, you can install your later projects as dependencies of these projects by adding an entry as such in the `pyproject.toml` file:
+            
+            ```toml
+            dependencies = [
+                "$program_name @ git+https://github.com/$username/$program_name.git"
+            ]
+            ```
         '''))
 
     print_and_log('Creating a SETTINGS.md file...')
@@ -661,7 +681,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     if github_repo_url:
         print_and_log('Creating remote repository...')
-        origin = repo.create_remote('origin', github_repo_url)
+        repo.create_remote('origin', github_repo_url)
 
         try:
             print_and_log(f'Pushing {master_branch.name} branch to origin...')

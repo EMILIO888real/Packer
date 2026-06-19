@@ -3,6 +3,7 @@
 ### Added
 - automatic Github origin URL updating to using a Personal Access Token (PAT) to authenticate. 
 - s creation of a new 'development' branch and switch to it before pushing the initial commit to GitHub in `setup` of a new project. 
+- `global_exception_handler` to `main.py` of newly created projects by `setup` to automatic set the `sys.excepthook` to use the exception handler. 
 
 ### Changed
 - Significantly upgraded the documentation for the configuration module (`config.py`) by adding simple documentation for the 2 pydantic modules and upgraded the main modules documentation. 
@@ -14,6 +15,8 @@
 - Introduced `projects_file_path` and `settings_file_path` in paths.py. 
 - Overall description or high level summary to write out to the tmp file if AI summary isn't in use. 
 - Git branches syncing logic with local git directory and Github to use the native `GitPython` implementation. 
+- Significantly improved and updated the TODO.md file of newly created projects by `setup` to include more preset TODO's and some tips on maximizing the projects layout effectiveness. 
+- Some minor things to make the project cleaner, *like switching to from keyword imports and such*. 
 
 ### Fixed
 - Mistake in `change.py` to work even without AI summary. 
