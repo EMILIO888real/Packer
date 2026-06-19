@@ -10,7 +10,7 @@
 - `et.py` by moving any and all functions and other python objects to different modules that weren't general tools that could be used by any and all my type of projects, a lot of TUI based functions went to `etf.py`. 
 - `etf.py` module to contain just functions for managing and creation immersive TUI's, mostly moved a lot of python Objects for handling various terminal states from the `et.py` module. 
 - Updated all imports in the entire project that were using `et.py` to also use `etf.py` if the object was moved to that module. 
-- ompletely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
+- completely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
 - Updated all imports in the entire project to utilize both modules `et` and `etf` to handle the new python object locations gracefully. 
 - Introduced `projects_file_path` and `settings_file_path` in paths.py. 
 
@@ -24,6 +24,7 @@
 - Migrated from using `open()` and `dump()` to `Path.write_text()` with `dumps()` and `loads()` for handling project configuration in tui.py, while fixing the problem with just overwriting the entire projects file every time a new project was added. 
 - Removed always unnecessarily updating the projects.json file, instead it only gets updated when actually a new project has been added. 
 - `CLI` `import` command to merge saved projects if there are any and merge settings, also to store or extract the files to the configuration directory tied to the user and the software instead of CWD. 
+- Typo in the changelog. 
 
 ---
 
