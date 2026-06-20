@@ -2,8 +2,12 @@
 
 ### Added
 - `parse_issue.py`, which nicely parsers or categorizes and optionally also cleanly outputs issues created by packers exception handler or similar type. 
+- `global_exception_handler` to copy all possible log files that are associated with all of the error reports in a single file. 
 
 ### Changed
+- Utilizes `tempfile.TemporaryDirectory` for creating temporary directories during error report generation, instead of manually handling. 
+- Switched to writing actually None or null in json instead of "None". 
+- Error report file generation to only occur if an error has occurred and if the file doesn't already exist. 
 
 ### Fixed
 

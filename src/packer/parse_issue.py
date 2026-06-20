@@ -41,7 +41,7 @@ def print_formatted(issue: dict):
                 print(f'{item[0]}: {item[1]}')
         print(error_report['traceback'])
         log_file = error_report['associated log file']
-        if log_file != 'None':
+        if log_file:
             print(issue['logs'][log_file])
         
 
