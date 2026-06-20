@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- `parse_issue.py`, which nicely parsers or categorizes and optionally also cleanly outputs issues created by packers exception handler or similar type. 
 
 ### Changed
 
