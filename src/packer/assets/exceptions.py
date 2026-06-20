@@ -51,7 +51,7 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
         for error_report in error_reports:
             log_path = error_report['associated log file']
             if log_path:
-                copy(log_path, f'{tmp_dir}/{log_path.name}')
+                copy(log_path, f'{tmp_dir}/{Path(log_path).name}')
         make_archive(f'{log_dir}/issue {datetime.date(datetime.now())}', 'zip', tmp_dir)
 
     print(f'error report generated at: "{error_report_path.absolute()}"')

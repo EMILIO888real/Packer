@@ -10,6 +10,7 @@
 - Error report file generation to only occur if an error has occurred and if the file doesn't already exist. 
 
 ### Fixed
+- Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 
 
 ---
 
