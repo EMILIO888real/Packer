@@ -42,7 +42,7 @@ def print_formatted(issue: dict):
         print(error_report['traceback'])
         log_file = error_report['associated log file']
         if log_file:
-            print(issue['logs'][log_file])
+            print(issue['logs'][Path(log_file).name])
         
 
 def tui():
