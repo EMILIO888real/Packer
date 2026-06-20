@@ -50,15 +50,15 @@ def tui():
     user_error = prompt_user('Parse a user issue')
 
     if user_error:
-        issues = [issue for issue in listdir(download_path) if Path(issue).suffix == '.zip' and Path(issue).name.startswith('issue')]
+        issues = [Path(f'{download_path}/{issue}') for issue in listdir(download_path) if Path(issue).suffix == '.zip' and Path(issue).name.startswith('issue')]
         print_list(issues, index=True)
     else:
-        issues = [issue for issue in listdir(log_dir) if Path(issue).suffix == '.zip']
+        issues = [Path(f'{log_dir}/{issue}') for issue in listdir(log_dir) if Path(issue).suffix == '.zip']
         print_list(issues, index=True, start='')
     
     if issues != []:
         index = int(input('Enter the index you wish to choose: '))
-        print_formatted(parse_issue(f'{log_dir}/{issues[index]}'))
+        print_formatted(parse_issue(issues[index]))
         if prompt_user('Delete the issue'):
             remove(issues[index])
     else:
