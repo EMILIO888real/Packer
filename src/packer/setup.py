@@ -333,6 +333,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             - [ ] Remove the paths.py file, if you won't need user tied paths to your software, *useful to remove for a library for example*
             - [ ] Update the main `__init__.py` module if you are going to have your python package importable
             - [ ] Remove the `UI` folder if you don't plan on building UI for your package, *useful to remove for a library for example*
+            - [ ] Update the Github's repository settings or other fields, for example the temporary description created by Packer, recommended to use the same short description that you use in your pyproject.toml file.
             
             ## Tips
             
