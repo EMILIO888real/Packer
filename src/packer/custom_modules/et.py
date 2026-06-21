@@ -25,13 +25,13 @@ from collections.abc import Collection
 from os import execl, replace, listdir, mkdir
 from typing import Any, Optional, Union
 from pathlib import Path
-from json import JSONDecodeError, dump, load
+from json import JSONDecodeError, load
 from datetime import datetime, timedelta
 from shutil import ignore_patterns, which, copy2, copytree
 from subprocess import Popen
 import logging
 from dirhash import dirhash
-from requests import get, post, delete
+from requests import get, post, delete, put
 from platformdirs import user_log_dir
 from random import randint
 from itertools import islice, cycle
@@ -440,7 +440,7 @@ def format_version_text(version: dict) -> str:
 
     return f'{version["major"]}.{version["minor"]}.{version["patch"]}'
 
-def create_go_file_folder(folder_name: str, GOFILE_USER_TOKEN: str) -> dict:
+def create_gofile_folder(folder_name: str, GOFILE_USER_TOKEN: str) -> dict:
     '''Create a folder in the GoFile account root directory.
 
     Creates a folder in the root directory of the GoFile account and returns
@@ -455,20 +455,34 @@ def create_go_file_folder(folder_name: str, GOFILE_USER_TOKEN: str) -> dict:
     '''
 
     payload = {'token': GOFILE_USER_TOKEN}
-
     response = get('https://api.gofile.io/accounts/getid', params=payload)
     account_id = response.json()['data']['id']
+    
     response = get(f'https://api.gofile.io/accounts/{account_id}', params=payload)
-
-    payload = {
+    
+    create_payload = {
         'token': GOFILE_USER_TOKEN,
         'folderName': folder_name,
         'parentFolderId': response.json()['data']['rootFolder']
     }
-
-    response = post('https://api.gofile.io/contents/createFolder', data=payload)
-
-    return response.json()
+    create_response = post('https://api.gofile.io/contents/createFolder', data=create_payload).json()
+    
+    if create_response.get('status') == 'ok':
+        new_folder_id = create_response['data']['id']
+        
+        update_url = f'https://api.gofile.io/contents/{new_folder_id}/update'
+        update_payload = {
+            'token': GOFILE_USER_TOKEN,
+            'attribute': 'public',
+            'attributeValue': 'true' # Send as a string 'true' or 'false'
+        }
+        
+        update_response = put(update_url, data=update_payload).json()
+        
+        # Inject the update confirmation into the final response payload for transparency
+        create_response['data']['is_public_updated'] = update_response.get('status') == 'ok'
+        
+    return create_response
 
 def load_config(assets_dir: Traversable, config_dir: str | Path) -> str | tuple[dict | None, dict, dict | None]:
     '''Load configuration settings from files.

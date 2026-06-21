@@ -48,7 +48,7 @@ def create_venv(created_venv) -> None:
     run(['python', '-m', 'venv', '.venv'])
     created_venv.set()
 
-def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, overwrite_existing: bool = False) -> str:
+def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, overwrite_existing: bool = False, gofile_code: str | None = None) -> str:
     '''Set up a new project scaffold and initialize its local Git history.
 
     The generated layout currently looks like this:
@@ -101,6 +101,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :type github_repo_url: str, optional
     :param overwrite_existing: Overwrite the existing folder if it exists, defaults to False.
     :type overwrite_existing: bool, optional
+    :param gofile_code: The code for the GoFile folder where the project will be uploaded, defaults to None.
+    :type gofile_code: str, optional
     :return: The URL of the created GitHub repository, if there is one
     :rtype: str | None
     '''
@@ -329,8 +331,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         f.write(dedent('''\
             # TODO
 
-            - [ ] Update the README.md file
-            - [ ] Update the CHANGELOG.md file, if not using packer's change.py.
+            - [ ] Update the README.md file, especially the Github and GoFile URL, if they aren't complete, replace None with the required info, for Github username/repo. And for GoFile folder URL
+            - [ ] Update the CHANGELOG.md file, if not using packer's change.py
             - [ ] Update the ROADMAP.md file
             - [ ] Update the pyproject.toml file
             - [ ] Check and update the .gitignore if necessary
@@ -338,8 +340,9 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             - [ ] Remove the paths.py file, if you won't need user tied paths to your software, *useful to remove for a library for example*
             - [ ] Update the main `__init__.py` module if you are going to have your python package importable
             - [ ] Remove the `UI` folder if you don't plan on building UI for your package, *useful to remove for a library for example*
-            - [ ] Update the Github's repository settings or other fields, for example the temporary description created by Packer, recommended to use the same short description that you use in your pyproject.toml file.
-            
+            - [ ] Update the Github's repository settings or other fields, for example the temporary description created by Packer, recommended to use the same short description that you use in your pyproject.toml file
+            - [ ] Update GoFile folder properties like the description or other things
+                       
             ## Tips
             
             Some tips on how to maximize this project layout for your python packages.
@@ -484,8 +487,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
             Available via:
 
-            * **GitHub Releases:** [GitHub Releases](%release_url)
-            * **Third-party website (GoFile):** [Archive](%gofile_url)
+            * **GitHub Releases:** [GitHub Releases](https://github.com/{github_repo_url if github_repo_url else None}/releases/)
+            * **Third-party website (GoFile):** [Archive](https://gofile.io/d/{gofile_code if gofile_code else None})
 
             ### Binary Downloads
 
@@ -499,9 +502,9 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             ### To install:
 
             * **GitHub:**
-              Download the appropriate binary for your system from the [Releases page](%release_url).
+              Download the appropriate binary for your system from the [Releases page](https://github.com/{github_repo_url if github_repo_url else None}/releases/).
             * **Third-party website (GoFile):**
-              Head to the website [Archive](%gofile_url) and download the specific archive with the appropriate version.
+              Head to the website [Archive](https://gofile.io/d/{gofile_code if gofile_code else None}) and download the specific archive with the appropriate version.
 
             After installing, continue following instructions in this README.
 

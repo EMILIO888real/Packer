@@ -56,6 +56,7 @@ def main():
     setup_command_parser.add_argument('-t', '--pat', dest='setup_github_pat', help='GitHub personal access token')
     setup_command_parser.add_argument('-u', '--github-url', dest='setup_github_repo_url', help='GitHub repository URL')
     setup_command_parser.add_argument('-o', '--overwrite', action='store_true', dest='setup_overwrite', help='Overwrite existing project')
+    setup_command_parser.add_argument('-c', '--code', action='store_true', dest='setup_gofile_code', help='GoFile URL / code (eg. OktQl5)')
 
     export_command_parser = subparsers.add_parser('export', help='Export all config saved by Packer in an archive')
     export_command_parser.add_argument('-p', '--path', dest='export_path', help='Path to export archive to')
@@ -152,7 +153,7 @@ def main():
                       args.setup_program_name if args.setup_program_name else input('Program name: '),
                       args.setup_github_pat if args.setup_github_pat else input('Github PAT: '),
                       args.setup_github_repo_url if args.setup_github_repo_url else input('Github repo URL: '),
-                      args.setup_overwrite if args.setup_overwrite else False)}''')
+                      args.setup_overwrite if args.setup_overwrite else False, args.setup_gofile_code if args.setup_gofile_code else input('GoFile code: '))}''')
         
         case 'export':
             files = [

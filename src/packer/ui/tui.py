@@ -6,7 +6,7 @@ from subprocess import run
 
 from packer.setup import main as setup, tui
 from packer.paths import config_dir, projects_file_path
-from packer.custom_modules.et import create_go_file_folder, normalize_settings_keys
+from packer.custom_modules.et import create_gofile_folder, normalize_settings_keys
 from packer.custom_modules.etf import stripped_input, simple_prompt
 from packer.config import Project, projects_configurations, all_settings
 
@@ -46,18 +46,18 @@ def main() -> tuple[str, Project]:
         user_setup_data = tui()
         project_directory = user_setup_data[0]
         program_name = user_setup_data[2]
-        print('Starting setup...')
-        github_repo_url = setup(*user_setup_data)
-        print('Setup complete. Continuing with configuration...')
-
 
         gofile_user_token = getpass('3. Gofile user token: ')
 
-        gofile_folder_id_input = getpass('4. Gofile folder id (leave empty to create a folder): ')
-        if not gofile_folder_id_input:
-            gofile_folder_id = create_go_file_folder(input('name of the folder: '), gofile_user_token)['data']['id']
-        else:
-            gofile_folder_id = gofile_folder_id_input
+        gofile_folder_id = getpass('4. Gofile folder id (leave empty to create a folder): ')
+        if not gofile_folder_id:
+            response = create_gofile_folder(input('name of the folder: '), gofile_user_token)
+            gofile_code = response['data']['code']
+            gofile_folder_id = response['data']['id']
+        
+        print('Starting setup...')
+        github_repo_url = setup(*user_setup_data, gofile_code if gofile_code in locals() else input('GoFile code [None] '))
+        print('Setup complete. Continuing with configuration...')
 
 
         print('Now go over to Github and create a PAT and enter it below.')

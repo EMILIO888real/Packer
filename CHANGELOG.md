@@ -5,6 +5,7 @@
 - `global_exception_handler` to copy all possible log files that are associated with all of the error reports in a single file. 
 - Update GitHub repository settings or other fields, such as temporary description created by Packer as another TODO entry in the newly created project by Packer's `setup`. 
 - `utils.py` creation for Packer's `setup` as an empty file. 
+- new option for `create_go_file_folder` function to include an additional step for updating the folder's public attribute. 
 
 ### Changed
 - Utilizes `tempfile.TemporaryDirectory` for creating temporary directories during error report generation, instead of manually handling. 
@@ -13,6 +14,10 @@
 - `setup.py` file: The function `main()` now returns `None` when no GitHub repository URL is created, instead of raising an exception. 
 - New addition in the `cli.py` file: Outputting the GitHub repository URL returned by the `setup()` function during CLI execution. 
 - `--config` output command to `Packer's` `CLI` to use `model_dump`, creating a dictionary and outputting it cleanly with `pprint`, instead of manually formatting a `str`, by casting the `Settings` object to a `str`. 
+- `setup` potion of `Packer` to include the Github repo url releases page and the GoFile download url or the short link to the folder in the README creation process. 
+- The TODO.md to include entries about updating Github and GoFile and cleaned it up a bit. 
+- Appropriately updated the `TUI` to also pass the GoFile code if the folder was created by `Packer`, but you can also pass it yourself. 
+- The `CLI` to also appropriately have an option to enter the GoFile code via a flag or just input if not provided. 
 
 ### Fixed
 - Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 
