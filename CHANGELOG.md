@@ -12,6 +12,7 @@
 - Error report file generation to only occur if an error has occurred and if the file doesn't already exist. 
 - `setup.py` file: The function `main()` now returns `None` when no GitHub repository URL is created, instead of raising an exception. 
 - New addition in the `cli.py` file: Outputting the GitHub repository URL returned by the `setup()` function during CLI execution. 
+- `--config` output command to `Packer's` `CLI` to use `model_dump`, creating a dictionary and outputting it cleanly with `pprint`, instead of manually formatting a `str`, by casting the `Settings` object to a `str`. 
 
 ### Fixed
 - Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 

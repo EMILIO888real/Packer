@@ -2,6 +2,7 @@ from argparse import ArgumentParser
 from json import dump, load
 from os import mkdir
 from pathlib import Path
+from pprint import pprint
 from shutil import rmtree, which
 import sys
 from subprocess import run
@@ -223,7 +224,7 @@ def main():
             print('No projects saved!')
     
     if args.config:
-        print_list([setting.replace('=', ': ') for setting in str(all_settings).split(' ')])
+        pprint(all_settings.model_dump())
 
     if args.projects:
         SENSITIVE_CONTENT = ('gofile user token', 'gofile folder id', 'github repo token')
