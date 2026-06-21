@@ -10,6 +10,8 @@
 - Utilizes `tempfile.TemporaryDirectory` for creating temporary directories during error report generation, instead of manually handling. 
 - Switched to writing actually None or null in json instead of "None". 
 - Error report file generation to only occur if an error has occurred and if the file doesn't already exist. 
+- `setup.py` file: The function `main()` now returns `None` when no GitHub repository URL is created, instead of raising an exception. 
+- New addition in the `cli.py` file: Outputting the GitHub repository URL returned by the `setup()` function during CLI execution. 
 
 ### Fixed
 - Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 

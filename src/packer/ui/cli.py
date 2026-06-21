@@ -146,12 +146,12 @@ def main():
             
             
         case 'setup':
-                setup(args.setup_path if args.setup_path else input('Path: '),
+                print(f'''Github repository url: {setup(args.setup_path if args.setup_path else input('Path: '),
                       args.setup_author_name if args.setup_author_name else input('Author name: '),
                       args.setup_program_name if args.setup_program_name else input('Program name: '),
                       args.setup_github_pat if args.setup_github_pat else input('Github PAT: '),
                       args.setup_github_repo_url if args.setup_github_repo_url else input('Github repo URL: '),
-                      args.setup_overwrite if args.setup_overwrite else False)
+                      args.setup_overwrite if args.setup_overwrite else False)}''')
         
         case 'export':
             files = [

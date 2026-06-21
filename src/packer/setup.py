@@ -101,8 +101,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :type github_repo_url: str, optional
     :param overwrite_existing: Overwrite the existing folder if it exists, defaults to False.
     :type overwrite_existing: bool, optional
-    :return: The URL of the created GitHub repository.
-    :rtype: str
+    :return: The URL of the created GitHub repository, if there is one
+    :rtype: str | None
     '''
 
     program_name = program_name.lower()
@@ -701,7 +701,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
     
-    return github_repo_url.lstrip('https://github.com/')
+    return github_repo_url.lstrip('https://github.com/') if github_repo_url else None
 
 def tui() -> tuple[str]:
     '''
