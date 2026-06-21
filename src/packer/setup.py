@@ -137,6 +137,11 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     mkdir('.github/workflows')
     mkdir(f'{root_dir}/ui')
 
+    print_and_log('Creating utils.py...')
+    with open(f'{root_dir}/utils.py', 'w') as f:
+        f.write(dedent(f'''\
+        '''))
+
     print_and_log('Creating core.py...')
     with open(f'{root_dir}/core.py', 'w') as f:
         f.write(dedent(f'''\
