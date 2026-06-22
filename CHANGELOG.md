@@ -28,6 +28,7 @@
 - The issue parser for printing formatted output to find the log file in the parser issue by it's name, not the full path how it's written in the report, since the path has been stripped in the archive. 
 - Changed the way issues are collected from both download_path and log_dir directories to correctly delete them afterwards. 
 - Introduced a checks to ensure the log file exists before reading its content in `global_exception_handler`. 
+- Refactored `print_formatted` function to manage logs index for iterating through error reports and logs in a more organized manner. 
 
 ---
 

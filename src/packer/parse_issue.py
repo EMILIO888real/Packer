@@ -33,14 +33,16 @@ def parse_issue(path: str | Path) -> dict[str: list[dict], str: list[str]]:
     return results
 
 def print_formatted(issue: dict):
-    for i, error_report in enumerate(issue['error reports']):
+    log_index = 0
+    for error_report in issue['error reports']:
         print('-' * 150)
         for item in error_report.items():
             if item[0] != 'traceback':
                 print(f'{item[0]}: {item[1]}')
         print(error_report['traceback'])
         if error_report['log timestamp']:
-            print(issue['logs'][i])
+            print(issue['logs'][log_index])
+            log_index += 1
         
 
 def tui():
