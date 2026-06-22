@@ -24,7 +24,7 @@ def parse_issue(path: str | Path) -> dict[str: list[dict], str: list[str]]:
                     for i in range(len(error_reports)):
                         error_reports[i] = loads(error_reports[i])
                 else:
-                    logs = f.read().split('______Start of the log ')
+                    logs = [f'______Start of the log {log}' for log in f.read().split('______Start of the log ')]
     results = {'error reports': error_reports}
 
     if 'logs' in locals():
