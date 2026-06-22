@@ -1,35 +1,35 @@
-## [%new_version] - %date
+## [0.13.0] - 2026-06-22
 
 ### Added
-- `parse_issue.py`, which nicely parsers or categorizes and optionally also cleanly outputs issues created by packers exception handler or similar type. 
-- `global_exception_handler` to copy all possible log files that are associated with all of the error reports in a single file. 
-- Update GitHub repository settings or other fields, such as temporary description created by Packer as another TODO entry in the newly created project by Packer's `setup`. 
-- `utils.py` creation for Packer's `setup` as an empty file. 
-- new option for `create_go_file_folder` function to include an additional step for updating the folder's public attribute. 
-- `parse_issue`, `print_formatted` to the public API from `packer.parse_issue`. 
+- [ec039b6] `parse_issue.py`, which nicely parsers or categorizes and optionally also cleanly outputs issues created by packers exception handler or similar type. 
+- [13d7170] `global_exception_handler` to copy all possible log files that are associated with all of the error reports in a single file. 
+- [a76d5bb] Update GitHub repository settings or other fields, such as temporary description created by Packer as another TODO entry in the newly created project by Packer's `setup`. 
+- [08ac0b9] `utils.py` creation for Packer's `setup` as an empty file. 
+- [f56df76] new option for `create_go_file_folder` function to include an additional step for updating the folder's public attribute. 
+- [4fa243e] `parse_issue`, `print_formatted` to the public API from `packer.parse_issue`.
 
 ### Changed
-- Utilizes `tempfile.TemporaryDirectory` for creating temporary directories during error report generation, instead of manually handling. 
-- Switched to writing actually None or null in json instead of "None". 
-- Error report file generation to only occur if an error has occurred and if the file doesn't already exist. 
-- `setup.py` file: The function `main()` now returns `None` when no GitHub repository URL is created, instead of raising an exception. 
-- New addition in the `cli.py` file: Outputting the GitHub repository URL returned by the `setup()` function during CLI execution. 
-- `--config` output command to `Packer's` `CLI` to use `model_dump`, creating a dictionary and outputting it cleanly with `pprint`, instead of manually formatting a `str`, by casting the `Settings` object to a `str`. 
-- `setup` potion of `Packer` to include the Github repo url releases page and the GoFile download url or the short link to the folder in the README creation process. 
-- The TODO.md to include entries about updating Github and GoFile and cleaned it up a bit. 
-- Appropriately updated the `TUI` to also pass the GoFile code if the folder was created by `Packer`, but you can also pass it yourself. 
-- The `CLI` to also appropriately have an option to enter the GoFile code via a flag or just input if not provided. 
-- the opening mode of the log file in `init_logger` function to append if the file already exists, otherwise write, to not overwrite existing logs. 
-- `exception_global_handler` to save the latest log timestamp, instead of it's own. 
-- Parser_issue to add logs as a list ordered in the order they were written, there is also a log timestamp on each error report to match them, but I am not sure it's really needed, since I didn't use it except to check if a log exists. 
+- [13d7170] Utilizes `tempfile.TemporaryDirectory` for creating temporary directories during error report generation, instead of manually handling. 
+- [13d7170] Switched to writing actually None or null in json instead of "None". 
+- [13d7170] Error report file generation to only occur if an error has occurred and if the file doesn't already exist. 
+- [d4c2143] `setup.py` file: The function `main()` now returns `None` when no GitHub repository URL is created, instead of raising an exception. 
+- [d4c2143] New addition in the `cli.py` file: Outputting the GitHub repository URL returned by the `setup()` function during CLI execution. 
+- [c3a6e14] `--config` output command to `Packer's` `CLI` to use `model_dump`, creating a dictionary and outputting it cleanly with `pprint`, instead of manually formatting a `str`, by casting the `Settings` object to a `str`. 
+- [f56df76] `setup` potion of `Packer` to include the Github repo url releases page and the GoFile download url or the short link to the folder in the README creation process. 
+- [f56df76] The TODO.md to include entries about updating Github and GoFile and cleaned it up a bit. 
+- [f56df76] Appropriately updated the `TUI` to also pass the GoFile code if the folder was created by `Packer`, but you can also pass it yourself. 
+- [f56df76] The `CLI` to also appropriately have an option to enter the GoFile code via a flag or just input if not provided. 
+- [e47fb59] the opening mode of the log file in `init_logger` function to append if the file already exists, otherwise write, to not overwrite existing logs. 
+- [d22dc44] `exception_global_handler` to save the latest log timestamp, instead of it's own. 
+- [1f330c3] Parser_issue to add logs as a list ordered in the order they were written, there is also a log timestamp on each error report to match them, but I am not sure it's really needed, since I didn't use it except to check if a log exists.
 
 ### Fixed
-- Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 
-- The issue parser for printing formatted output to find the log file in the parser issue by it's name, not the full path how it's written in the report, since the path has been stripped in the archive. 
-- Changed the way issues are collected from both download_path and log_dir directories to correctly delete them afterwards. 
-- Introduced a checks to ensure the log file exists before reading its content in `global_exception_handler`. 
-- Refactored `print_formatted` function to manage logs index for iterating through error reports and logs in a more organized manner. 
-- Refactored reading and formatting of logs in parse_issue function to include the full name starting with `______Start of the log `, instead of the timestamp, looked weird. 
+- [72ccfff] Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 
+- [d4b58b2] The issue parser for printing formatted output to find the log file in the parser issue by it's name, not the full path how it's written in the report, since the path has been stripped in the archive. 
+- [5e42aff] Changed the way issues are collected from both download_path and log_dir directories to correctly delete them afterwards. 
+- [1f330c3] Introduced a checks to ensure the log file exists before reading its content in `global_exception_handler`. 
+- [26a50d7] Refactored `print_formatted` function to manage logs index for iterating through error reports and logs in a more organized manner. 
+- [a815573] Refactored reading and formatting of logs in parse_issue function to include the full name starting with `______Start of the log `, instead of the timestamp, looked weird.
 
 ---
 
