@@ -107,7 +107,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :rtype: str | None
     '''
 
-    program_name = program_name.lower()
     root_dir = f'src/{program_name}'
 
     if Path(project_directory).exists():
@@ -462,7 +461,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Creating README.md...')
     with open('README.md', 'w') as f:
         f.write(dedent(f'''\
-            # {program_name.capitalize()}
+            # {program_name}
 
             A short description of the project.
 
@@ -727,7 +726,9 @@ def tui() -> tuple[str]:
     while (program_name[:1].isdigit()) or (program_name.count(' ') > 0) or (not match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', program_name)) or (iskeyword(program_name)) or (program_name in builtin_module_names or (check_module_conflict(program_name))):
         print('Name isn\'t acceptable since it doesn\'t follow restrictions:')
         print_list(['Can\'t start with a number', 'Can\'t contain any spaces', 'Can\'t contain any special characters (Alphanumeric characters and underscores only)', 'Can\'t be a Python keyword', 'Can\'t be a built-in module name', 'Can\'t be in conflict with other existing modules'], start='\t* ')
-        program_name = input('Reenter the program name: ')
+        program_name = input('Reenter the program name: ').capitalize()
+    
+    program_name = f'{program_name[0].upper()}{program_name[1:]}'
 
 
     default_project_dir = f'{user_documents_dir()}/{program_name}'

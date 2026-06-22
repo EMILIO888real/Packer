@@ -7,6 +7,7 @@
 ### Changed
 - Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
 - osen description and chosen title file extensions to .md, instead of .txt for nicer text editor or IDE support. 
+- Program name to capitalize only it's first letter. 
 
 ### Fixed
 
