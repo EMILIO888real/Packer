@@ -130,8 +130,8 @@ class Packer():
         # Actions needed to run once, (setup actions)
         self.terminal_width = get_terminal_size().columns
         self.logger = init_logger('packer', 'EMILIO')
-        self.chosen_description_path = Path(f'{data_dir}/chosen description.txt')
-        self.chosen_title_path = Path(f'{data_dir}/chosen version title.txt')
+        self.chosen_description_path = Path(f'{data_dir}/chosen description.md')
+        self.chosen_title_path = Path(f'{data_dir}/chosen version title.md')
         self.git_repo = Repo()
         with open(release_notes_template_path) as f:
             self.release_text = f.read()
