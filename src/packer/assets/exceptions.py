@@ -3,7 +3,7 @@ from pathlib import Path
 import sys
 from tempfile import TemporaryDirectory
 from traceback import format_exception
-from json import dump, loads
+from json import dump
 from shutil import make_archive, copy
 from packer.custom_modules.etf import print_colored_text
 from packer.config import packer_version
@@ -29,29 +29,27 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
 
     print('Generating an error report...')
 
+    with open(log_path) as f:
+        content = f.read()
+    timestamp_index = content.rfind('______Start of the log ') + 23
+    
+    
+
     error_report = {'packer version': packer_version,
                     'platform': sys.platform,
                     'python version': sys.version,
                     'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\nInput: '),
                     'traceback': ''.join(format_exception(exc_type, exc_value, exc_traceback)),
-                    'associated log file': None if not log_path.exists() else str(log_path)}
+                    'log timestamp': content[timestamp_index: timestamp_index + 26]}
     
     with open(error_report_path, 'a' if Path(error_report_path).exists() else 'w') as f:
         dump(error_report, f)
         f.write('\n') # For the next errors, so it's possible to compound them.
-    
-    with open(error_report_path, 'r') as f:
-        error_reports = f.readlines()
-        for i in range(len(error_reports)):
-            error_reports[i] = loads(error_reports[i])
 
     print('Creating issue archive...')
     with TemporaryDirectory() as tmp_dir:
         copy(error_report_path, f'{tmp_dir}/{error_report_path.name}')
-        for error_report in error_reports:
-            log_path = error_report['associated log file']
-            if log_path:
-                copy(log_path, f'{tmp_dir}/{Path(log_path).name}')
+        copy(log_path, f'{tmp_dir}/{log_path.name}')
         make_archive(f'{log_dir}/issue {datetime.date(datetime.now())}', 'zip', tmp_dir)
 
     print(f'error report generated at: "{error_report_path.absolute()}"')
