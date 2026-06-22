@@ -21,11 +21,13 @@
 - The `CLI` to also appropriately have an option to enter the GoFile code via a flag or just input if not provided. 
 - the opening mode of the log file in `init_logger` function to append if the file already exists, otherwise write, to not overwrite existing logs. 
 - `exception_global_handler` to save the latest log timestamp, instead of it's own. 
+- Parser_issue to add logs as a list ordered in the order they were written, there is also a log timestamp on each error report to match them, but I am not sure it's really needed, since I didn't use it except to check if a log exists. 
 
 ### Fixed
 - Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 
 - The issue parser for printing formatted output to find the log file in the parser issue by it's name, not the full path how it's written in the report, since the path has been stripped in the archive. 
 - Changed the way issues are collected from both download_path and log_dir directories to correctly delete them afterwards. 
+- Introduced a checks to ensure the log file exists before reading its content in `global_exception_handler`. 
 
 ---
 

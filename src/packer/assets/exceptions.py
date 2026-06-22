@@ -29,9 +29,10 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
 
     print('Generating an error report...')
 
-    with open(log_path) as f:
-        content = f.read()
-    timestamp_index = content.rfind('______Start of the log ') + 23
+    if Path(log_path).exists():
+        with open(log_path) as f:
+            content = f.read()
+        timestamp_index = content.rfind('______Start of the log ') + 23
     
     
 
@@ -40,7 +41,7 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
                     'python version': sys.version,
                     'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\nInput: '),
                     'traceback': ''.join(format_exception(exc_type, exc_value, exc_traceback)),
-                    'log timestamp': content[timestamp_index: timestamp_index + 26]}
+                    'log timestamp': content[timestamp_index: timestamp_index + 26] if 'timestamp_index' in locals() else None}
     
     with open(error_report_path, 'a' if Path(error_report_path).exists() else 'w') as f:
         dump(error_report, f)
@@ -49,7 +50,8 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
     print('Creating issue archive...')
     with TemporaryDirectory() as tmp_dir:
         copy(error_report_path, f'{tmp_dir}/{error_report_path.name}')
-        copy(log_path, f'{tmp_dir}/{log_path.name}')
+        if 'timestamp_index' in locals():
+            copy(log_path, f'{tmp_dir}/{log_path.name}')
         make_archive(f'{log_dir}/issue {datetime.date(datetime.now())}', 'zip', tmp_dir)
 
     print(f'error report generated at: "{error_report_path.absolute()}"')
