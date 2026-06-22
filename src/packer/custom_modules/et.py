@@ -417,7 +417,7 @@ def init_logger(program: str, author: str, log_format: str = '[%(levelname)s] %(
     '''
 
     log_file_name = log_file_path(program, author)
-    with open(log_file_name, 'w') as f:
+    with open(log_file_name, 'a' if Path(log_file_name).exists() else 'w') as f:
         f.write(f'______Start of the log {datetime.now()}______\n')
     logger = logging.getLogger(log_file_name)
     logger.setLevel(logging.DEBUG)

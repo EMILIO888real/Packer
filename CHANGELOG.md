@@ -18,6 +18,7 @@
 - The TODO.md to include entries about updating Github and GoFile and cleaned it up a bit. 
 - Appropriately updated the `TUI` to also pass the GoFile code if the folder was created by `Packer`, but you can also pass it yourself. 
 - The `CLI` to also appropriately have an option to enter the GoFile code via a flag or just input if not provided. 
+- the opening mode of the log file in `init_logger` function to append if the file already exists, otherwise write, to not overwrite existing logs. 
 
 ### Fixed
 - Replaced `log_path.name` with `Path(log_path).name` in the copy function call for log files, using Python's built-in `Path` class. 
