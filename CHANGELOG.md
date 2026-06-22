@@ -6,6 +6,7 @@
 - Update GitHub repository settings or other fields, such as temporary description created by Packer as another TODO entry in the newly created project by Packer's `setup`. 
 - `utils.py` creation for Packer's `setup` as an empty file. 
 - new option for `create_go_file_folder` function to include an additional step for updating the folder's public attribute. 
+- `parse_issue`, `print_formatted` to the public API from `packer.parse_issue`. 
 
 ### Changed
 - Utilizes `tempfile.TemporaryDirectory` for creating temporary directories during error report generation, instead of manually handling. 
