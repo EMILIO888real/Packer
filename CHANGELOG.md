@@ -1,8 +1,10 @@
 ## [%new_version] - %date
 
 ### Added
+- Update in README.md: Email for suggestions and bugs is now [emilspro888@gmail.com] (previously GitHub repository only). 
 
 ### Changed
+- Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
 
 ### Fixed
 
