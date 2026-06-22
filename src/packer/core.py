@@ -3,7 +3,7 @@ from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive
-from os import chdir, remove
+from os import chdir, listdir, remove
 from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
@@ -143,6 +143,8 @@ class Packer():
         self.SINGLE_RE = compile(
             r"^(Added|Changed|Fixed):\s*(.+)$"
         )
+        self.run_pyinstaller = any(Path().glob('*.spec'))
+
 
         # Settings related actions
         if input_queue:
@@ -362,13 +364,14 @@ class Packer():
                 make_archive(f'{cache_dir}/{self.program_name} [nuitka]', 'zip', f'{cache_dir}/main.dist')
 
             
-            self.print_and_log('Bundling the program using PyInstaller...')
-            waiting_for_pyinstaller_bundling = threading.Event()
-            pyinstaller_done = self._Popen([sys.executable,
-                        '-m',
-                        'PyInstaller', 'main.spec',
-                         '--distpath', f'{cache_dir}/dist',
-                         '--workpath', f'{cache_dir}/build'], waiting_for_pyinstaller_bundling)
+            if self.run_pyinstaller:
+                self.print_and_log('Bundling the program using PyInstaller...')
+                waiting_for_pyinstaller_bundling = threading.Event()
+                pyinstaller_done = self._Popen([sys.executable,
+                            '-m',
+                            'PyInstaller', 'main.spec',
+                            '--distpath', f'{cache_dir}/dist',
+                            '--workpath', f'{cache_dir}/build'], waiting_for_pyinstaller_bundling)
 
             self.print_and_log('Uploading archive to Gofile...')
             retry_gofile = True
@@ -487,11 +490,12 @@ class Packer():
 
             self.print_and_log('Uploading the compiled programs to the github release...')
 
-            self.print_and_log('Waiting for pyinstaller to finish...')
-            waiting_for_pyinstaller_bundling.set()
-            pyinstaller_done.wait()
+            if self.run_pyinstaller:
+                self.print_and_log('Waiting for pyinstaller to finish...')
+                waiting_for_pyinstaller_bundling.set()
+                pyinstaller_done.wait()
 
-            self.git_release.upload_asset(path=f'{cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
+                self.git_release.upload_asset(path=f'{cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
 
             if self.compile_command != None:
                 self.print_and_log('Waiting for Nuitka to finish...')
@@ -501,7 +505,8 @@ class Packer():
 
 
             self.print_and_log('Cleaning up cache...')
-            rmtree(f'{cache_dir}/dist')
+            if self.run_pyinstaller:
+                rmtree(f'{cache_dir}/dist')
 
             if self.compile_command != None:
                 rmtree(f'{cache_dir}/main.dist')

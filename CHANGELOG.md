@@ -2,6 +2,7 @@
 
 ### Added
 - Update in README.md: Email for suggestions and bugs is now [emilspro888@gmail.com] (previously GitHub repository only). 
+- check for the existence of a '.spec' file to run PyInstaller, enabling it only when needed, meaning Pyinstaller is optional, delete the `.spec` file to disable it. 
 
 ### Changed
 - Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
