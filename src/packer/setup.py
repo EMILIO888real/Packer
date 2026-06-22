@@ -705,7 +705,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     
     return github_repo_url.lstrip('https://github.com/') if github_repo_url else None
 
-def tui() -> tuple[str]:
+def tui(project_directory: str = None, author_name: str = None, program_name: str = None, github_pat: str = None, github_repo_url: str = None, overwrite: bool = None, gofile_code: str = None) -> tuple[str]:
     '''
     Interactive command-line user interface for collecting project setup information.
 
@@ -714,46 +714,59 @@ def tui() -> tuple[str]:
     information is provided and returns the collected data as a tuple.
 
     :return: A tuple containing:
-        - program_name (str): The name of the program.
+        - project_directory (str): The absolute path to the project directory.
         - author_name (str): The name of the author.
+        - program_name (str): The name of the program.
         - github_pat (str or None): The GitHub PAT if provided, otherwise None.
+        - github_repo_url (str or None): The GitHub repository URL if provided, otherwise None.
         - overwrite (bool): Whether to overwrite the existing project
+        - gofile_code (str or None): The GoFile code if provided, otherwise None.
     :rtype: tuple[str]
     '''
 
-    program_name = input('1. Program name: ')
+    if not program_name:
+        program_name = input('1. Program name: ')
 
-    while (program_name[:1].isdigit()) or (program_name.count(' ') > 0) or (not match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', program_name)) or (iskeyword(program_name)) or (program_name in builtin_module_names or (check_module_conflict(program_name))):
-        print('Name isn\'t acceptable since it doesn\'t follow restrictions:')
-        print_list(['Can\'t start with a number', 'Can\'t contain any spaces', 'Can\'t contain any special characters (Alphanumeric characters and underscores only)', 'Can\'t be a Python keyword', 'Can\'t be a built-in module name', 'Can\'t be in conflict with other existing modules'], start='\t* ')
-        program_name = input('Reenter the program name: ').capitalize()
-    
-    program_name = f'{program_name[0].upper()}{program_name[1:]}'
+        while (program_name[:1].isdigit()) or (program_name.count(' ') > 0) or (not match(r'^[a-zA-Z_][a-zA-Z0-9_]*$', program_name)) or (iskeyword(program_name)) or (program_name in builtin_module_names or (check_module_conflict(program_name))):
+            print('Name isn\'t acceptable since it doesn\'t follow restrictions:')
+            print_list(['Can\'t start with a number', 'Can\'t contain any spaces', 'Can\'t contain any special characters (Alphanumeric characters and underscores only)', 'Can\'t be a Python keyword', 'Can\'t be a built-in module name', 'Can\'t be in conflict with other existing modules'], start='\t* ')
+            program_name = input('Reenter the program name: ').capitalize()
+        
+        program_name = f'{program_name[0].upper()}{program_name[1:]}'
 
 
     default_project_dir = f'{user_documents_dir()}/{program_name}'
 
-    project_directory = input(f'2. Project directory (absolute path, default to: {default_project_dir}): ')
-    if project_directory == '':
-        project_directory = default_project_dir
+    if not project_directory:
+        project_directory = input(f'2. Project directory (absolute path, default to: {default_project_dir}): ')
+        if project_directory == '':
+            project_directory = default_project_dir
 
-    overwrite = True
-    if Path(project_directory).exists():
-        if not simple_prompt('Directory already exists, overwrite it', 'n'):
-            overwrite = False
+    if overwrite is None:
+        overwrite = True
+        if Path(project_directory).exists():
+            if not simple_prompt('Directory already exists, overwrite it', 'n'):
+                overwrite = False
 
     project_directory.rstrip('/')
 
-    github_pat = getpass('3. Github personal access token (with Administration permissions): ').strip() or None
-    github_repo_url = not github_pat and stripped_input('4. Github repo url (username/repo): ') or None
+    if not github_pat:
+        github_pat = getpass('3. Github personal access token (with Administration permissions): ').strip() or None
+    
+    if not github_repo_url:
+        github_repo_url = not github_pat and stripped_input('4. Github repo url (username/repo): ') or None
 
     default_name = getuser()
 
-    author_name = input(f'5. Author name of the program [default to: {default_name}]: ')
-    if author_name == '':
-        author_name = default_name
+    if not author_name:
+        author_name = input(f'5. Author name of the program [default to: {default_name}]: ')
+        if author_name == '':
+            author_name = default_name
+    
+    if not gofile_code:
+        gofile_code = stripped_input('6. GoFile code: ') or None
 
-    return (project_directory, author_name, program_name, github_pat, github_repo_url, overwrite)
+    return (project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code)
 
 if __name__ == '__main__':
     print('You will need to configure [4-5] settings.')

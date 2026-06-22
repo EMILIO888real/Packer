@@ -81,7 +81,7 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
         if ai_summary:
             bullet_summary_list = bullet_summary.splitlines()
             with open(temp_path, 'w') as f:
-                f.write(bullet_summary_list[i])
+                f.write(bullet_summary_list[i] if len(bullet_summary_list) > i else 'AI didn\'t generate anything...')
 
         run([text_editor, wait_flag, temp_path])
 

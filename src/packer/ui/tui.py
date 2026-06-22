@@ -52,11 +52,11 @@ def main() -> tuple[str, Project]:
         gofile_folder_id = getpass('4. Gofile folder id (leave empty to create a folder): ')
         if not gofile_folder_id:
             response = create_gofile_folder(input('name of the folder: '), gofile_user_token)
-            gofile_code = response['data']['code']
+            user_setup_data[-1] = response['data']['code']
             gofile_folder_id = response['data']['id']
-        
+
         print('Starting setup...')
-        github_repo_url = setup(*user_setup_data, gofile_code if gofile_code in locals() else input('GoFile code [None] '))
+        github_repo_url = setup(*user_setup_data)
         print('Setup complete. Continuing with configuration...')
 
 

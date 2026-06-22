@@ -3,13 +3,19 @@
 ### Added
 - Update in README.md: Email for suggestions and bugs is now [emilspro888@gmail.com] (previously GitHub repository only). 
 - check for the existence of a '.spec' file to run PyInstaller, enabling it only when needed, meaning Pyinstaller is optional, delete the `.spec` file to disable it. 
+- `GoFile code` to the `TUI` in `setup` to be prompted if not provided. 
 
 ### Changed
 - Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
 - osen description and chosen title file extensions to .md, instead of .txt for nicer text editor or IDE support. 
 - Program name to capitalize only it's first letter. 
+- The `CLI` `setup` command for the setup function is updated to call tui function in `src/packer/ui/cli.py` with passing flags as arguments to it if provided. 
+- Documentation of `setup` `tui` function to be more accurate. 
+- Appropriately `tui.py` `setup` function call to use GoFile code if provided otherwise let TUI handle it. 
+- `setup's` TUI function to allow providing the parameter it will be prompting for to skip them if they already have been gather in other ways, like CLI flags. 
 
 ### Fixed
+- `change.py` to put in a default template "AI didn't generate anything...", if nothing was generated for that change. 
 
 ---
 

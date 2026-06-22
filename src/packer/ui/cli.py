@@ -15,7 +15,7 @@ from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path
 from packer.config import Project, packer_version, projects_configurations, all_settings
 from packer.core import Packer
-from packer.setup import main as setup
+from packer.setup import main as setup, tui
 
 def _clear_path(path: str | Path) -> None:
     path = Path(path)
@@ -148,12 +148,13 @@ def main():
             
             
         case 'setup':
-                print(f'''Github repository url: {setup(args.setup_path if args.setup_path else input('Path: '),
-                      args.setup_author_name if args.setup_author_name else input('Author name: '),
-                      args.setup_program_name if args.setup_program_name else input('Program name: '),
-                      args.setup_github_pat if args.setup_github_pat else input('Github PAT: '),
-                      args.setup_github_repo_url if args.setup_github_repo_url else input('Github repo URL: '),
-                      args.setup_overwrite if args.setup_overwrite else False, args.setup_gofile_code if args.setup_gofile_code else input('GoFile code: '))}''')
+                print(f'''Github repository url: {setup(tui(args.setup_path,
+                    args.setup_author_name,
+                    args.setup_program_name,
+                    args.setup_github_pat,
+                    args.setup_github_repo_url,
+                    args.setup_overwrite,
+                    args.setup_gofile_code))}''')
         
         case 'export':
             files = [
