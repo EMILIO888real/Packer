@@ -429,7 +429,9 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             description = "A short description about your program: {program_name}."
             readme = "README.md"
             license = "MIT"
-            dependencies = []
+            dependencies = [
+                "platformdirs"
+            ]
 
             [tool.setuptools]
             include-package-data = true
