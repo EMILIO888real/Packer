@@ -14,6 +14,7 @@ from multiprocessing import Process, Event
 from sys import exit, platform, builtin_module_names
 from re import match
 from keyword import iskeyword
+from packer.utils import pip_install
 from platformdirs import user_documents_dir
 
 from packer.custom_modules.et import init_logger, tree
@@ -43,7 +44,7 @@ def print_and_log(text: str, level: int = 20, color: Sequence[int] = [255, 255, 
     print_colored_text(text, color, end=end)
     logger.log(level, text)
 
-def create_venv(created_venv) -> None:
+def _create_venv(created_venv) -> None:
     print_and_log('Creating a python virtual environment...')
     run(['python', '-m', 'venv', '.venv'])
     created_venv.set()
@@ -125,7 +126,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         chdir(project_directory)
 
     created_venv = Event()
-    Process(target=create_venv, args=[created_venv]).start()
+    Process(target=_create_venv, args=[created_venv]).start()
 
     print_and_log('Creating source code directory...')
     mkdir(f'src')
@@ -670,6 +671,9 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Waiting for .venv to finish creating...')
     created_venv.wait()
+
+    print_and_log('Installing platformdirs package into venv')
+    pip_install(['platformdirs'])
 
     print_and_log('Staging files for initial commit...')
     repo.git.add(all=True)

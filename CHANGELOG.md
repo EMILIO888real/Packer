@@ -5,6 +5,7 @@
 - check for the existence of a '.spec' file to run PyInstaller, enabling it only when needed, meaning Pyinstaller is optional, delete the `.spec` file to disable it. 
 - `GoFile code` to the `TUI` in `setup` to be prompted if not provided. 
 - `platformdirs` module to `pyproject.toml` file dependencies of newly created projects by `setup`. 
+- `pip_install` function was added in utils and used in setup to install the platformdirs package for a newly created project. 
 
 ### Changed
 - Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
