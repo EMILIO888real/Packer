@@ -26,8 +26,9 @@ def main():
 
     try:
         packer = Packer(new_version, version, project_directory,
-                        project_configuration.gofile_user_token, project_configuration.gofile_folder_id, project_configuration.github_repo_token,
+                        project_configuration.github_repo_token,
                         project_configuration.program_name, project_configuration.github_repo_url,
+                        project_configuration.gofile_user_token, project_configuration.gofile_folder_id,
                         None, None,
                         project_configuration.compile_command, project_configuration.before_commands, project_configuration.after_commands, 
                         project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt)

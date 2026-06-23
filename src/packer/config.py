@@ -69,8 +69,8 @@ class Project(BaseModel):
         changelog_git_hash (bool): Whether to include git hash in changelog (default: True).
     '''
 
-    gofile_user_token: str
-    gofile_folder_id: str
+    gofile_user_token: str | None = None
+    gofile_folder_id: str | None = None 
     github_repo_token: str
     program_name: str
     github_repo_url: str

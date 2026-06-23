@@ -70,9 +70,9 @@ class Packer():
     :param project_path: The path to the project directory.
     :type project_path: str | Path
     :param GOFILE_USER_TOKEN: The user token for Gofile, used to upload the archive.
-    :type GOFILE_USER_TOKEN: str
+    :type GOFILE_USER_TOKEN: str, optional
     :param FOLDER_ID: The folder id for Gofile, used to upload the archive.
-    :type FOLDER_ID: str
+    :type FOLDER_ID: str, optional
     :param GITHUB_REPO_TOKEN: The token for the Github repo, used to publish the release.
     :type GITHUB_REPO_TOKEN: str
     :param program_name: The name of the program, used for naming the archive and the release.
@@ -102,7 +102,8 @@ class Packer():
     '''
 
     def __init__(self, version: dict, old_version: dict, project_path: str | Path,
-                 GOFILE_USER_TOKEN: str, FOLDER_ID: str, GITHUB_REPO_TOKEN: str, program_name: str, github_repo_url: str,
+                 GITHUB_REPO_TOKEN: str, program_name: str, github_repo_url: str, 
+                 GOFILE_USER_TOKEN: str | None = None, FOLDER_ID: str | None = None,
                  input_queue: Queue = None, output_queue: Queue = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['before_commands'].default, after_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['after_commands'].default,
@@ -372,36 +373,37 @@ class Packer():
                             'PyInstaller', 'main.spec',
                             '--distpath', f'{cache_dir}/dist',
                             '--workpath', f'{cache_dir}/build'], waiting_for_pyinstaller_bundling)
+            
+            if self.GOFILE_USER_TOKEN and self.FOLDER_ID:
+                self.print_and_log('Uploading archive to Gofile...')
+                retry_gofile = True
+                retry_gofile_count = -1
+                while retry_gofile:
+                    try:
+                        retry_gofile_count += 1
+                        if retry_gofile_count > 2:
+                            self.print_and_log(f'After {retry_gofile_count} unsuccessful attempts the release has been paused')
+                            self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no')
+                            if not self.prompt_user('Has the problem been resolved'):
+                                self.revert_changes()
 
-            self.print_and_log('Uploading archive to Gofile...')
-            retry_gofile = True
-            retry_gofile_count = -1
-            while retry_gofile:
-                try:
-                    retry_gofile_count += 1
-                    if retry_gofile_count > 2:
-                        self.print_and_log(f'After {retry_gofile_count} unsuccessful attempts the release has been paused')
-                        self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no')
-                        if not self.prompt_user('Has the problem been resolved'):
+                        response = upload_gofile_file(Path(f'{cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
+                        if response.get('status') != 'ok' or not response.get('data'):
+                            self.print_and_log(f'GoFile upload returned an invalid response: {response}')
                             self.revert_changes()
+                        retry_gofile = False
+                    except exceptions.SSLError:
+                        self.print_and_log('Encountered an SSL (verification) error when uploading to GoFile')
+                    except Exception as e:
+                        self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}')
 
-                    response = upload_gofile_file(Path(f'{cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
-                    if response.get('status') != 'ok' or not response.get('data'):
-                        self.print_and_log(f'GoFile upload returned an invalid response: {response}')
-                        self.revert_changes()
-                    retry_gofile = False
-                except exceptions.SSLError:
-                    self.print_and_log('Encountered an SSL (verification) error when uploading to GoFile')
-                except Exception as e:
-                    self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}')
-
-                if retry_gofile:
-                    self.print_and_log('retrying in 3 seconds...')
-                    sleep(3)
+                    if retry_gofile:
+                        self.print_and_log('retrying in 3 seconds...')
+                        sleep(3)
 
 
-            download_url = response['data']['downloadPage']
-            self.file_id = response['data']['id']
+                download_url = response['data']['downloadPage']
+                self.file_id = response['data']['id']
 
             if self.before_commands:
                 self.print_and_log('Running pre commit hooks...')

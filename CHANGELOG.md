@@ -14,6 +14,9 @@
 - Documentation of `setup` `tui` function to be more accurate. 
 - Appropriately `tui.py` `setup` function call to use GoFile code if provided otherwise let TUI handle it. 
 - `setup's` TUI function to allow providing the parameter it will be prompting for to skip them if they already have been gather in other ways, like CLI flags. 
+- `gofile_user_token` and `gofile_folder_id` in `src/packer/config.py`, making them optional with default value of None, ensuring Packer can also save configurations as such. 
+- GoFile user token and GoFile folder id for the main `Packer` class to have those parameters as optional and now they are checked if they are truthy before trying to upload. 
+- All instances of Packer class use case to use the updated parameters and `TUI` to handle correctly allowing fields to be None. 
 
 ### Fixed
 - `change.py` to put in a default template "AI didn't generate anything...", if nothing was generated for that change. 

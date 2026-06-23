@@ -115,8 +115,10 @@ def main():
 
             packer = Packer(
                 next_version, current_version, project_path,
-                project_config.gofile_user_token, project_config.gofile_folder_id, project_config.github_repo_token,
-                project_config.program_name, project_config.github_repo_url, None, None, project_config.compile_command,
+                project_config.github_repo_token,
+                project_config.program_name, project_config.github_repo_url,
+                project_config.gofile_user_token, project_config.gofile_folder_id, 
+                None, None, project_config.compile_command,
                 project_config.before_commands, project_config.after_commands,
                 project_config.model, project_config.description_prompt, project_config.title_prompt,
                 project_config.release_notes_template_path, project_config.changelog_git_hash,
