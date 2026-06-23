@@ -34,9 +34,12 @@ from pathlib import Path
 from shutil import which
 from typing import Any, Sequence
 from pydantic import BaseModel
+from getpass import getpass
+import json
+
 from packer.custom_modules.et import format_version_text, normalize_settings_keys
 from packer.paths import assets_dir, config_dir
-import json
+
 
 with open(f'{assets_dir}/version.json') as f:
     packer_version = format_version_text(json.load(f))
@@ -146,6 +149,7 @@ class Settings(BaseModel):
         {'role': 'user', 'content': '$bullet_summary'},
     ]
     model: str = 'mistral'
+    getpass_echo_char: str | None = None
 
 settings_path = f'{config_dir}/settings.json'
 
@@ -168,3 +172,15 @@ if Path(f'{config_dir}/projects.json').exists():
         projects_configurations = json.load(f)
 else:
     projects_configurations = None
+
+
+def _getpass(prompt: str) -> str:
+    '''
+    Prompt the user for a password with echo_char option using whatever is specified in settings.
+
+    :param prompt: The prompt to display to the user.
+    :type prompt: str
+    :return: The password entered by the user.
+    :rtype: str
+    '''
+    return getpass(prompt, echo_char=all_settings.getpass_echo_char)

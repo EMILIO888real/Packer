@@ -1,5 +1,5 @@
 
-from getpass import getpass, getuser
+from getpass import getuser
 from importlib import import_module
 from os import chdir, mkdir
 from pathlib import Path
@@ -19,7 +19,7 @@ from platformdirs import user_documents_dir
 
 from packer.custom_modules.et import init_logger, tree
 from packer.custom_modules.etf import print_colored_text, simple_prompt, stripped_input
-from packer.config import packer_version
+from packer.config import packer_version, _getpass
 from packer.custom_modules.etf import print_list
 
 logger = init_logger('packer setup', 'EMILIO')
@@ -757,7 +757,7 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     project_directory.rstrip('/')
 
     if not github_pat:
-        github_pat = getpass('3. Github personal access token (with Administration permissions): ').strip() or None
+        github_pat = _getpass('3. Github personal access token (with Administration permissions): ').strip() or None
     
     if not github_repo_url:
         github_repo_url = not github_pat and stripped_input('4. Github repo url (username/repo): ') or None

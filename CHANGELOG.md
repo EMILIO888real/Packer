@@ -6,6 +6,7 @@
 - `GoFile code` to the `TUI` in `setup` to be prompted if not provided. 
 - `platformdirs` module to `pyproject.toml` file dependencies of newly created projects by `setup`. 
 - `pip_install` function was added in utils and used in setup to install the platformdirs package for a newly created project. 
+- Introduced an optional setting in the user settings to optionally choose the echo char for the `getpass` method by default it's still None, which is disabled echo. 
 
 ### Changed
 - Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 

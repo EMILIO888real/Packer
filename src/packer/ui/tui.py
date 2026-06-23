@@ -1,4 +1,3 @@
-from getpass import getpass
 from json import dumps, loads
 from pathlib import Path
 from typing import Callable
@@ -8,7 +7,7 @@ from packer.setup import main as setup, tui
 from packer.paths import config_dir, projects_file_path
 from packer.custom_modules.et import create_gofile_folder, normalize_settings_keys
 from packer.custom_modules.etf import stripped_input, simple_prompt
-from packer.config import Project, projects_configurations, all_settings
+from packer.config import Project, _getpass, projects_configurations, all_settings
 
 def main() -> tuple[str, Project]:
     '''
@@ -47,9 +46,9 @@ def main() -> tuple[str, Project]:
         project_directory = user_setup_data[0]
         program_name = user_setup_data[2]
 
-        gofile_user_token = getpass('3. Gofile user token: ') or None
+        gofile_user_token = _getpass('3. Gofile user token: ') or None
 
-        gofile_folder_id = getpass('4. Gofile folder id (leave empty to create a folder): ') or None
+        gofile_folder_id = _getpass('4. Gofile folder id (leave empty to create a folder): ') or None
         if not gofile_folder_id:
             folder_name = input('name of the folder: (leave empty to skip)') or None
             if folder_name:
@@ -65,7 +64,7 @@ def main() -> tuple[str, Project]:
         print('Now go over to Github and create a PAT and enter it below.')
         projects_configurations = {
             project_directory: {
-                'github repo token': getpass('5. Github repo token: '),
+                'github repo token': _getpass('5. Github repo token: '),
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
                 'github repo url': github_repo_url,
