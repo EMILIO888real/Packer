@@ -155,12 +155,12 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     with open(f'{root_dir}/assets/exceptions.py', 'w') as f:
         f.write(dedent(f'''\
             from datetime import datetime
-            from os import mkdir
             from pathlib import Path
             import sys
+            from tempfile import TemporaryDirectory
             from traceback import format_exception
             from json import dump
-            from shutil import make_archive, copy, rmtree
+            from shutil import make_archive, copy
             from {program_name}.config import {program_name}_version
             from {program_name}.paths import log_path, error_report_path, log_dir
 
@@ -184,30 +184,30 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
                 print('Generating an error report...')
 
-                if not log_path.exists():
-                    log_path = None
+                if Path(log_path).exists():
+                    with open(log_path) as f:
+                        content = f.read()
+                    timestamp_index = content.rfind('______Start of the log ') + 23
+                
+                
 
-                error_report = {{'program version': {program_name}_version,
+                error_report = {{'{program_name} version': {program_name}version,
                                 'platform': sys.platform,
                                 'python version': sys.version,
                                 'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\\nInput: '),
                                 'traceback': ''.join(format_exception(exc_type, exc_value, exc_traceback)),
-                                'associated log file': str(log_path)}}
-
-
-                with open(error_report_path, 'a') as f:
+                                'log timestamp': content[timestamp_index: timestamp_index + 26] if 'timestamp_index' in locals() else None}}
+                
+                with open(error_report_path, 'a' if Path(error_report_path).exists() else 'w') as f:
                     dump(error_report, f)
                     f.write('\\n') # For the next errors, so it's possible to compound them.
 
                 print('Creating issue archive...')
-                tmp_dir = f'{{log_dir}}/temp dir'
-                if not Path(tmp_dir).exists():
-                    mkdir(tmp_dir)
-                copy(error_report_path, f'{{tmp_dir}}/{{error_report_path.name}}')
-                if log_path is not None:
-                    copy(log_path, f'{{tmp_dir}}/{{log_path.name}}')
-                make_archive(f'{{log_dir}}/issue {{datetime.date(datetime.now())}}', 'zip', tmp_dir)
-                rmtree(tmp_dir)
+                with TemporaryDirectory() as tmp_dir:
+                    copy(error_report_path, f'{{tmp_dir}}/{{error_report_path.name}}')
+                    if 'timestamp_index' in locals():
+                        copy(log_path, f'{{tmp_dir}}/{{log_path.name}}')
+                    make_archive(f'{{log_dir}}/issue {{datetime.date(datetime.now())}}', 'zip', tmp_dir)
 
                 print(f'error report generated at: "{{error_report_path.absolute()}}"')
                 print(f'Created an issue archive with the error report and log associated with it: "{{log_dir}}/issue {{datetime.date(datetime.now())}}.zip".\\nPlease submit this to a developer!')
