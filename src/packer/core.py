@@ -516,10 +516,6 @@ class Packer():
                 rmtree(f'{cache_dir}/main.dist')
                 remove(f'{cache_dir}{self.program_name} [nuitka].zip')
 
-            self.print_and_log('Cleaning up temporary files...')
-            remove(f'{data_dir}/chosen description.txt')
-            remove(f'{data_dir}/chosen version title.txt')
-
             self.print_and_log('Writing social media post text to a file...')
             with open(f'{data_dir}/social media post.md', 'w') as f:
                 f.write(self.release_text)
@@ -566,6 +562,10 @@ class Packer():
                 except GitCommandError as e:
                     self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
             self.git_repo.remotes.origin.push()
+
+            self.print_and_log('Cleaning up temporary files...')
+            remove(self.chosen_description_path)
+            remove(self.chosen_title_path)
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
             release_url = self.git_release.html_url

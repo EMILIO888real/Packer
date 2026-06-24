@@ -23,9 +23,11 @@
 - GoFile user token and GoFile folder id for the main `Packer` class to have those parameters as optional and now they are checked if they are truthy before trying to upload. 
 - All instances of Packer class use case to use the updated parameters and `TUI` to handle correctly allowing fields to be None. 
 - `global_exception_handler` in `setup` for new project to use the latest tech `Packer` uses, you can also use Packer to parse those error cleanly. 
+- Moved clean up of temporary files to the end of the script right before announcing a successful release in case errors occur during the last moments. 
 
 ### Fixed
 - `change.py` to put in a default template "AI didn't generate anything...", if nothing was generated for that change. 
+- Paths to the chosen description and chosen version title files by using the already generated ones from the constructor. 
 
 ---
 
