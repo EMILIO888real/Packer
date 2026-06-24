@@ -140,16 +140,18 @@ class Settings(BaseModel):
         )},
     ]
     high_level_summary_prompt: list[dict[str, str]] = [
-        {'role': 'system', 'content': (
-    'You are a concise reviewer. '
-    'Take the bullet list below and write one short high-level summary sentence. '
-    'Do not repeat every item. Focus on the overall change and its impact. '
-    'Return only the summary sentence, with no bullets or extra commentary.'
-)},
+            {'role': 'system', 'content': (
+        'You are a concise reviewer. '
+        'Take the bullet list below and write one short high-level summary sentence. '
+        'Do not repeat every item. Focus on the overall change and its impact. '
+        'Return only the summary sentence, with no bullets or extra commentary.'
+    )},
         {'role': 'user', 'content': '$bullet_summary'},
     ]
     model: str = 'mistral'
     getpass_echo_char: str | None = None
+    copy_github_release_clipboard: bool = True
+    
 
 settings_path = f'{config_dir}/settings.json'
 

@@ -3,7 +3,7 @@ from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive
-from os import chdir, listdir, remove
+from os import chdir, remove
 from json import dump
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
@@ -17,6 +17,7 @@ import tomlkit
 import threading
 from string import Template
 import sys
+from pyperclip import copy
 
 from packer.custom_modules.et import tree, delete_upload, init_logger
 from packer.custom_modules.etf import bool_answer, simple_prompt, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
@@ -566,6 +567,12 @@ class Packer():
             self.git_repo.remotes.origin.push()
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
+            release_url = self.git_release.html_url
+            if all_settings.copy_github_release_clipboard:
+                copy(release_url)
+                self.print_and_log('Copied GitHub release URL to clipboard')
+            else:
+                self.print_and_log(f'Github release: {release_url}')
             self.print_and_log(f'Social media post text has been saved to {data_dir}/social media post.md. You can use it to announce the new version on social media platforms!')
             self.print_and_log(f'Log file has been saved to: {str(log_path.absolute())}')
 
