@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- utomatic error report via the internet using formspree.io API. 
 
 ### Changed
 
