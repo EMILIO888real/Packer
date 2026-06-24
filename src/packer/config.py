@@ -151,6 +151,7 @@ class Settings(BaseModel):
     model: str = 'mistral'
     getpass_echo_char: str | None = None
     copy_github_release_clipboard: bool = True
+    open_gitHub_release: bool = True
     
 
 settings_path = f'{config_dir}/settings.json'

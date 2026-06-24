@@ -18,6 +18,7 @@ import threading
 from string import Template
 import sys
 from pyperclip import copy
+from webbrowser import open_new_tab
 
 from packer.custom_modules.et import tree, delete_upload, init_logger
 from packer.custom_modules.etf import bool_answer, simple_prompt, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
@@ -568,6 +569,8 @@ class Packer():
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
             release_url = self.git_release.html_url
+            if all_settings.open_gitHub_release:
+                open_new_tab(release_url)
             if all_settings.copy_github_release_clipboard:
                 copy(release_url)
                 self.print_and_log('Copied GitHub release URL to clipboard')

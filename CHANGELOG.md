@@ -9,6 +9,7 @@
 - Introduced an optional setting in the user settings to optionally choose the echo char for the `getpass` method by default it's still None, which is disabled echo. 
 - Functionality to allow user input for additional packages to install during setup, using `setup.py`. 
 - setting to copy the GitHub release URL to the clipboard or just output it by default it copies it. 
+- a new setting `open_gitHub_release` which opens the GitHub release URL in the user's default browser new tab or a new window. 
 
 ### Changed
 - Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
