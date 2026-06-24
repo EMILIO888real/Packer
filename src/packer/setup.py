@@ -675,6 +675,10 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Installing platformdirs package into venv')
     pip_install(['platformdirs'])
 
+    packages = input('Enter other packages to install [None] ').split(' ')
+    if packages:
+        pip_install(packages)
+
     print_and_log('Staging files for initial commit...')
     repo.git.add(all=True)
     print_and_log('Committing files...')

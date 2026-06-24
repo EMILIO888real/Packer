@@ -25,4 +25,4 @@ def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
             python_exe = Path('.venv/Scripts/python.exe')
         else:
             python_exe = Path('.venv/bin/python')
-    run([str(python_exe), '-m', 'pip', 'install', ' '.join(packages)], check=True)
+    run([str(python_exe), '-m', 'pip', 'install', *packages], check=True)
