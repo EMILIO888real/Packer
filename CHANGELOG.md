@@ -1,33 +1,33 @@
-## [%new_version] - %date
+## [0.14.0] - 2026-06-24
 
 ### Added
-- Update in README.md: Email for suggestions and bugs is now [emilspro888@gmail.com] (previously GitHub repository only). 
-- check for the existence of a '.spec' file to run PyInstaller, enabling it only when needed, meaning Pyinstaller is optional, delete the `.spec` file to disable it. 
-- `GoFile code` to the `TUI` in `setup` to be prompted if not provided. 
-- `platformdirs` module to `pyproject.toml` file dependencies of newly created projects by `setup`. 
-- `pip_install` function was added in utils and used in setup to install the platformdirs package for a newly created project. 
-- Introduced an optional setting in the user settings to optionally choose the echo char for the `getpass` method by default it's still None, which is disabled echo. 
-- Functionality to allow user input for additional packages to install during setup, using `setup.py`. 
-- setting to copy the GitHub release URL to the clipboard or just output it by default it copies it. 
-- a new setting `open_gitHub_release` which opens the GitHub release URL in the user's default browser new tab or a new window. 
+- [b3653ff] Update in README.md: Email for suggestions and bugs is now [emilspro888@gmail.com] (previously GitHub repository only). 
+- [164c53a] check for the existence of a '.spec' file to run PyInstaller, enabling it only when needed, meaning Pyinstaller is optional, delete the `.spec` file to disable it. 
+- [a28a2b7] `GoFile code` to the `TUI` in `setup` to be prompted if not provided. 
+- [618d464] `platformdirs` module to `pyproject.toml` file dependencies of newly created projects by `setup`. 
+- [6af4fad] `pip_install` function was added in utils and used in setup to install the platformdirs package for a newly created project. 
+- [73f8976] Introduced an optional setting in the user settings to optionally choose the echo char for the `getpass` method by default it's still None, which is disabled echo. 
+- [eff707a] Functionality to allow user input for additional packages to install during setup, using `setup.py`. 
+- [65cdd11] setting to copy the GitHub release URL to the clipboard or just output it by default it copies it. 
+- [966dabd] a new setting `open_gitHub_release` which opens the GitHub release URL in the user's default browser new tab or a new window.
 
 ### Changed
-- Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
-- chosen description and chosen title file extensions to .md, instead of .txt for nicer text editor or IDE support. 
-- Program name to capitalize only it's first letter. 
-- The `CLI` `setup` command for the setup function is updated to call tui function in `src/packer/ui/cli.py` with passing flags as arguments to it if provided. 
-- Documentation of `setup` `tui` function to be more accurate. 
-- Appropriately `tui.py` `setup` function call to use GoFile code if provided otherwise let TUI handle it. 
-- `setup's` TUI function to allow providing the parameter it will be prompting for to skip them if they already have been gather in other ways, like CLI flags. 
-- `gofile_user_token` and `gofile_folder_id` in `src/packer/config.py`, making them optional with default value of None, ensuring Packer can also save configurations as such. 
-- GoFile user token and GoFile folder id for the main `Packer` class to have those parameters as optional and now they are checked if they are truthy before trying to upload. 
-- All instances of Packer class use case to use the updated parameters and `TUI` to handle correctly allowing fields to be None. 
-- `global_exception_handler` in `setup` for new project to use the latest tech `Packer` uses, you can also use Packer to parse those error cleanly. 
-- Moved clean up of temporary files to the end of the script right before announcing a successful release in case errors occur during the last moments. 
+- [b3653ff] Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
+- c [04105b3] osen description and chosen title file extensions to .md, instead of .txt for nicer text editor or IDE support. 
+- [254fa7d] Program name to capitalize only it's first letter. 
+- [a28a2b7] The `CLI` `setup` command for the setup function is updated to call tui function in `src/packer/ui/cli.py` with passing flags as arguments to it if provided. 
+- [a28a2b7] Documentation of `setup` `tui` function to be more accurate. 
+- [a28a2b7] Appropriately `tui.py` `setup` function call to use GoFile code if provided otherwise let TUI handle it. 
+- [a28a2b7] `setup's` TUI function to allow providing the parameter it will be prompting for to skip them if they already have been gather in other ways, like CLI flags. 
+- [1a88703] `gofile_user_token` and `gofile_folder_id` in `src/packer/config.py`, making them optional with default value of None, ensuring Packer can also save configurations as such. 
+- [1a88703] GoFile user token and GoFile folder id for the main `Packer` class to have those parameters as optional and now they are checked if they are truthy before trying to upload. 
+- [1a88703] All instances of Packer class use case to use the updated parameters and `TUI` to handle correctly allowing fields to be None. 
+- [2584e85] `global_exception_handler` in `setup` for new project to use the latest tech `Packer` uses, you can also use Packer to parse those error cleanly. 
+- [fc56760] Moved clean up of temporary files to the end of the script right before announcing a successful release in case errors occur during the last moments.
 
 ### Fixed
-- `change.py` to put in a default template "AI didn't generate anything...", if nothing was generated for that change. 
-- Paths to the chosen description and chosen version title files by using the already generated ones from the constructor. 
+- [a28a2b7] `change.py` to put in a default template "AI didn't generate anything...", if nothing was generated for that change. 
+- [fc56760] Paths to the chosen description and chosen version title files by using the already generated ones from the constructor.
 
 ---
 
