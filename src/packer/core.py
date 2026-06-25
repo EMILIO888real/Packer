@@ -485,17 +485,33 @@ class Packer():
                     self.print_and_log('Waiting...')
                     sleep(1)
             
-            self.print_and_log('Publishing a new release on Github...')
-            self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}',
-                                                            message=self.release_text, target_commitish=sha)
+            self.print_and_log('Publishing a new release on GitHub...')
+
+            retry_release = True
+            retry_release_count = 0
+            while retry_release:
+                try:
+                    if retry_release_count > 3:
+                        self.print_and_log(f'Failed to create a release on GitHub after {retry_release_count} attempts')
+                        self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no')
+                        if not self.prompt_user('Has the problem been resolved'):
+                            self.revert_changes()
+                    self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}',
+                                                                    message=self.release_text, target_commitish=sha)
+                    retry_release = False
+                except Exception as e:
+                    self.print_and_log(f'Failed to create a release on GitHub | Error: {e}', [255, 0, 0], 30)
+                    self.print_and_log('Retrying in 3 seconds...', [0, 0, 255])
+                    sleep(3)
+                    retry_release_count += 1
             
             self.print_and_log('Fetching the git tag...')
             self.git_repo.remotes.origin.fetch(tags=True)
 
-            self.print_and_log('Uploading the compiled programs to the github release...')
+            self.print_and_log('Uploading the compiled programs to the GitHub release...')
 
             if self.run_pyinstaller:
-                self.print_and_log('Waiting for pyinstaller to finish...')
+                self.print_and_log('Waiting for PyInstaller to finish...')
                 waiting_for_pyinstaller_bundling.set()
                 pyinstaller_done.wait()
 

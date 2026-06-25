@@ -3,6 +3,7 @@
 ### Added
 - a setting to disable and or enable automatic error report via the internet using formspree.io. 
 - Documentation for the new settings in it's dedicated file `SETTINGS.md`. 
+- Introduced error handling and retry mechanism when publishing a GitHub release. 
 
 ### Changed
 - Output of the `global_exception_handler` to be cleaner. 
