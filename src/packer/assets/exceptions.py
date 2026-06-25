@@ -36,7 +36,7 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
 
     print('Generating an error report...')
 
-    error_report = {'timestamp': datetime.now(),
+    error_report = {'timestamp': str(datetime.now()),
                     'packer version': packer_version,
                     'platform': sys.platform,
                     'python version': sys.version,

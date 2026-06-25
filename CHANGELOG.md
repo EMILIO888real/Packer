@@ -9,6 +9,7 @@
 - Automatic error reporting to be cleaner and handle any foreseeable problems that I saw. 
 
 ### Fixed
+- Added formatting change: `str()` function is used to convert the timestamp into a string format in the error report. 
 
 ---
 
