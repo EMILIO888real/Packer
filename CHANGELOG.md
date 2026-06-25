@@ -9,6 +9,8 @@
 - Output of the `global_exception_handler` to be cleaner. 
 - Removed `parse_issue.py`, since there are no archives anymore and all error reports are a single json, so to output it cleanly print it out with `pprint.pprint` or use some already ready solutions to easily view json from a dashboard or mail. 
 - Removed imports from the no more `parse_issue` module from the root `__init__.py` from the public API. 
+- Added `bullet_summary_prompt`, `high_level_summary_prompt`, and `model` parameters to the `main` function in `change.py` to not be completely reliant on `Packer`. 
+- User written message clean up to be a bit more logical first remove excess the updated first character or add a "." if needed. 
 
 ### Fixed
 - Mistakes in the `CHANGELOG`, created by `change.py`, I will look more into this and hopefully find the reason soon and fix them, report if you know anything. 

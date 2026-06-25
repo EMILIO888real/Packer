@@ -9,7 +9,9 @@ from ollama import chat
 
 from packer.config import all_settings
 
-def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: str = '--wait', modification_types: list[str] = ['c'], overall_description: str = None, ai_summary: bool = True, verbose: bool = True):
+def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: str = '--wait', modification_types: list[str] = ['c'],
+         overall_description: str = None, ai_summary: bool = True, verbose: bool = True,
+         bullet_summary_prompt = all_settings.changes_summary_prompt, high_level_summary_prompt = all_settings.high_level_summary_prompt, model: str = all_settings.model):
     '''
     Opens a temporary file in the specified text editor for describing the project's modification
 
@@ -31,6 +33,12 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
     :type ai_summary: bool
     :param verbose: Whether to print verbose output (default is True)
     :type verbose: bool
+    :param bullet_summary_prompt: The prompt template for generating bullet point summaries (default is all_settings.changes_summary_prompt)
+    :type bullet_summary_prompt: list[dict]
+    :param high_level_summary_prompt: The prompt template for generating high-level summaries (default is all_settings.high_level_summary_prompt)
+    :type high_level_summary_prompt: list[dict]
+    :param model: The AI model to use for generating summaries (default is all_settings.model)
+    :type model: str
     '''
 
     text_editor = which(text_editor)
@@ -46,12 +54,12 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
                 'changes': ','.join(modification_types)
             }
 
-        all_settings.changes_summary_prompt[1]['content'] = Template(all_settings.changes_summary_prompt[1 if all_settings.changes_summary_prompt[1]['role'] == 'user' else 0]['content']).substitute(summary_data)
+        bullet_summary_prompt[1]['content'] = Template(bullet_summary_prompt[1 if bullet_summary_prompt[1]['role'] == 'user' else 0]['content']).substitute(summary_data)
         if verbose:
             print('Generating bullet summary...')
         bullet_summary = chat(
-        model=all_settings.model,
-        messages=all_settings.changes_summary_prompt,
+        model=model,
+        messages=bullet_summary_prompt
         )['message']['content'].strip()
 
 
@@ -59,12 +67,12 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
             'bullet_summary': bullet_summary
         }
 
-        all_settings.high_level_summary_prompt[1]['content'] = Template(all_settings.high_level_summary_prompt[1 if all_settings.high_level_summary_prompt[1]['role'] == 'user' else 0]['content']).substitute(high_level_summary_data)
+        high_level_summary_prompt[1]['content'] = Template(high_level_summary_prompt[1 if high_level_summary_prompt[1]['role'] == 'user' else 0]['content']).substitute(high_level_summary_data)
         if verbose:
             print('Generating high level summary...')
         high_level_summary = chat(
-        model='mistral',
-        messages=all_settings.high_level_summary_prompt,
+        model=model,
+        messages=high_level_summary_prompt
         )['message']['content'].strip()
 
 
@@ -87,12 +95,7 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
 
         with open(temp_path) as f:
             message = f.read().strip()
-
-        message = f'{message[:1].capitalize()}{message[1:]}'
         remove(temp_path)
-
-        if not message.endswith('.'):
-            message = f'{message}.'
 
         match modification_type:
             case 'a':
@@ -109,6 +112,10 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
         message = message.lstrip()
         message = message.lstrip(modification_type)
         message = message.strip()
+
+        message = f'{message[:1].capitalize()}{message[1:]}'
+        if not message.endswith('.'):
+            message = f'{message}.'
 
         messages.append([modification_type, message])
 
