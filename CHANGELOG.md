@@ -1,17 +1,23 @@
 ## [%new_version] - %date
 
 ### Added
+- a setting to disable and or enable automatic error report via the internet using formspree.io. 
+- Documentation for the new settings in it's dedicated file `SETTINGS.md`. 
 
 ### Changed
+- Output of the `global_exception_handler` to be cleaner. 
+- Removed `parse_issue.py`, since there are no archives anymore and all error reports are a single json, so to output it cleanly print it out with `pprint.pprint` or use some already ready solutions to easily view json from a dashboard or mail. 
+- Removed imports from the no more `parse_issue` module from the root `__init__.py` from the public API. 
 
 ### Fixed
+- Mistakes in the `CHANGELOG`, created by `change.py`, I will look more into this and hopefully find the reason soon and fix them, report if you know anything. 
 
 ---
 
 ## [0.14.1] - 2026-06-25
 
 ### Added
-- [b947c7a] utomatic error report via the internet using formspree.io API. 
+- [b947c7a] automatic error report via the internet using formspree.io API. 
 - [e6a7b22] Clean fallback methods of reporting errors like opening user's default email client with already filled out data, user just needs to hit send or opening a GitHub issue creation.
 
 ### Changed
@@ -38,7 +44,7 @@
 
 ### Changed
 - [b3653ff] Gave up on writing ROADMAP.md, since I have never wanted to write, possible in the future will create a bot to write it from the `TODO.md`. 
-- c [04105b3] osen description and chosen title file extensions to .md, instead of .txt for nicer text editor or IDE support. 
+- [04105b3] chosen description and chosen title file extensions to .md, instead of .txt for nicer text editor or IDE support. 
 - [254fa7d] Program name to capitalize only it's first letter. 
 - [a28a2b7] The `CLI` `setup` command for the setup function is updated to call tui function in `src/packer/ui/cli.py` with passing flags as arguments to it if provided. 
 - [a28a2b7] Documentation of `setup` `tui` function to be more accurate. 
@@ -103,7 +109,7 @@
 - [d41a836] The codebase has moved all functions that could be relevant for many projects to the `et` module. This includes loading and merging settings, normalizing settings keys, and resolving versions, `utils module`, becomes empty for the time being. 
 - [d41a836] The default settings JSON file in assets directory has been removed, since the logic for loading global packer settings has changed in `config.py` to rely on the pydantic module, there is no need for 2 copies of the settings. 
 - [d41a836] s have been made to the `load_config`, `simple_merge_settings`, and `normalize_settings_keys` functions in the `utils.py` module to import these new functions from the `et` module. 
--  [d5d9928] ompletely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
+-  [d5d9928] completely overhauled `etf.py` module to now mostly just contain python objects for manipulating and managing terminal states for immersive UI's and other interfaces, most of these functions came from `et.py`. This overhaul includes documentation for both modules. 
 - [d5d9928] Updated all imports in the entire project to utilize both modules `et` and `etf` to handle the new python object locations gracefully. 
 - [def6e30] Introduced `projects_file_path` and `settings_file_path` in paths.py. 
 - [3483c8a] Overall description or high level summary to write out to the tmp file if AI summary isn't in use. 
@@ -151,7 +157,7 @@
 - [f72f99c] `setup` `main` function's doctype to be more accurate to current state and added `ui` folder to it's creation. 
 - [8f1e377] Function `main` now accepts additional arguments: wait_flag, modification_types (default is ['c']), ai_summary (default is True), and verbose (default is True). 
 - [ecf3e4f] Function `which` is imported and used for finding the executable path of a text editor in the `CLI` module. 
-- [2fbf590] ompletely overhauled the README to use the same kind of structure that the `setup` generates as a README template. 
+- [2fbf590] completely overhauled the README to use the same kind of structure that the `setup` generates as a README template. 
 - [2fbf590] `Project.md` file to also display the new `changelog_git_hash` settings field. 
 - [2fbf590] `changes_summary_prompt` to not include a negative prompt to not utilize multi level lists. 
 - [ea29623] Modified README.md: Updates the link to the settings documentation from "docs/PROJECT.md" and "docs/CLI.md" to "docs/SETTINGS.md". The new link includes both global Packer settings and project-specific settings, while the old links only covered project-specific settings. 

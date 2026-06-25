@@ -26,6 +26,10 @@ The following options appear in the global `settings.json` file.
 | `changes_summary_prompt` | `list[dict[str, str]]` | prompt template | Template used for AI-assisted summaries of git diffs. This is typically a system/user prompt pair. |
 | `high_level_summary_prompt` | `list[dict[str, str]]` | prompt template | Template used to convert a bullet summary into one concise high-level sentence. |
 | `model` | `str` | `mistral` | Default model name used for AI generation tasks in Packer. |
+| `getpass_echo_char` | `str \| None` | `None` | Character used to echo input when prompting for passwords. Set to `null` to disable echoing. |
+| `copy_github_release_clipboard` | `bool` | `true` | Copy the GitHub release URL to the clipboard after creating a release. |
+| `open_gitHub_release` | `bool` | `true` | Open the GitHub release page in the default browser after creating a release. |
+| `automatic_error_reporting` | `bool` | `true` | Automatically send error reports to the Packer developers for debugging purposes. |
 
 ## Prompt settings
 
@@ -41,3 +45,4 @@ These values are passed directly to the AI model and can be edited to adjust ton
 - These settings are global and apply to all Packer-managed projects for the current user.
 - Project-specific settings such as `gofile_user_token`, `github_repo_url`, and `compile_command` are documented in `docs/PROJECT.md`.
 - Changes to `settings.json` are loaded when Packer starts.
+

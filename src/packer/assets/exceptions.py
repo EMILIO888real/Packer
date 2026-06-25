@@ -10,7 +10,7 @@ from webbrowser import open_new_tab
 from urllib import parse
 
 from packer.custom_modules.etf import print_colored_text, prompt_user
-from packer.config import packer_version
+from packer.config import packer_version, all_settings
 from packer.paths import log_path, error_report_path
 
 
@@ -28,6 +28,8 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
 
     if issubclass(exc_type, KeyboardInterrupt) or issubclass(exc_type, SystemExit): # Ignore any errors when quitting the program.
         return
+
+    print_colored_text(f'An error has occurred: Type: {exc_type} | Value: {exc_value}', [255, 0, 0])
 
     try:
         user_notes = input('Could you explain a bit more about the error? What, How or When did the error happen?\nInput: ')
@@ -51,15 +53,16 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
 
     print_colored_text(f'error report generated at: "{error_report_path.absolute()}"', [0, 255, 0])
 
-    print('Automatically reporting the problem via formspree.io...')
-    if not report_error(error_report):
-        if prompt_user('Open the default email client if no then GitHub new issue creation will be opened in the default browser'):
-            copy(error_report)
-            print('We copied the error report to your clipboard')
-            open_new_tab('https://github.com/EMILIO888real/Packer/issues/new')
-        else:
-            print('Specify your email if needed and hit send')
-            prompt_user_to_email(error_report)
+    if all_settings.automatic_error_reporting:
+        print('Automatically reporting the problem via formspree.io...')
+        if not report_error(error_report):
+            if prompt_user('Open the default email client if no then GitHub new issue creation will be opened in the default browser'):
+                copy(error_report)
+                print('We copied the error report to your clipboard')
+                open_new_tab('https://github.com/EMILIO888real/Packer/issues/new')
+            else:
+                print('Specify your email if needed and hit send')
+                prompt_user_to_email(error_report)
     sys.exit(1)
 
 
