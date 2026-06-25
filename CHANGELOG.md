@@ -1,15 +1,15 @@
-## [%new_version] - %date
+## [0.14.1] - 2026-06-25
 
 ### Added
-- utomatic error report via the internet using formspree.io API. 
-- Clean fallback methods of reporting errors like opening user's default email client with already filled out data, user just needs to hit send or opening a GitHub issue creation. 
+- [b947c7a] utomatic error report via the internet using formspree.io API. 
+- [e6a7b22] Clean fallback methods of reporting errors like opening user's default email client with already filled out data, user just needs to hit send or opening a GitHub issue creation.
 
 ### Changed
-- `global_exception_handler` to not create an archive with an error report and the associated log, but instead just an error report with the log pasted in. 
-- Automatic error reporting to be cleaner and handle any foreseeable problems that I saw. 
+- [e6a7b22] `global_exception_handler` to not create an archive with an error report and the associated log, but instead just an error report with the log pasted in. 
+- [e6a7b22] Automatic error reporting to be cleaner and handle any foreseeable problems that I saw.
 
 ### Fixed
-- Added formatting change: `str()` function is used to convert the timestamp into a string format in the error report. 
+- [8c6b953] Added formatting change: `str()` function is used to convert the timestamp into a string format in the error report.
 
 ---
 
