@@ -9,7 +9,7 @@ from ollama import chat
 
 from packer.config import all_settings
 
-def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: str = '--wait', modification_types: list[str] = ['c'],
+def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag, modification_types: list[str] = ['c'],
          overall_description: str = None, ai_summary: bool = True, verbose: bool = True,
          bullet_summary_prompt = all_settings.changes_summary_prompt, high_level_summary_prompt = all_settings.high_level_summary_prompt, model: str = all_settings.model):
     '''
@@ -147,26 +147,31 @@ def main(git_directory: str | Path = '.', text_editor: str = 'code', wait_flag: 
     run(['git', 'commit', '-m', git_message.strip()])
     run(['git', 'push'])
 
-def tui():
+def tui(changes: list[str] | None = None, overall_description: str | None = None):
     '''
     Launches a text-based user interface for creating project change logs and committing them.
 
     This function is intended to be used as an entry point for a TUI that guides the user
-    through creating a changelog entry and committing it to the repository.
+    through creating changelog entries and committing them to the repository.
     '''
 
-    amount = int(input('Enter the amount of changes: '))
-    if amount > 1:
-        print('Enter each change idvidually, both in terminal and text editor.')
+    if not changes:
+        amount = int(input('Enter the amount of changes: '))
+        if amount > 1:
+            print('Enter each change idvidually, both in terminal and text editor.')
 
-    changes = []
-    for _ in range(amount):
-        changes.append(input('Enter the modification type [a, c, f] ').strip().lower())
-    if len(changes) > 1:
-        overall_description = input('High level description for all changes together [None]: ').strip()
-    else:
-        overall_description = None
-    main(text_editor=all_settings.text_editor, wait_flag=all_settings.wait_flag, modification_types=changes, overall_description=overall_description)
+        changes = []
+        for _ in range(amount):
+            changes.append(input('Enter the modification type [a, c, f] ').strip().lower())
+
+    if not overall_description:
+        if len(changes) > 1:
+            overall_description = input('High level description for all changes together [None]: ').strip()
+        else:
+            overall_description = None
+
+    return (changes, overall_description)
 
 if __name__ == '__main__':
-    tui()
+    output = tui()
+    main(modification_types=output[0], overall_description=output[1])

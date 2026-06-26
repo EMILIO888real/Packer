@@ -4,6 +4,8 @@
 - a setting to disable and or enable automatic error report via the internet using formspree.io. 
 - Documentation for the new settings in it's dedicated file `SETTINGS.md`. 
 - Introduced error handling and retry mechanism when publishing a GitHub release. 
+- `find_user_project` function to the config to able to more easily search for a project saved by packer using only it's name, instead of a full path. 
+- `change` command to the CLI to be able to launch the `change` module of `Packer` without needing to import it on any of your projects with `Packer` settings being respected. 
 
 ### Changed
 - Output of the `global_exception_handler` to be cleaner. 
@@ -11,6 +13,7 @@
 - Removed imports from the no more `parse_issue` module from the root `__init__.py` from the public API. 
 - Added `bullet_summary_prompt`, `high_level_summary_prompt`, and `model` parameters to the `main` function in `change.py` to not be completely reliant on `Packer`. 
 - User written message clean up to be a bit more logical first remove excess the updated first character or add a "." if needed. 
+- `tui` function in `change.py` to be able to pass all input that it requests and then the tui only prompts for the missing data and returns all data in a tuple, so it's easily usable in the CLI and TUI. 
 
 ### Fixed
 - Mistakes in the `CHANGELOG`, created by `change.py`, I will look more into this and hopefully find the reason soon and fix them, report if you know anything. 

@@ -13,9 +13,10 @@ from packer.custom_modules.et import resolve_version, normalize_settings_keys
 from packer.custom_modules.etf import stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path
-from packer.config import Project, packer_version, projects_configurations, all_settings
+from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project
 from packer.core import Packer
 from packer.setup import main as setup, tui
+from packer.change import main as change, tui as change_tui
 
 def _clear_path(path: str | Path) -> None:
     path = Path(path)
@@ -66,6 +67,11 @@ def main():
     import_command_parser.add_argument('-p', '--path', dest='import_path', required=True, help='Path to the archive to import')
     import_command_parser.add_argument('-s', '--safe', dest='import_safe', help='Password to the archive')
 
+    change_command_parser = subparsers.add_parser('change', help='Commit a change of a packer like style project')
+    change_command_parser.add_argument('-p', '--project', dest='change_project', help='Specify the project')
+    change_command_parser.add_argument('-c', '--changes', dest='change_changes', help='Specify the changes')
+    change_command_parser.add_argument('-o', '--overall-description', dest='change_overall_description', help='Specify the overall description, only in use if there are more than 1 change')
+
 
     args = parser.parse_args()
 
@@ -91,18 +97,13 @@ def main():
 
         case 'run':
             user_chosen_project = args.project if args.project else stripped_input('Enter the project to update: ')
-            project_config = None
-            project_path = None
 
-            for candidate_path in projects_configurations.keys():
-                if Path(candidate_path).name == user_chosen_project:
-                    project_path = Path(candidate_path)
-                    project_config = Project(**normalize_settings_keys(projects_configurations[candidate_path]))
-                    break
-
+            project_path = find_user_project(user_chosen_project)
             if not project_path:
                 print(f'No such project found: {user_chosen_project}')
                 sys.exit(1)
+
+            project_config = Project(**normalize_settings_keys(projects_configurations[project_path]))
 
             with open(f'{project_path}/src/{project_config.program_name}/assets/version.json') as version_handle:
                 current_version = load(version_handle)
@@ -207,6 +208,16 @@ def main():
                 dump(existing_settings)
             
             rmtree(tmp_dir)
+        
+        case 'change':
+            project = find_user_project(args.change_project if args.change_project else Path().cwd().name)
+            if project:
+                output = change_tui(args.change_changes, args.change_overall_description)
+                change(project, modification_types=output[0], overall_description=output[1])
+            else:
+                print(f'I couldn\'t find your project: {project}')
+                sys.exit(1)
+
 
     if args.paths:
         print(f'root_dir: {root_dir}')

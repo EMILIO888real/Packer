@@ -188,3 +188,12 @@ def _getpass(prompt: str) -> str:
     :rtype: str
     '''
     return getpass(prompt, echo_char=all_settings.getpass_echo_char)
+
+def find_user_project(name: str) -> Path | None:
+    name.lower()
+
+    for candidate_path in projects_configurations.keys():
+        if Path(candidate_path).name.lower() == name:
+            return Path(candidate_path)
+    
+    return None
