@@ -6,6 +6,7 @@
 - Introduced error handling and retry mechanism when publishing a GitHub release. 
 - `find_user_project` function to the config to able to more easily search for a project saved by packer using only it's name, instead of a full path. 
 - `change` command to the CLI to be able to launch the `change` module of `Packer` without needing to import it on any of your projects with `Packer` settings being respected. 
+- Documentation for doing manual operation that the `revert_changes` method of `Packer` executes in case it fails catastrophically. 
 
 ### Changed
 - Output of the `global_exception_handler` to be cleaner. 
