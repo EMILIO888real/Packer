@@ -151,7 +151,7 @@ def main():
             
             
         case 'setup':
-                print(f'''Github repository url: {setup(tui(args.setup_path,
+                print(f'''Github repository url: {setup(*tui(args.setup_path,
                     args.setup_author_name,
                     args.setup_program_name,
                     args.setup_github_pat,

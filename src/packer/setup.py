@@ -599,9 +599,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         '''))
 
     if license_type:
-        license_text = g.get_license(license_type).body
-        license_text.replace('[year]', str(datetime.now().year))
-        license_text.replace('[fullname]', author_name)
+        license_text = g.get_license(license_type).body.replace('[year]', str(datetime.now().year)).replace('[fullname]', author_name)
 
         print_and_log(f'Creating an {license_type} license...')
         with open('LICENSE', 'w') as f:
