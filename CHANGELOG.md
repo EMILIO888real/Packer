@@ -1,29 +1,29 @@
-## [%new_version] - %date
+## [0.15.0] - 2026-06-27
 
 ### Added
-- a setting to disable and or enable automatic error report via the internet using formspree.io. 
-- Documentation for the new settings in it's dedicated file `SETTINGS.md`. 
-- Introduced error handling and retry mechanism when publishing a GitHub release. 
-- `find_user_project` function to the config to able to more easily search for a project saved by packer using only it's name, instead of a full path. 
-- `change` command to the CLI to be able to launch the `change` module of `Packer` without needing to import it on any of your projects with `Packer` settings being respected. 
-- Documentation for doing manual operation that the `revert_changes` method of `Packer` executes in case it fails catastrophically. 
-- Parameter to the `setup` function `license_type`, where you can specify a standart license that will be fetched from GitHub with the option to skip it and create your own later. 
-- Local installation of the new project in editable mode for `setup` via `pip install -e .`. 
+- [dc8938e] a setting to disable and or enable automatic error report via the internet using formspree.io. 
+- [dc8938e] Documentation for the new settings in it's dedicated file `SETTINGS.md`. 
+- [9598543] Introduced error handling and retry mechanism when publishing a GitHub release. 
+- [5381336] `find_user_project` function to the config to able to more easily search for a project saved by packer using only it's name, instead of a full path. 
+- [5381336] `change` command to the CLI to be able to launch the `change` module of `Packer` without needing to import it on any of your projects with `Packer` settings being respected. 
+- [facdb3b] Documentation for doing manual operation that the `revert_changes` method of `Packer` executes in case it fails catastrophically. 
+- [1e88c1e] Parameter to the `setup` function `license_type`, where you can specify a standart license that will be fetched from GitHub with the option to skip it and create your own later. 
+- [1e88c1e] Local installation of the new project in editable mode for `setup` via `pip install -e .`.
 
 ### Changed
-- Output of the `global_exception_handler` to be cleaner. 
-- Removed `parse_issue.py`, since there are no archives anymore and all error reports are a single json, so to output it cleanly print it out with `pprint.pprint` or use some already ready solutions to easily view json from a dashboard or mail. 
-- Removed imports from the no more `parse_issue` module from the root `__init__.py` from the public API. 
-- Added `bullet_summary_prompt`, `high_level_summary_prompt`, and `model` parameters to the `main` function in `change.py` to not be completely reliant on `Packer`. 
-- User written message clean up to be a bit more logical first remove excess the updated first character or add a "." if needed. 
-- `tui` function in `change.py` to be able to pass all input that it requests and then the tui only prompts for the missing data and returns all data in a tuple, so it's easily usable in the CLI and TUI. 
-- Project settings documentation to be much better and clearer, like clarifying that project-specific settings are stored in `projects.json` instead of `settings.json`. 
-- `PyInstaller` verification and automatic running to be much smoother in case it fails it is copied to the user's download directory for inspection and the setup process can keep going on. 
-- `pip_install` install function it `utils.py` to actually function correctly, not installing twice and as such, *I think I might have been on something when writing it*. 
+- [dc8938e] Output of the `global_exception_handler` to be cleaner. 
+- [dc8938e] Removed `parse_issue.py`, since there are no archives anymore and all error reports are a single json, so to output it cleanly print it out with `pprint.pprint` or use some already ready solutions to easily view json from a dashboard or mail. 
+- [dc8938e] Removed imports from the no more `parse_issue` module from the root `__init__.py` from the public API. 
+- [f5e0aa5] Added `bullet_summary_prompt`, `high_level_summary_prompt`, and `model` parameters to the `main` function in `change.py` to not be completely reliant on `Packer`. 
+- [f5e0aa5] User written message clean up to be a bit more logical first remove excess the updated first character or add a "." if needed. 
+- [5381336] `tui` function in `change.py` to be able to pass all input that it requests and then the tui only prompts for the missing data and returns all data in a tuple, so it's easily usable in the CLI and TUI. 
+- [1e88c1e] Project settings documentation to be much better and clearer, like clarifying that project-specific settings are stored in `projects.json` instead of `settings.json`. 
+- [1e88c1e] `PyInstaller` verification and automatic running to be much smoother in case it fails it is copied to the user's download directory for inspection and the setup process can keep going on. 
+- [1e88c1e] `pip_install` install function it `utils.py` to actually function correctly, not installing twice and as such, *I think I might have been on something when writing it*.
 
 ### Fixed
-- Mistakes in the `CHANGELOG`, created by `change.py`, I will look more into this and hopefully find the reason soon and fix them, report if you know anything. 
-- Various code mistakes to correctly create a new project using the `setup` function, like saving manually the version as a string at the moment instead of calling a non-existent function. 
+- [dc8938e] Mistakes in the `CHANGELOG`, created by `change.py`, I will look more into this and hopefully find the reason soon and fix them, report if you know anything. 
+- [1e88c1e] Various code mistakes to correctly create a new project using the `setup` function, like saving manually the version as a string at the moment instead of calling a non-existent function.
 
 ---
 
