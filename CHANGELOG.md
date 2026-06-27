@@ -7,6 +7,8 @@
 - `find_user_project` function to the config to able to more easily search for a project saved by packer using only it's name, instead of a full path. 
 - `change` command to the CLI to be able to launch the `change` module of `Packer` without needing to import it on any of your projects with `Packer` settings being respected. 
 - Documentation for doing manual operation that the `revert_changes` method of `Packer` executes in case it fails catastrophically. 
+- Parameter to the `setup` function `license_type`, where you can specify a standart license that will be fetched from GitHub with the option to skip it and create your own later. 
+- Local installation of the new project in editable mode for `setup` via `pip install -e .`. 
 
 ### Changed
 - Output of the `global_exception_handler` to be cleaner. 
@@ -15,9 +17,13 @@
 - Added `bullet_summary_prompt`, `high_level_summary_prompt`, and `model` parameters to the `main` function in `change.py` to not be completely reliant on `Packer`. 
 - User written message clean up to be a bit more logical first remove excess the updated first character or add a "." if needed. 
 - `tui` function in `change.py` to be able to pass all input that it requests and then the tui only prompts for the missing data and returns all data in a tuple, so it's easily usable in the CLI and TUI. 
+- Project settings documentation to be much better and clearer, like clarifying that project-specific settings are stored in `projects.json` instead of `settings.json`. 
+- `PyInstaller` verification and automatic running to be much smoother in case it fails it is copied to the user's download directory for inspection and the setup process can keep going on. 
+- `pip_install` install function it `utils.py` to actually function correctly, not installing twice and as such, *I think I might have been on something when writing it*. 
 
 ### Fixed
 - Mistakes in the `CHANGELOG`, created by `change.py`, I will look more into this and hopefully find the reason soon and fix them, report if you know anything. 
+- Various code mistakes to correctly create a new project using the `setup` function, like saving manually the version as a string at the moment instead of calling a non-existent function. 
 
 ---
 

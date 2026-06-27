@@ -1,9 +1,10 @@
 
+from datetime import datetime
 from getpass import getuser
 from importlib import import_module
-from os import chdir, mkdir
+from os import chdir, listdir, mkdir
 from pathlib import Path
-from shutil import rmtree
+from shutil import copy, rmtree
 from subprocess import CalledProcessError, run
 from textwrap import dedent
 from typing import Sequence
@@ -14,13 +15,14 @@ from multiprocessing import Process, Event
 from sys import exit, platform, builtin_module_names
 from re import match
 from keyword import iskeyword
-from packer.utils import pip_install
 from platformdirs import user_documents_dir
 
+from packer.utils import pip_install
 from packer.custom_modules.et import init_logger, tree
 from packer.custom_modules.etf import print_colored_text, simple_prompt, stripped_input
 from packer.config import packer_version, _getpass
 from packer.custom_modules.etf import print_list
+from packer.paths import download_dir
 
 logger = init_logger('packer setup', 'EMILIO')
 
@@ -49,7 +51,7 @@ def _create_venv(created_venv) -> None:
     run(['python', '-m', 'venv', '.venv'])
     created_venv.set()
 
-def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, overwrite_existing: bool = False, gofile_code: str | None = None) -> str:
+def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, overwrite_existing: bool = False, gofile_code: str | None = None, license_type: str | None = 'MIT') -> str:
     '''Set up a new project scaffold and initialize its local Git history.
 
     The generated layout currently looks like this:
@@ -107,6 +109,14 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :return: The URL of the created GitHub repository, if there is one
     :rtype: str | None
     '''
+
+    if license_type:
+        g = Github()
+
+        licenses = g.get_licenses()
+
+        if license_type not in licenses:
+            print('Unknown license type\nExiting...')
 
     root_dir = f'src/{program_name}'
 
@@ -222,7 +232,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             from {program_name}.paths import assets_dir
                        
             with open(f'{{assets_dir}}/version.json') as f:
-                {program_name}_version = format_version_text(load(f))
+                {program_name}_version = '0.1.0' # You should replace this with a function to get the version from the json file or something, et has one if you want.
         '''))
 
     print_and_log('Creating build.yaml file...')
@@ -429,7 +439,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             version = "0.0.0"
             description = "A short description about your program: {program_name}."
             readme = "README.md"
-            license = "MIT"
+            license = "{license_type}"
             dependencies = [
                 "platformdirs"
             ]
@@ -588,9 +598,14 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             - [ ] Stable release with all planned features implemented and tested.
         '''))
 
-    print_and_log('Creating an MIT license...')
-    with open('LICENSE', 'w') as f:
-        f.write(f'MIT License\n\nCopyright (c) 2025 {author_name}\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n')
+    if license_type:
+        license_text = g.get_license(license_type).body
+        license_text.replace('[year]', str(datetime.now().year))
+        license_text.replace('[fullname]', author_name)
+
+        print_and_log(f'Creating an {license_type} license...')
+        with open('LICENSE', 'w') as f:
+            f.write(license_text)
 
     print_and_log('Creating .spec file...')
     with open(f'main.spec', 'w') as f:
@@ -639,13 +654,26 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Removing build directory...')
     rmtree('build')
 
+    successfully_built = False
     print_and_log(f'We will start bundled version up for you automatically. It should just print out in the black box "Hello world!"')
     try:
         output = run([f'./dist/{program_name}{'.exe' if platform == 'win32' else ''}'], capture_output=True, text=True, check=True).stdout.rstrip('\n')
         print_and_log(f'Successfully ran the build. The output: {output}', end=' ')
-        print_and_log(f'[{'valid' if output == 'Hello, world!' else 'invalid'}]', 30, [0, 255, 0] if output == 'Hello, world!' else [255, 0, 0])
+        successfully_built = output == 'Hello, world!'
+        print_and_log(f'[{'valid' if successfully_built else 'invalid'}]', 30, [0, 255, 0] if successfully_built else [255, 0, 0])
     except CalledProcessError as e:
         print_and_log(f'Something went wrong in the built version: {e}', 30, [255, 0, 0])
+
+    if not successfully_built:
+        if listdir('dist') != []:
+            executable_name = f'{program_name}'
+            if platform == 'win32':
+                executable_name += '.exe'
+
+            copy(f'dist/{executable_name}', f'{download_dir}/{executable_name}')
+            print_and_log('Copied the broken executable to your downloads directory for your inspection')
+        else:
+            print_and_log('Failed to create the executable entirely, skipping copying')
 
     print_and_log('Removing dist directory...')
     rmtree('dist')
@@ -675,9 +703,11 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Installing platformdirs package into venv')
     pip_install(['platformdirs'])
 
-    packages = input('Enter other packages to install [None] ').split(' ')
-    if packages:
-        pip_install(packages)
+    print_and_log('Installing your project in editable mode in .venv...')
+    python_exe_path = ('.venv/Scripts/python.exe'
+            if platform == 'win32'
+            else '.venv/bin/python')
+    run([python_exe_path, '-m', 'pip', 'install', '-e', '.'])
 
     print_and_log('Staging files for initial commit...')
     repo.git.add(all=True)
@@ -774,12 +804,12 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
             author_name = default_name
     
     if not gofile_code:
-        gofile_code = stripped_input('6. GoFile code: ') or None
+        gofile_code = stripped_input('6. GoFile code [None]: ') or None
 
     return (project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code)
 
 if __name__ == '__main__':
-    print('You will need to configure [4-5] settings.')
+    print('You will need to configure [idk] settings.')
     try:
         print(f'github repo url: {main(*tui())}')
     except KeyboardInterrupt:

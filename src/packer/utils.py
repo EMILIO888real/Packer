@@ -15,14 +15,10 @@ def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
     :param python_exe_path: Path to the Python executable to use for installation.
         If None, the CWD .venv executable is used
     :type python_exe_path: str | Path | None
-    :return: None
-    :rtype: None
     '''
-    cmd = [python_exe_path or 'python', '-m', 'pip', 'install'] + packages
-    run(cmd, check=True)
+    
     if not python_exe_path:
-        if platform == 'win32':
-            python_exe = Path('.venv/Scripts/python.exe')
-        else:
-            python_exe = Path('.venv/bin/python')
-    run([str(python_exe), '-m', 'pip', 'install', *packages], check=True)
+        python_exe_path = ('.venv/Scripts/python.exe'
+            if platform == 'win32'
+            else '.venv/bin/python')
+    run([python_exe_path, '-m', 'pip', 'install', *packages], check=True)

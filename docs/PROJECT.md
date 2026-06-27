@@ -1,71 +1,111 @@
-# All of the Project related settings structure and values
+# Project Settings
 
-*project related settings* are those that are unique to each project created, there are also user settings that is uniform for all settings. Second are to control general behavior of Packer.
+This document describes the project-specific Packer settings stored in the user configuration directory.
+
+Unlike the global settings in `settings.json`, these settings are unique to each Packer-managed project and are stored in `projects.json`.
 
 ## File locations
 
-Config files are stored in the user's platform-specific config directory using `user_config_dir('packer', 'EMILIO', ensure_exists=True)`. The two main config files are `settings.json` and `projects.json`.
+Project settings are stored in the platform-specific Packer config directory.
 
-| OS      | Path                                                           |
-|---------|----------------------------------------------------------------|
-| Linux   | `~/.config/packer/settings.json`                              |
-|         | `~/.config/packer/projects.json`                              |
-| macOS   | `~/Library/Application Support/packer/settings.json`          |
-|         | `~/Library/Application Support/packer/projects.json`          |
-| Windows | `C:\Users\<username>\AppData\Local\EMILIO\packer\settings.json` |
-|         | `C:\Users\<username>\AppData\Local\EMILIO\packer\projects.json` |
+| OS      | Path                                                            |
+| ------- | --------------------------------------------------------------- |
+| Linux   | `~/.config/packer/projects.json`                                |
+| macOS   | `~/Library/Application Support/packer/projects.json`            |
+| Windows | `C:\Users\<username>\AppData\Local\EMILIO\packer\projects.json` |
 
 ## Settings
 
-| Setting                     | Type                             | Value                                                                                                   | Description                                                                                                                                                       |
-|-----------------------------|----------------------------------|---------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| gofile_user_token           | str                              |                                                                                                         | Token for accessing gofile API.                                                                                                                                   |
-| gofile_folder_id            | str                              |                                                                                                         | ID of the folder in gofile where files are uploaded.                                                                                                              |
-| github_repo_token           | str                              |                                                                                                         | Token for accessing GitHub repository.                                                                                                                            |
-| changelog_git_hash         | bool                              |   True                                                                                                      | Whether to add git hashes to the changelog entries.                                                                                                                  |
-| program_name                | str                              |                                                                                                         | Name of the program or project.                                                                                                                                   |
-| github_repo_url             | str                              |                                                                                                         | URL of the GitHub repository.                                                                                                                                     |
-| before_commands             | Sequence[Sequence[str]] \| None  | None                                                                                                    | Commands to run before committing process.                                                                                                                         |
-| after_commands              | Sequence[Sequence[str]] \| None  | None                                                                                                    | Commands to run after the committing process.                                                                                                                          |
-| compile_command             | Sequence[str] \| None            | None                                                                                                    | Command to compile the project.                                                                                                                                   |
-| model                       | str                              | 'mistral'                                                                                               | LLM model to use for generating release notes and titles.                                                                                                         |
-| description_prompt          | list[dict[str, str]]             | [ {'role': 'system', 'content': 'You are a senior developer writing professional release notes...'}, ... ] | Prompt used to generate a concise description of the changes.                                                                                                     |
-| title_prompt                | list[dict[str, str]]             | [ {'role': 'system', 'content': 'You are a cryptic oracle...'}, ... ]                                   | Prompt used to generate a mystical, indirect puzzle title for the release.                                                                                        |
-| release_notes_template_path | str \| Path                      | Path(f'{assets_dir}/RELEASE.md')                                                                        | Path to the template file used for generating release notes.                                                                                                      |
+The following options are stored for each project in `projects.json`.
 
-### Release notes template file structure
+| Setting                       | Type                              | Default             | Description                                                                                                         |
+| ----------------------------- | --------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `gofile_user_token`           | `str`                             | —                   | GoFile API token used to upload release archives.                                                                   |
+| `gofile_folder_id`            | `str`                             | —                   | ID of the GoFile folder where release archives are uploaded.                                                        |
+| `github_repo_token`           | `str`                             | —                   | GitHub personal access token used for repository operations.                                                        |
+| `github_repo_url`             | `str`                             | —                   | GitHub repository URL in the form `username/repository`.                                                            |
+| `program_name`                | `str`                             | —                   | Name of the project used throughout generated releases and documentation.                                           |
+| `changelog_git_hash`          | `bool`                            | `true`              | Include commit hashes in generated changelog entries.                                                               |
+| `before_commands`             | `Sequence[Sequence[str]] \| None` | `None`              | Commands executed before the release process begins. Each command is represented as a sequence of arguments.        |
+| `after_commands`              | `Sequence[Sequence[str]] \| None` | `None`              | Commands executed after the release process completes. Each command is represented as a sequence of arguments.      |
+| `compile_command`             | `Sequence[str] \| None`           | `None`              | Command used to build or compile the project before packaging.                                                      |
+| `model`                       | `str`                             | `mistral`           | AI model used when generating release titles and descriptions for this project. Overrides the global model setting. |
+| `description_prompt`          | `list[dict[str, str]]`            | prompt template     | Prompt template used to generate the release description.                                                           |
+| `title_prompt`                | `list[dict[str, str]]`            | prompt template     | Prompt template used to generate the release title.                                                                 |
+| `release_notes_template_path` | `str \| Path`                     | `assets/RELEASE.md` | Path to the release notes template used when generating GitHub releases.                                            |
 
-The release notes template contains the following sections:
+## Release notes template
 
-**Header**
-- `$program_name Update [$new_version]` - Title with program name and new version number
+`release_notes_template_path` points to the Markdown template used when generating GitHub releases.
 
-**Description**
-- `$version_description` - AI-generated concise description of the changes in this release
+The default template is:
+[`RELEASE.md`](../src/packer/assets/RELEASE.md).
 
-**Installation**
-- Provides two installation options:
-  - **GitHub**: Clone repository link using the `$github_repo_url`
-  - **GoFile**: Third-party archive download link using `$gofile_download_url`
-- Includes clone command and instructions for both methods
-- References README for post-installation setup
+Supported template variables:
 
-**Changes**
-- `$latest_changelog` - The changelog entries for the current version
-- Link to full changelog on GitHub master branch
-
-**Tips**
-- Explains differences between GitHub and GoFile distributions
-- GitHub contains all versions but is larger; GoFile contains only the newest version
-- Highlights advantages of GitHub installation (easy updates via git pull)
-
-**Template Variables**
 | Variable | Description |
-|----------|-------------|
-| `$program_name` | Name of the program/project |
-| `$new_version` | The new release version number |
-| `$version_description` | short high level version description |
-| `$github_repo_url` | GitHub repository URL |
-| `$gofile_download_url` | GoFile archive download URL |
-| `$latest_changelog` | Changelog entries for the current version |
+| --- | --- |
+| `$program_name` | Project name. |
+| `$new_version` | Newly created release version. |
+| `$version_description` | AI-generated high-level summary of the release. |
+| `$github_repo_url` | GitHub repository URL. |
+| `$gofile_download_url` | GoFile archive download URL. |
+| `$latest_changelog` | Changelog entries for the current release. |
 
+See the default release template:
+[`src/packer/assets/RELEASE.md`](../src/packer/assets/RELEASE.md)
+
+A typical release template consists of the following sections:
+
+### Header
+
+Displays the project name and release version.
+
+```text
+$program_name Update [$new_version]
+```
+
+### Description
+
+Contains the AI-generated summary of the release.
+
+```text
+$version_description
+```
+
+### Installation
+
+Provides installation instructions using either:
+
+* GitHub (repository clone)
+* GoFile (downloadable release archive)
+
+This section typically includes:
+
+* Repository clone command
+* GoFile download link
+* Reference to the project's README for post-installation setup
+
+### Changes
+
+Displays the changelog entries for the current release.
+
+```text
+$latest_changelog
+```
+
+Most templates also include a link to the complete changelog in the GitHub repository.
+
+### Tips
+
+An optional section explaining the differences between the available distribution methods, for example:
+
+* GitHub contains the complete project history and supports updates via `git pull`.
+* GoFile provides only the latest packaged release and is intended for users who only need the newest version.
+
+## Notes
+
+* These settings are stored per project in `projects.json`.
+* Global settings that affect all projects are documented in `docs/SETTINGS.md`.
+* Prompt templates are passed directly to the configured AI model and can be customized to change the generated output.
+* Changes to `projects.json` are loaded when Packer starts.
