@@ -2,6 +2,7 @@
 
 ### Added
 - Implemented optional GitHub authentication using PAT (Personal Access Token) for pushing to remote repositories. 
+- Reference to the `MANUAL_REVERT.md` file has been added to the README. 
 
 ### Changed
 - Updated `CLI` documentation, mentioning the new commands, like change that weren't described before and so on. 
