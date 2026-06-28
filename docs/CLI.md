@@ -18,6 +18,8 @@ You can still run the module form during development:
 .venv/bin/python -m packer.main [global options] [command] [command options]
 ```
 
+A lot of commands flags are optional and will prompt for input if not provided. You can also use the `--help` flag to see all available options.
+
 Global options
 --------------
 
@@ -38,8 +40,8 @@ Commands
   - If no flags are provided, `clear` removes cache, config, data and logs.
 
 - `run` : Run the release/update process for a saved project.
-  - `-p, --project` : Project directory name (prompts if omitted).
-  - `-v, --version` : Target version string (prompts if omitted).
+  - `-p, --project` : Project directory name.
+  - `-v, --version` : Target version string.
 
 - `edit` : Open user files in an editor.
   - `-s, --settings` : Open `settings.json` for editing.
@@ -54,14 +56,21 @@ Commands
   - `-t, --pat`         : GitHub personal access token.
   - `-u, --github-url`  : GitHub repository URL.
   - `-o, --overwrite`   : Overwrite existing project files.
+  - `-c, --code`        : GoFile URL / code (eg. OktQl5).
+  - `-l, --license`     : License for the new project.
 
 - `export` : Export Packer user config into an encrypted ZIP archive.
   - `-p, --path` : Destination directory for the archive.
   - `-s, --safe` : Password to encrypt the archive.
 
 - `import` : Import Packer config from an archive.
-  - `-p, --path` : Path to the archive to import (required).
+  - `-p, --path` : Path to the archive to import.
   - `-s, --safe` : Password for the archive if encrypted.
+
+- `change` : Commit a change of a packer like style project
+  - `-p, --project` : Project directory name.
+  - `-c, --change` : Change description.
+  - `-o  --overall-description` : Overall description of the change.
 
 Examples
 --------

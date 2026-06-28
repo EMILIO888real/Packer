@@ -1,8 +1,14 @@
 ## [%new_version] - %date
 
 ### Added
+- Implemented optional GitHub authentication using PAT (Personal Access Token) for pushing to remote repositories. 
 
 ### Changed
+- Updated `CLI` documentation, mentioning the new commands, like change that weren't described before and so on. 
+- Enhanced the TUI (Text User Interface) to collect license type and GitHub authentication preferences from users. 
+- Updated CLI argument parsing to include new flags for license selection and GitHub authentication. 
+- GitHub license fetching to handle incorrect license types and just run better. 
+- `TUI` to update the `GoFile` code by using normal indexing, instead of reverse indexing. 
 
 ### Fixed
 - License text replacement logic in setup.py by chaining replace() calls instead of separate operations that didn't even save the results. 

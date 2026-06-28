@@ -10,7 +10,7 @@ from textwrap import dedent
 from typing import Sequence
 from json import dump
 from git import Repo
-from github import Auth, Github
+from github import Auth, Github, GithubException
 from multiprocessing import Process, Event
 from sys import exit, platform, builtin_module_names
 from re import match
@@ -51,7 +51,8 @@ def _create_venv(created_venv) -> None:
     run(['python', '-m', 'venv', '.venv'])
     created_venv.set()
 
-def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None, overwrite_existing: bool = False, gofile_code: str | None = None, license_type: str | None = 'MIT') -> str:
+def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None,
+         overwrite_existing: bool = False, gofile_code: str | None = None, license_type: str | None = 'MIT', github_auth: bool = False) -> str:
     '''Set up a new project scaffold and initialize its local Git history.
 
     The generated layout currently looks like this:
@@ -106,17 +107,13 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :type overwrite_existing: bool, optional
     :param gofile_code: The code for the GoFile folder where the project will be uploaded, defaults to None.
     :type gofile_code: str, optional
+    :param license_type: The type of license to use for the project, defaults to 'MIT'.
+    :type license_type: str, optional   
+    :param github_auth: Whether to use GitHub authentication for pushing to the remote repository, defaults to False.
+    :type github_auth: bool, optional
     :return: The URL of the created GitHub repository, if there is one
     :rtype: str | None
     '''
-
-    if license_type:
-        g = Github()
-
-        licenses = g.get_licenses()
-
-        if license_type not in licenses:
-            print('Unknown license type\nExiting...')
 
     root_dir = f'src/{program_name}'
 
@@ -599,11 +596,15 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         '''))
 
     if license_type:
-        license_text = g.get_license(license_type).body.replace('[year]', str(datetime.now().year)).replace('[fullname]', author_name)
+        g = Github()
 
-        print_and_log(f'Creating an {license_type} license...')
-        with open('LICENSE', 'w') as f:
-            f.write(license_text)
+        try:
+            license_text = g.get_license(license_type).body.replace('[year]', str(datetime.now().year)).replace('[fullname]', author_name)
+            print_and_log(f'Creating an {license_type} license...')
+            with open('LICENSE', 'w') as f:
+                f.write(license_text)
+        except GithubException:
+            print_and_log(f'Couldn\'t fetch {license_type} license from GitHub, please ensure the name is correct. | Error: {e}')
 
     print_and_log('Creating .spec file...')
     with open(f'main.spec', 'w') as f:
@@ -726,8 +727,18 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         ).clone_url
 
     if github_repo_url:
+        if github_auth:
+            print_and_log('Updating Github origin URL with PAT...')
+            authenticated_url = (
+            f"https://x-access-token:{github_pat}@github.com/"
+            f"{github_repo_url.removeprefix('https://github.com/')}"
+            )
+
         print_and_log('Creating remote repository...')
-        repo.create_remote('origin', github_repo_url)
+        if github_auth:
+            repo.create_remote('origin', authenticated_url)
+        else:
+            repo.create_remote('origin', github_repo_url)
 
         try:
             print_and_log(f'Pushing {master_branch.name} branch to origin...')
@@ -743,7 +754,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     
     return github_repo_url.lstrip('https://github.com/') if github_repo_url else None
 
-def tui(project_directory: str = None, author_name: str = None, program_name: str = None, github_pat: str = None, github_repo_url: str = None, overwrite: bool = None, gofile_code: str = None) -> tuple[str]:
+def tui(project_directory: str = None, author_name: str = None, program_name: str = None, github_pat: str = None, github_repo_url: str = None,
+        overwrite: bool = None, gofile_code: str = None, license_type: str = None, github_auth: bool = None) -> tuple[str]:
     '''
     Interactive command-line user interface for collecting project setup information.
 
@@ -752,13 +764,15 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     information is provided and returns the collected data as a tuple.
 
     :return: A tuple containing:
-        - project_directory (str): The absolute path to the project directory.
-        - author_name (str): The name of the author.
-        - program_name (str): The name of the program.
-        - github_pat (str or None): The GitHub PAT if provided, otherwise None.
-        - github_repo_url (str or None): The GitHub repository URL if provided, otherwise None.
-        - overwrite (bool): Whether to overwrite the existing project
-        - gofile_code (str or None): The GoFile code if provided, otherwise None.
+    - project_directory (str): The absolute path to the project directory.
+    - author_name (str): The name of the author.
+    - program_name (str): The name of the program.
+    - github_pat (str or None): The GitHub PAT if provided, otherwise None.
+    - github_repo_url (str or None): The GitHub repository URL if provided, otherwise None.
+    - overwrite (bool): Whether to overwrite the existing project
+    - gofile_code (str or None): The GoFile code if provided, otherwise None.
+    - license_type (str or None): The type of license to use for the project, defaults to 'MIT'.
+    - github_auth (bool): Whether to use GitHub authentication for pushing to the remote repository, defaults to False.
     :rtype: tuple[str]
     '''
 
@@ -803,8 +817,14 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     
     if not gofile_code:
         gofile_code = stripped_input('6. GoFile code [None]: ') or None
+    
+    if not license_type:
+        license_type = stripped_input('7. License type: [MIT]: ') or None
+    
+    if not github_auth:
+        github_auth = simple_prompt('8. Authenticate with GitHub using a PAT for pushing', 'n')
 
-    return (project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code)
+    return (project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code, license_type, github_auth)
 
 if __name__ == '__main__':
     print('You will need to configure [idk] settings.')

@@ -53,7 +53,7 @@ def main() -> tuple[str, Project]:
             folder_name = input('name of the folder: (leave empty to skip)') or None
             if folder_name:
                 response = create_gofile_folder(folder_name, gofile_user_token)
-                user_setup_data[-1] = response['data']['code']
+                user_setup_data[6] = response['data']['code']
                 gofile_folder_id = response['data']['id']
 
         print('Starting setup...')

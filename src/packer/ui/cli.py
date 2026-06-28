@@ -58,6 +58,8 @@ def main():
     setup_command_parser.add_argument('-u', '--github-url', dest='setup_github_repo_url', help='GitHub repository URL')
     setup_command_parser.add_argument('-o', '--overwrite', action='store_true', dest='setup_overwrite', help='Overwrite existing project')
     setup_command_parser.add_argument('-c', '--code', action='store_true', dest='setup_gofile_code', help='GoFile URL / code (eg. OktQl5)')
+    setup_command_parser.add_argument('-l', '--license', dest='setup_license', help='License for the new project')
+    setup_command_parser.add_argument('--authenticate', dest='setup_authenticate', action='store_true', help='Authenticate with GitHub using a PAT (Personal Access Token) for pushing')
 
     export_command_parser = subparsers.add_parser('export', help='Export all config saved by Packer in an archive')
     export_command_parser.add_argument('-p', '--path', dest='export_path', help='Path to export archive to')
@@ -157,7 +159,9 @@ def main():
                     args.setup_github_pat,
                     args.setup_github_repo_url,
                     args.setup_overwrite,
-                    args.setup_gofile_code))}''')
+                    args.setup_gofile_code,
+                    args.setup_license, 
+                    args.setup_authenticate))}''')
         
         case 'export':
             files = [
