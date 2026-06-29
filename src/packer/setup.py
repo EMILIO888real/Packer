@@ -758,15 +758,15 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     return github_repo_url.lstrip('https://github.com/') if github_repo_url else None
 
 def tui(project_directory: str = None, author_name: str = None, program_name: str = None, github_pat: str = None, github_repo_url: str = None,
-        overwrite: bool = None, gofile_code: str = None, license_type: str = None, github_auth: bool = None) -> tuple[str]:
+        overwrite: bool = None, gofile_code: str = None, license_type: str = None, github_auth: bool = None) -> list[str]:
     '''
     Interactive command-line user interface for collecting project setup information.
 
     This function prompts the user for various project details such as the program name,
     author name, and GitHub Personal Access Token (PAT). It ensures that required
-    information is provided and returns the collected data as a tuple.
+    information is provided and returns the collected data as a list.
 
-    :return: A tuple containing:
+    :return: A list containing:
     - project_directory (str): The absolute path to the project directory.
     - author_name (str): The name of the author.
     - program_name (str): The name of the program.
@@ -776,7 +776,7 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     - gofile_code (str or None): The GoFile code if provided, otherwise None.
     - license_type (str or None): The type of license to use for the project, defaults to 'MIT'.
     - github_auth (bool): Whether to use GitHub authentication for pushing to the remote repository, defaults to False.
-    :rtype: tuple[str]
+    :rtype: list[str]
     '''
 
     if not program_name:
@@ -827,7 +827,7 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     if not github_auth:
         github_auth = simple_prompt('8. Authenticate with GitHub using a PAT for pushing', 'n')
 
-    return (project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code, license_type, github_auth)
+    return [project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code, license_type, github_auth]
 
 if __name__ == '__main__':
     print('You will need to configure [idk] settings.')
