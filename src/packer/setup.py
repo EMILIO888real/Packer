@@ -5,7 +5,7 @@ from importlib import import_module
 from os import chdir, listdir, mkdir
 from pathlib import Path
 from shutil import copy, rmtree
-from subprocess import CalledProcessError, run
+from subprocess import PIPE, STDOUT, CalledProcessError, run, Popen
 from textwrap import dedent
 from typing import Sequence
 from json import dump
@@ -42,8 +42,11 @@ def check_module_conflict(program_name: str) -> bool:
     except ImportError:
         return False
 
-def print_and_log(text: str, level: int = 20, color: Sequence[int] = [255, 255, 255], end: str = '\n') -> None:
-    print_colored_text(text, color, end=end)
+def print_and_log(text: str, level: int = 20, color: Sequence[int] | None = None, end: str = '\n') -> None:
+    if color:
+        print_colored_text(text, color, end=end)
+    else:
+        print(text, end=end)
     logger.log(level, text)
 
 def _create_venv(created_venv) -> None:
@@ -644,11 +647,11 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
         '''))
         
     print_and_log('Verify main.spec via running it...')
+    
+    process = Popen([f'pyinstaller', 'main.spec'], stdout=PIPE, stderr=STDOUT, text=True)
 
-    verify_result = run([f'pyinstaller', 'main.spec'], capture_output=True)
-
-    print_and_log(f'Ran command: pyinstaller main.spec\nstdout: {verify_result.stdout.decode()}\nstderr: {verify_result.stderr.decode()}')
-
+    for text in process.stdout:
+        print_and_log(text.rstrip('\n'))
 
     print_and_log('Removing build directory...')
     rmtree('build')

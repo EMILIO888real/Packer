@@ -702,10 +702,13 @@ class Packer():
         
         return results
 
-    def _print_and_log(self, text: str, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
+    def _print_and_log(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20):
             '''Prints the text and logs it to the packer log file.'''
 
-            print_colored_text(text, color)
+            if color:
+                print_colored_text(text, color)
+            else:
+                print(text)
             self.log_action(text, level)
     
     def _send_queue_request(self, question: str, default: str | int = 'y') -> str | int:

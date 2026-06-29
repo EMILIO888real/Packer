@@ -10,6 +10,8 @@
 - Updated CLI argument parsing to include new flags for license selection and GitHub authentication. 
 - GitHub license fetching to handle incorrect license types and just run better. 
 - `TUI` to update the `GoFile` code by using normal indexing, instead of reverse indexing. 
+- Use case of `print_colored_text` functions to optionally use colored text or regular print based on whether a color is provided, with a default argument as None, instead of arbitrarily outputting white text. 
+- PyInstaller execution to stream output line-by-line instead of capturing all output at once in `setup`. 
 
 ### Fixed
 - License text replacement logic in setup.py by chaining replace() calls instead of separate operations that didn't even save the results. 
