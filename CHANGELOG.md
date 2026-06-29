@@ -16,6 +16,7 @@
 ### Fixed
 - License text replacement logic in setup.py by chaining replace() calls instead of separate operations that didn't even save the results. 
 - CLI `setup` command's argument passing in cli.py to use unpacking operator (*) for setup function call. 
+- Introduced platform check for 'win32' before importing termios module. 
 
 ---
 

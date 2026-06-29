@@ -26,8 +26,10 @@ from sys import stdin, platform
 from select import select
 from string import punctuation, digits, ascii_letters
 from datetime import datetime, timedelta
-from termios import tcsetattr, tcgetattr, ECHO, ICANON, TCSAFLUSH
 from atexit import register
+
+if platform != 'win32':
+    from termios import tcsetattr, tcgetattr, ECHO, ICANON, TCSAFLUSH
 
 
 def change_color(color: list = [138, 43, 226]) -> None:
