@@ -632,7 +632,7 @@ class Packer():
                 self.git_repo.heads['master'].checkout()
                 self._revert_git_head(commit_count)
                 self.print_and_log('Switching back to development branch...')
-                self.git_repo.heads['master'].checkout()
+                self.git_repo.heads['development'].checkout()
         else:
             self.git_repo.head.reset(working_tree=True)
 

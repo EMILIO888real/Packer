@@ -24,6 +24,7 @@
 - Unction `tui` signature change: list[str] return type instead of tuple[str]. 
 - `change` `CLI` commands output for not finding a path to output your guess instead of the search result. 
 - Changed project_path from string to string conversion when accessing projects_configurations dictionary to ensure proper key lookup. 
+- Changed git branch checkout from 'master' to 'development' in the Packer class. 
 
 ---
 
