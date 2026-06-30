@@ -806,7 +806,7 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     project_directory.rstrip('/')
 
     if not github_pat:
-        github_pat = _getpass('3. Github personal access token (with Administration permissions): ').strip() or None
+        github_pat = _getpass('3. Github personal access token (with Administration permissions (contents and workflows (all read and write) are extra optional permissions if you wanna authenticate using PAT)): ').strip() or None
     
     if not github_repo_url:
         github_repo_url = not github_pat and stripped_input('4. Github repo url (username/repo): ') or None

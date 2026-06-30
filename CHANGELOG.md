@@ -15,6 +15,7 @@
 - PyInstaller execution to stream output line-by-line instead of capturing all output at once in `setup`. 
 - Add exclusion for video format files: `*.mp4`, `*.mov`, `*.avi`, `*.mkv` in `.gitignore`. 
 - Updated TUI project creation flow to improve user prompts and other various output. 
+- Updated the prompt message for Github personal access token to include additional information about required permissions, specifically mentioning "contents and workflows (all read and write)" and "extra optional permissions" for authentication using PAT. 
 
 ### Fixed
 - License text replacement logic in setup.py by chaining replace() calls instead of separate operations that didn't even save the results. 
