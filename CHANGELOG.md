@@ -14,6 +14,7 @@
 - Use case of `print_colored_text` functions to optionally use colored text or regular print based on whether a color is provided, with a default argument as None, instead of arbitrarily outputting white text. 
 - PyInstaller execution to stream output line-by-line instead of capturing all output at once in `setup`. 
 - Add exclusion for video format files: `*.mp4`, `*.mov`, `*.avi`, `*.mkv` in `.gitignore`. 
+- Updated TUI project creation flow to improve user prompts and other various output. 
 
 ### Fixed
 - License text replacement logic in setup.py by chaining replace() calls instead of separate operations that didn't even save the results. 

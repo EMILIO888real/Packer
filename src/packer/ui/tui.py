@@ -2,6 +2,7 @@ from json import dumps, loads
 from pathlib import Path
 from typing import Callable
 from subprocess import run
+from inspect import signature
 
 from packer.setup import main as setup, tui
 from packer.paths import config_dir, projects_file_path
@@ -39,18 +40,18 @@ def main() -> tuple[str, Project]:
 
 
     if project_directory == None:
+        print(f'Creating a new project profile!\nYou will need to set up some required settings before we begin.')
 
-        print(f'Creating a new project profile!\nYou will need to set up some required settings[7] before we begin.')
-
+        print(f'Starting with creating a new project, up to {len(signature(tui).parameters)} options.')
         user_setup_data = tui()
         project_directory = user_setup_data[0]
         program_name = user_setup_data[2]
 
-        gofile_user_token = _getpass('3. Gofile user token: ') or None
+        gofile_user_token = _getpass('1. Gofile user token: ') or None
 
-        gofile_folder_id = _getpass('4. Gofile folder id (leave empty to create a folder): ') or None
+        gofile_folder_id = _getpass('2. Gofile folder id (leave empty to create a folder): ') or None
         if not gofile_folder_id:
-            folder_name = input('name of the folder: (leave empty to skip)') or None
+            folder_name = input('name of the folder: (leave empty to skip): ') or None
             if folder_name:
                 response = create_gofile_folder(folder_name, gofile_user_token)
                 user_setup_data[6] = response['data']['code']
