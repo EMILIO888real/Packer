@@ -1,30 +1,30 @@
-## [%new_version] - %date
+## [0.16.0] - 2026-06-30
 
 ### Added
-- Implemented optional GitHub authentication using PAT (Personal Access Token) for pushing to remote repositories. 
-- Reference to the `MANUAL_REVERT.md` file has been added to the README. 
-- A docstring for the `find_user_project` function in `src/packer/config.py` explaining its purpose and return type. 
+- [4b8612a] Implemented optional GitHub authentication using PAT (Personal Access Token) for pushing to remote repositories. 
+- [e16a805] Reference to the `MANUAL_REVERT.md` file has been added to the README. 
+- [c0431d7] A docstring for the `find_user_project` function in `src/packer/config.py` explaining its purpose and return type.
 
 ### Changed
-- Updated `CLI` documentation, mentioning the new commands, like change that weren't described before and so on. 
-- Enhanced the TUI (Text User Interface) to collect license type and GitHub authentication preferences from users. 
-- Updated CLI argument parsing to include new flags for license selection and GitHub authentication. 
-- GitHub license fetching to handle incorrect license types and just run better. 
-- `TUI` to update the `GoFile` code by using normal indexing, instead of reverse indexing. 
-- Use case of `print_colored_text` functions to optionally use colored text or regular print based on whether a color is provided, with a default argument as None, instead of arbitrarily outputting white text. 
-- PyInstaller execution to stream output line-by-line instead of capturing all output at once in `setup`. 
-- Add exclusion for video format files: `*.mp4`, `*.mov`, `*.avi`, `*.mkv` in `.gitignore`. 
-- Updated TUI project creation flow to improve user prompts and other various output. 
-- Updated the prompt message for Github personal access token to include additional information about required permissions, specifically mentioning "contents and workflows (all read and write)" and "extra optional permissions" for authentication using PAT. 
+- [4b8612a] Updated `CLI` documentation, mentioning the new commands, like change that weren't described before and so on. 
+- [4b8612a] Enhanced the TUI (Text User Interface) to collect license type and GitHub authentication preferences from users. 
+- [4b8612a] Updated CLI argument parsing to include new flags for license selection and GitHub authentication. 
+- [4b8612a] GitHub license fetching to handle incorrect license types and just run better. 
+- [4b8612a] `TUI` to update the `GoFile` code by using normal indexing, instead of reverse indexing. 
+- [b293274] Use case of `print_colored_text` functions to optionally use colored text or regular print based on whether a color is provided, with a default argument as None, instead of arbitrarily outputting white text. 
+- [b293274] PyInstaller execution to stream output line-by-line instead of capturing all output at once in `setup`. 
+- [dcff896] Add exclusion for video format files: `*.mp4`, `*.mov`, `*.avi`, `*.mkv` in `.gitignore`. 
+- [133b3b6] Updated TUI project creation flow to improve user prompts and other various output. 
+- [125fb19] Updated the prompt message for Github personal access token to include additional information about required permissions, specifically mentioning "contents and workflows (all read and write)" and "extra optional permissions" for authentication using PAT.
 
 ### Fixed
-- License text replacement logic in setup.py by chaining replace() calls instead of separate operations that didn't even save the results. 
-- CLI `setup` command's argument passing in cli.py to use unpacking operator (*) for setup function call. 
-- Introduced platform check for 'win32' before importing termios module. 
-- Unction `tui` signature change: list[str] return type instead of tuple[str]. 
-- `change` `CLI` commands output for not finding a path to output your guess instead of the search result. 
-- Changed project_path from string to string conversion when accessing projects_configurations dictionary to ensure proper key lookup. 
-- Changed git branch checkout from 'master' to 'development' in the Packer class. 
+- [5c88d29] License text replacement logic in setup.py by chaining replace() calls instead of separate operations that didn't even save the results. 
+- [5c88d29] CLI `setup` command's argument passing in cli.py to use unpacking operator (*) for setup function call. 
+- [e260162] Introduced platform check for 'win32' before importing termios module. 
+- [7379ad2] Unction `tui` signature change: list[str] return type instead of tuple[str]. 
+- [c0431d7] `change` `CLI` commands output for not finding a path to output your guess instead of the search result. 
+- [926232f] Changed project_path from string to string conversion when accessing projects_configurations dictionary to ensure proper key lookup. 
+- [f89007d] Changed git branch checkout from 'master' to 'development' in the Packer class.
 
 ---
 
