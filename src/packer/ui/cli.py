@@ -214,12 +214,13 @@ def main():
             rmtree(tmp_dir)
         
         case 'change':
-            project = find_user_project(args.change_project if args.change_project else Path().cwd().name)
+            user_chosen_project = args.change_project if args.change_project else Path().cwd().name
+            project = find_user_project(user_chosen_project)
             if project:
                 output = change_tui(args.change_changes, args.change_overall_description)
                 change(project, modification_types=output[0], overall_description=output[1])
             else:
-                print(f'I couldn\'t find your project: {project}')
+                print(f'I couldn\'t find your project: {user_chosen_project}')
                 sys.exit(1)
 
 

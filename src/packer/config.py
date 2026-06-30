@@ -190,8 +190,17 @@ def _getpass(prompt: str) -> str:
     return getpass(prompt, echo_char=all_settings.getpass_echo_char)
 
 def find_user_project(name: str) -> Path | None:
-    name.lower()
+    '''
 
+    This function looks for a projects full path from just the given name of the folder of the project.
+    If no project is found, it returns None.
+
+    :type name: str
+    :return: The path to the project if found, otherwise None.
+    :rtype: Path | None
+    '''
+
+    name.lower()
     for candidate_path in projects_configurations.keys():
         if Path(candidate_path).name.lower() == name:
             return Path(candidate_path)

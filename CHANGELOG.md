@@ -3,6 +3,7 @@
 ### Added
 - Implemented optional GitHub authentication using PAT (Personal Access Token) for pushing to remote repositories. 
 - Reference to the `MANUAL_REVERT.md` file has been added to the README. 
+- A docstring for the `find_user_project` function in `src/packer/config.py` explaining its purpose and return type. 
 
 ### Changed
 - Updated `CLI` documentation, mentioning the new commands, like change that weren't described before and so on. 
@@ -19,6 +20,7 @@
 - CLI `setup` command's argument passing in cli.py to use unpacking operator (*) for setup function call. 
 - Introduced platform check for 'win32' before importing termios module. 
 - Unction `tui` signature change: list[str] return type instead of tuple[str]. 
+- `change` `CLI` commands output for not finding a path to output your guess instead of the search result. 
 
 ---
 
