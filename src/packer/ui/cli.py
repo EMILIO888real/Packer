@@ -105,7 +105,7 @@ def main():
                 print(f'No such project found: {user_chosen_project}')
                 sys.exit(1)
 
-            project_config = Project(**normalize_settings_keys(projects_configurations[project_path]))
+            project_config = Project(**normalize_settings_keys(projects_configurations[str(project_path)]))
 
             with open(f'{project_path}/src/{project_config.program_name}/assets/version.json') as version_handle:
                 current_version = load(version_handle)
