@@ -10,3 +10,9 @@ dev
 
 # Distribution / Packaging
 *.egg-info/
+
+# Some basic video formats
+*.mp4
+*.mov
+*.avi
+*.mkv
