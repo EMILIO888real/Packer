@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- A new `use_pyinstaller` parameter to control whether PyInstaller-related files and build processes are generated. 
 
 ### Changed
 
