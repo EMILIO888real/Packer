@@ -2,6 +2,7 @@
 
 ### Added
 - A new `use_pyinstaller` parameter to control whether PyInstaller-related files and build processes are generated. 
+- Sktop notifications for the a new release and packer errors, icon included. 
 
 ### Changed
 

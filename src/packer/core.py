@@ -25,6 +25,7 @@ from packer.custom_modules.etf import bool_answer, simple_prompt, hide_cursor, p
 from packer.config import all_settings, Project, packer_version
 from packer.paths import log_path, data_dir, cache_dir
 from packer.assets.exceptions import global_exception_handler
+from packer.utils import send_notification
 
 
 def thread_excepthook(args):
@@ -583,7 +584,10 @@ class Packer():
             remove(self.chosen_description_path)
             remove(self.chosen_title_path)
 
+
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
+            send_notification('New version released!', f'Version {self.version} has been released successfully!')
+
             release_url = self.git_release.html_url
             if all_settings.open_gitHub_release:
                 open_new_tab(release_url)

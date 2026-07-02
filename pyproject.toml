@@ -16,7 +16,8 @@ dependencies = [
     "pyinstaller",
     "tomlkit",
     "pyzipper",
-    "pyperclip"
+    "pyperclip",
+    "plyer"
 ]
 
 [tool.setuptools]

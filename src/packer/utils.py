@@ -1,6 +1,9 @@
 from pathlib import Path
 from subprocess import run
 from sys import platform
+from plyer import notification
+
+from packer.paths import assets_dir
 
 
 def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
@@ -22,3 +25,24 @@ def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
             if platform == 'win32'
             else '.venv/bin/python')
     run([python_exe_path, '-m', 'pip', 'install', *packages], check=True)
+
+
+def send_notification(title: str, message: str, timeout: int = 5):
+    '''
+    Send a desktop notification.
+
+    :param title: the title of the notification
+    :type title: str
+    :param message: the message of the notification
+    :type message: str
+    :param timeout: the duration (in seconds) for which the notification should be displayed
+    :type timeout: int
+    '''
+
+    notification.notify(
+        title=title,
+        message=message,
+        app_name='Packer',
+        app_icon=f'{assets_dir}/images/Packer icon.png',
+        timeout=timeout
+    )
