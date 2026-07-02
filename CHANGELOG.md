@@ -7,6 +7,7 @@
 - Documentation for the new setting in both the python docstring and `SETTINGS.md`. 
 
 ### Changed
+- Ll `print_and_log` function calls to use correct log levels for problems it's higher, otherwise the default 20/[INFO] is used. 
 
 ### Fixed
 

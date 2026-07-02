@@ -126,7 +126,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             print_and_log('Deleting existing directory...')
             rmtree(project_directory)
         else:
-            print_and_log('Aborting setup...')
+            print_and_log('Aborting setup...', 30)
             return github_repo_url.lstrip('https://github.com/')
 
     print_and_log('Creating project directory...')
@@ -609,7 +609,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             with open('LICENSE', 'w') as f:
                 f.write(license_text)
         except GithubException:
-            print_and_log(f'Couldn\'t fetch {license_type} license from GitHub, please ensure the name is correct. | Error: {e}')
+            print_and_log(f'Couldn\'t fetch {license_type} license from GitHub, please ensure the name is correct. | Error: {e}', 40)
 
     if not use_pyinstaller:
         print_and_log('Creating .spec file...')
@@ -676,9 +676,9 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
                     executable_name += '.exe'
 
                 copy(f'dist/{executable_name}', f'{download_dir}/{executable_name}')
-                print_and_log('Copied the broken executable to your downloads directory for your inspection')
+                print_and_log('Copied the broken executable to your downloads directory for your inspection', 30)
             else:
-                print_and_log('Failed to create the executable entirely, skipping copying')
+                print_and_log('Failed to create the executable entirely, skipping copying', 40)
 
         print_and_log('Removing dist directory...')
         rmtree('dist')

@@ -163,7 +163,7 @@ class Packer():
         
         if not all_settings.skip_git_status:
             if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
-                self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...')
+                self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...', 40)
                 sys.exit()
 
     def run(self):
@@ -385,23 +385,23 @@ class Packer():
                     try:
                         retry_gofile_count += 1
                         if retry_gofile_count > 2:
-                            self.print_and_log(f'After {retry_gofile_count} unsuccessful attempts the release has been paused')
-                            self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no')
+                            self.print_and_log(f'After {retry_gofile_count} unsuccessful attempts the release has been paused', 30)
+                            self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no', 30)
                             if not self.prompt_user('Has the problem been resolved'):
                                 self.revert_changes()
 
                         response = upload_gofile_file(Path(f'{cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
                         if response.get('status') != 'ok' or not response.get('data'):
-                            self.print_and_log(f'GoFile upload returned an invalid response: {response}')
+                            self.print_and_log(f'GoFile upload returned an invalid response: {response}', 40)
                             self.revert_changes()
                         retry_gofile = False
                     except exceptions.SSLError:
-                        self.print_and_log('Encountered an SSL (verification) error when uploading to GoFile')
+                        self.print_and_log('Encountered an SSL (verification) error when uploading to GoFile', 30)
                     except Exception as e:
-                        self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}')
+                        self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}', 30)
 
                     if retry_gofile:
-                        self.print_and_log('retrying in 3 seconds...')
+                        self.print_and_log('retrying in 3 seconds...', 30)
                         sleep(3)
 
 
@@ -436,12 +436,12 @@ class Packer():
                 self.committed = True
             except GitCommandError:
                 try:
-                    self.print_and_log('Fallback to unsigned commit...')
-                    self.git_repo.git.commit('-m', commit_message)
-                    self.committed = True
+                        self.print_and_log('Fallback to unsigned commit...', 30)
+                        self.git_repo.git.commit('-m', commit_message)
+                        self.committed = True
                 except GitCommandError as e:
                     self.committed = False
-                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
+                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0], 40)
                     self.revert_changes()
 
 
@@ -493,8 +493,8 @@ class Packer():
             while retry_release:
                 try:
                     if retry_release_count > 3:
-                        self.print_and_log(f'Failed to create a release on GitHub after {retry_release_count} attempts')
-                        self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no')
+                        self.print_and_log(f'Failed to create a release on GitHub after {retry_release_count} attempts', 30)
+                        self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no', 30)
                         if not self.prompt_user('Has the problem been resolved'):
                             self.revert_changes()
                     self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}',
@@ -502,7 +502,7 @@ class Packer():
                     retry_release = False
                 except Exception as e:
                     self.print_and_log(f'Failed to create a release on GitHub | Error: {e}', [255, 0, 0], 30)
-                    self.print_and_log('Retrying in 3 seconds...', [0, 0, 255])
+                    self.print_and_log('Retrying in 3 seconds...', [0, 0, 255], 30)
                     sleep(3)
                     retry_release_count += 1
             
@@ -573,11 +573,11 @@ class Packer():
                 self.prep_committed = True
             except GitCommandError:
                 try:
-                    self.print_and_log('Fallback to unsigned commit...')
+                    self.print_and_log('Fallback to unsigned commit...', 30)
                     self.git_repo.git.commit('-m', next_versions_commit_message)
                     self.prep_committed = True
                 except GitCommandError as e:
-                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0])
+                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0], 40)
             self.git_repo.remotes.origin.push()
 
             self.print_and_log('Cleaning up temporary files...')
