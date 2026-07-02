@@ -3,6 +3,8 @@
 ### Added
 - A new `use_pyinstaller` parameter to control whether PyInstaller-related files and build processes are generated. 
 - Sktop notifications for the a new release and packer errors, icon included. 
+- A new `desktop_notifications` setting to enable/disable desktop notifications for important events like release creation or errors. 
+- Documentation for the new setting in both the python docstring and `SETTINGS.md`. 
 
 ### Changed
 

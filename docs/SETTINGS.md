@@ -30,6 +30,7 @@ The following options appear in the global `settings.json` file.
 | `copy_github_release_clipboard` | `bool` | `true` | Copy the GitHub release URL to the clipboard after creating a release. |
 | `open_gitHub_release` | `bool` | `true` | Open the GitHub release page in the default browser after creating a release. |
 | `automatic_error_reporting` | `bool` | `true` | Automatically send error reports to the Packer developers for debugging purposes. |
+| `desktop_notifications` | `bool` | `true` | Show desktop notifications for important events, such as release creation or errors. |
 
 ## Prompt settings
 

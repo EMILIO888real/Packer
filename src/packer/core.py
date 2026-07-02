@@ -586,7 +586,8 @@ class Packer():
 
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
-            send_notification('New version released!', f'Version {self.version} has been released successfully!')
+            if all_settings.desktop_notifications:
+                send_notification('New version released!', f'Version {self.version} has been released successfully!')
 
             release_url = self.git_release.html_url
             if all_settings.open_gitHub_release:

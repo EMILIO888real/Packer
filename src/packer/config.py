@@ -114,6 +114,12 @@ class Settings(BaseModel):
         changes_summary_prompt (list[dict]): Prompt template for summarizing git diffs at a high level.
         high_level_summary_prompt (list[dict]): Prompt template for creating a single summary sentence
                                                   from a bullet-point list of changes.
+        model (str): The LLM model to use for generating summaries and descriptions (default: 'mistral').
+        getpass_echo_char (str | None): Character to echo when prompting for passwords (default: None, meaning no echo).
+        copy_github_release_clipboard (bool): Whether to copy GitHub release notes to the clipboard (default: True).
+        open_gitHub_release (bool): Whether to automatically open the GitHub release page after creating a release (default: True).
+        automatic_error_reporting (bool): Whether to automatically report errors to the developers (default: True).
+        desktop_notifications (bool): Whether to show desktop notifications for important events (default: True).
     '''
 
     text_editor: str = 'code'
@@ -153,6 +159,7 @@ class Settings(BaseModel):
     copy_github_release_clipboard: bool = True
     open_gitHub_release: bool = True
     automatic_error_reporting: bool = True
+    desktop_notifications: bool = True
     
 
 settings_path = f'{config_dir}/settings.json'
