@@ -19,6 +19,7 @@
 
 ### Fixed
 - Overly aggressive message filtering removing unnecessary prefixes to modification message in change.py. 
+- Added pygame dependency to the project's dependencies list. 
 
 ---
 

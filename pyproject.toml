@@ -18,7 +18,8 @@ dependencies = [
     "pyzipper",
     "pyperclip",
     "plyer",
-    "argcomplete"
+    "argcomplete",
+    "pygame"
 ]
 
 [tool.setuptools]
