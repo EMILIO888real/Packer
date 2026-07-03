@@ -15,14 +15,13 @@ from multiprocessing import Process, Event
 from sys import exit, platform, builtin_module_names
 from re import match
 from keyword import iskeyword
-from platformdirs import user_documents_dir
 
 from packer.utils import pip_install
 from packer.custom_modules.et import init_logger, tree
 from packer.custom_modules.etf import print_colored_text, simple_prompt, stripped_input
 from packer.config import packer_version, _getpass
 from packer.custom_modules.etf import print_list
-from packer.paths import download_dir
+from packer.paths import download_dir, documents_dir
 
 logger = init_logger('packer setup', 'EMILIO')
 
@@ -795,7 +794,7 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
         program_name = f'{program_name[0].upper()}{program_name[1:]}'
 
 
-    default_project_dir = f'{user_documents_dir()}/{program_name}'
+    default_project_dir = f'{documents_dir}/{program_name}'
 
     if not project_directory:
         project_directory = input(f'2. Project directory (absolute path, default to: {default_project_dir}): ')

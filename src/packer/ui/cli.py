@@ -8,12 +8,13 @@ import sys
 from subprocess import run
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
+from getpass import getuser
 
 from packer.assets.exceptions import global_exception_handler
 from packer.custom_modules.et import resolve_version, normalize_settings_keys
 from packer.custom_modules.etf import simple_prompt, stripped_input
 from packer.custom_modules.etf import print_list
-from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path
+from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir
 from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project
 from packer.core import Packer
 from packer.setup import main as setup, tui
@@ -24,6 +25,26 @@ def _clear_path(path: str | Path) -> None:
     rmtree(path, ignore_errors=True)
     print(f'Cleared {path}')
 
+def get_project_names(**kwargs):
+    return [Path(project).name for project in projects_configurations.keys()]
+
+def get_new_version(**kwargs):
+    return ['M', 'm', 'p']
+
+def get_text_editors(**kwargs):
+    return ['code', 'nvim', 'vim', 'nano', 'subl3', 'atom', 'emacs', 'idea', 'webstorm', 'notepad', 'pycharm']
+
+def get_wait_flags(**kwargs):
+    return ['--wait']
+
+def get_license_types(**kwargs):
+    return ['MIT', 'Apache-2.0', 'GPL-3.0', 'BSD-3-Clause', 'Unlicense']
+
+def get_author_names(**kwargs):
+    return [getuser()]
+
+def get_setup_paths(**kwargs):
+    return [f'{documents_dir}/']
 
 def main():
     parser = ArgumentParser('packer', description='Packer CLI tool')
@@ -42,24 +63,30 @@ def main():
     clear_command_parser.add_argument('-u', '--user', action='store_true', help='Clear user directory')
 
     run_command_parser = subparsers.add_parser('run', help='Runs packer release and update process on the specified project')
-    run_command_parser.add_argument('-p', '--project', help='Specify the project to release an update on')
-    run_command_parser.add_argument('-v', '--version', dest='run_version', help='Specify the new version to update to')
+    run_command_parser.add_argument('-p', '--project', help='Specify the project to release an update on').completer = get_project_names
+    run_command_parser.add_argument('-v', '--version', dest='run_version', help='Specify the new version to update to').completer = get_new_version
 
     edit_command_parser = subparsers.add_parser('edit', help='Edits user related data, like configurations, projects and so on')
     edit_command_parser.add_argument('-s', '--settings', action='store_true', help='Open to edit the settings.json in the user preferred text editor')
     edit_command_parser.add_argument('-p', '--projects', dest='edit_project', action='store_true', help='Open to edit the projects.json in the user preferred text editor')
-    edit_command_parser.add_argument('-t', '--text_editor', help='Specify the text editor to use over the one saved in settings')
-    edit_command_parser.add_argument('-w', '--wait_flag', help='Specify the wait flag for the text editor to use over the one saved in settings')
+    edit_command_parser.add_argument('-t', '--text_editor', help='Specify the text editor to use over the one saved in settings').completer = get_text_editors
+
+    edit_command_parser.add_argument('-w', '--wait_flag', help='Specify the wait flag for the text editor to use over the one saved in settings').completer = get_wait_flags
 
     setup_command_parser = subparsers.add_parser('setup', help='Runs the packer new project setup function')
-    setup_command_parser.add_argument('-p', '--path', dest='setup_path', help='Project directory to use for setup')
-    setup_command_parser.add_argument('-a', '--author-name', dest='setup_author_name', help='Author name for the new project')
+
+
+
+    setup_command_parser.add_argument('-p', '--path', dest='setup_path', help='Project directory to use for setup').completer = get_setup_paths
+    setup_command_parser.add_argument('-a', '--author-name', dest='setup_author_name', help='Author name for the new project').completer = get_author_names
     setup_command_parser.add_argument('-n', '--program-name', dest='setup_program_name', help='Program name for the new project')
     setup_command_parser.add_argument('-t', '--pat', dest='setup_github_pat', help='GitHub personal access token')
+
     setup_command_parser.add_argument('-u', '--github-url', dest='setup_github_repo_url', help='GitHub repository URL')
     setup_command_parser.add_argument('-o', '--overwrite', action='store_true', dest='setup_overwrite', help='Overwrite existing project')
     setup_command_parser.add_argument('-c', '--code', action='store_true', dest='setup_gofile_code', help='GoFile URL / code (eg. OktQl5)')
-    setup_command_parser.add_argument('-l', '--license', dest='setup_license', help='License for the new project')
+
+    setup_command_parser.add_argument('-l', '--license', dest='setup_license', help='License for the new project').completer = get_license_types
     setup_command_parser.add_argument('--authenticate', dest='setup_authenticate', action='store_true', help='Authenticate with GitHub using a PAT (Personal Access Token) for pushing')
 
     export_command_parser = subparsers.add_parser('export', help='Export all config saved by Packer in an archive')
@@ -71,7 +98,8 @@ def main():
     import_command_parser.add_argument('-s', '--safe', dest='import_safe', help='Password to the archive')
 
     change_command_parser = subparsers.add_parser('change', help='Commit a change of a packer like style project')
-    change_command_parser.add_argument('-p', '--project', dest='change_project', help='Specify the project')
+
+    change_command_parser.add_argument('-p', '--project', dest='change_project', help='Specify the project').completer = get_project_names
     change_command_parser.add_argument('-c', '--changes', dest='change_changes', help='Specify the changes')
     change_command_parser.add_argument('-o', '--overall-description', dest='change_overall_description', help='Specify the overall description, only in use if there are more than 1 change')
 
