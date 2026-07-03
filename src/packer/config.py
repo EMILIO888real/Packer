@@ -29,6 +29,10 @@ Attributes:
 
 __all__ = 'user_settings, default_settings, default_config, all_settings, load, packer_version'
 
+from os import environ
+
+environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # Turns off pygame hello message
+
 from collections.abc import Callable
 from pathlib import Path
 from shutil import which
@@ -36,6 +40,7 @@ from typing import Any, Sequence
 from pydantic import BaseModel
 from getpass import getpass
 import json
+import pygame
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys
 from packer.paths import assets_dir, config_dir
@@ -160,6 +165,7 @@ class Settings(BaseModel):
     open_gitHub_release: bool = True
     automatic_error_reporting: bool = True
     desktop_notifications: bool = True
+    notification_sound_path: str | Path = '1'
     
 
 settings_path = f'{config_dir}/settings.json'
@@ -173,9 +179,18 @@ with open(settings_path) as f:
 
 all_settings: Settings = Settings(**normalize_settings_keys(user_settings))
 
+
 # All setup for settings
 all_settings.text_editor = which(all_settings.text_editor)
 
+
+# All other miscellaneous setup
+
+pygame.mixer.init()
+
+notification_sound = pygame.mixer.Sound(f'{assets_dir}/audio/sounds/new notification {all_settings.notification_sound_path}.wav'
+                                        if len(all_settings.notification_sound_path.strip()) == 1
+                                        else all_settings.notification_sound_path)
 
 projects_configurations: dict[str, dict[str, Any]] | None
 if Path(f'{config_dir}/projects.json').exists():

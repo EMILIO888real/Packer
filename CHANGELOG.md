@@ -9,11 +9,13 @@
 - Command-line argument completion on unix style systems with `argcomplete`, which easily works along `argparse`. 
 - A confirmation prompt before deleting all Packer related data when no specific action flags are provided. 
 - More autocomplete options to the CLI, especially suggesting values for some flags, like choosing a project from Packer know projects. 
+- Notification sounds to notifications via `pygame` in the future, there are also plans to use it to create a `GUI`. 
 
 ### Changed
 - all `print_and_log` function calls to use correct log levels for problems it's higher, otherwise the default 20/[INFO] is used. 
 - `main.spec` to use the .ico file for building the program on Windows. 
 - Moved `user_documents_dir()` to `paths.py`, so both `cli.py` and `setup.py` can both import it instead of them calling the function twice. 
+- Documentation for settings both user and project to use `or`, instead of `|` to show the different types of data acceptable for that setting. 
 
 ### Fixed
 - Overly aggressive message filtering removing unnecessary prefixes to modification message in change.py. 

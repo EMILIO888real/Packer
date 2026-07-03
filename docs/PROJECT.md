@@ -26,13 +26,13 @@ The following options are stored for each project in `projects.json`.
 | `github_repo_url`             | `str`                             | —                   | GitHub repository URL in the form `username/repository`.                                                            |
 | `program_name`                | `str`                             | —                   | Name of the project used throughout generated releases and documentation.                                           |
 | `changelog_git_hash`          | `bool`                            | `true`              | Include commit hashes in generated changelog entries.                                                               |
-| `before_commands`             | `Sequence[Sequence[str]] \| None` | `None`              | Commands executed before the release process begins. Each command is represented as a sequence of arguments.        |
-| `after_commands`              | `Sequence[Sequence[str]] \| None` | `None`              | Commands executed after the release process completes. Each command is represented as a sequence of arguments.      |
-| `compile_command`             | `Sequence[str] \| None`           | `None`              | Command used to build or compile the project before packaging.                                                      |
+| `before_commands`             | `Sequence[Sequence[str]] or None` | `None`              | Commands executed before the release process begins. Each command is represented as a sequence of arguments.        |
+| `after_commands`              | `Sequence[Sequence[str]] or None` | `None`              | Commands executed after the release process completes. Each command is represented as a sequence of arguments.      |
+| `compile_command`             | `Sequence[str] or None`           | `None`              | Command used to build or compile the project before packaging.                                                      |
 | `model`                       | `str`                             | `mistral`           | AI model used when generating release titles and descriptions for this project. Overrides the global model setting. |
 | `description_prompt`          | `list[dict[str, str]]`            | prompt template     | Prompt template used to generate the release description.                                                           |
 | `title_prompt`                | `list[dict[str, str]]`            | prompt template     | Prompt template used to generate the release title.                                                                 |
-| `release_notes_template_path` | `str \| Path`                     | `assets/RELEASE.md` | Path to the release notes template used when generating GitHub releases.                                            |
+| `release_notes_template_path` | `str or Path`                     | `assets/RELEASE.md` | Path to the release notes template used when generating GitHub releases.                                            |
 
 ## Release notes template
 

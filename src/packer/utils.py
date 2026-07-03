@@ -4,6 +4,7 @@ from sys import platform
 from plyer import notification
 
 from packer.paths import assets_dir
+from packer.config import notification_sound
 
 
 def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
@@ -46,3 +47,5 @@ def send_notification(title: str, message: str, timeout: int = 5):
         app_icon=f'{assets_dir}/images/Packer icon.png',
         timeout=timeout
     )
+
+    notification_sound.play()
