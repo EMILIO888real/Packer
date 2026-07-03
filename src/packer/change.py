@@ -110,7 +110,8 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
 
         message = message.lstrip('-')
         message = message.lstrip()
-        message = message.lstrip(modification_type)
+        if message.lower().startswith(modification_type.lower()):
+            message = message[len(modification_type):].lstrip()
         message = message.strip()
 
         message = f'{message[:1].capitalize()}{message[1:]}'
