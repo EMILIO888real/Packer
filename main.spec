@@ -33,5 +33,6 @@ exe = EXE(
     strip=False,
     upx=True,
     console=True,
-    onefile=True
+    onefile=True,
+    icon='src/packer/assets/images/Packer icon.ico'
 )

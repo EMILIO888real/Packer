@@ -5,9 +5,11 @@
 - desktop notifications for the a new release and packer errors, icon included. 
 - A new `desktop_notifications` setting to enable/disable desktop notifications for important events like release creation or errors. 
 - Documentation for the new setting in both the python docstring and `SETTINGS.md`. 
+- An .ico icon file for windows build. 
 
 ### Changed
 - all `print_and_log` function calls to use correct log levels for problems it's higher, otherwise the default 20/[INFO] is used. 
+- `main.spec` to use the .ico file for building the program on Windows. 
 
 ### Fixed
 - Overly aggressive message filtering removing unnecessary prefixes to modification message in change.py. 
