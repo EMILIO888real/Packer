@@ -7,6 +7,7 @@ from shutil import rmtree, which
 import sys
 from subprocess import run
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
+from argcomplete import autocomplete
 
 from packer.assets.exceptions import global_exception_handler
 from packer.custom_modules.et import resolve_version, normalize_settings_keys
@@ -75,6 +76,7 @@ def main():
     change_command_parser.add_argument('-o', '--overall-description', dest='change_overall_description', help='Specify the overall description, only in use if there are more than 1 change')
 
 
+    autocomplete(parser)
     args = parser.parse_args()
 
     match args.command:
