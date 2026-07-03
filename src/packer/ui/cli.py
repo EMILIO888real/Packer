@@ -11,7 +11,7 @@ from argcomplete import autocomplete
 
 from packer.assets.exceptions import global_exception_handler
 from packer.custom_modules.et import resolve_version, normalize_settings_keys
-from packer.custom_modules.etf import stripped_input
+from packer.custom_modules.etf import simple_prompt, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path
 from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project
@@ -93,7 +93,8 @@ def main():
                 targets.add(data_dir)
 
             if not any((args.cache, args.save, args.log, args.user)):
-                targets.update((cache_dir, config_dir, data_dir, log_dir))
+                if simple_prompt('Are you sure you want to delete all Packer related data'):
+                    targets.update((cache_dir, config_dir, data_dir, log_dir))
 
             for target in targets:
                 _clear_path(target)

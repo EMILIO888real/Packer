@@ -7,6 +7,7 @@
 - Documentation for the new setting in both the python docstring and `SETTINGS.md`. 
 - An .ico icon file for windows build. 
 - Command-line argument completion on unix style systems with `argcomplete`, which easily works along `argparse`. 
+- A confirmation prompt before deleting all Packer related data when no specific action flags are provided. 
 
 ### Changed
 - all `print_and_log` function calls to use correct log levels for problems it's higher, otherwise the default 20/[INFO] is used. 
