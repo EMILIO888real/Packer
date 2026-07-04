@@ -30,8 +30,13 @@ Attributes:
 __all__ = 'user_settings, default_settings, default_config, all_settings, load, packer_version'
 
 from os import environ
+from warnings import filterwarnings
 
-from packer.exceptions import Global_exception_handler
+filterwarnings(
+    "ignore",
+    message=r".*Your system is avx2 capable but pygame was not built with support for it.*",
+    category=RuntimeWarning,
+)
 
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # Turns off pygame hello message
 
@@ -46,6 +51,7 @@ import pygame
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys
 from packer.paths import assets_dir, config_dir, log_path, error_report_path
+from packer.exceptions import Global_exception_handler
 
 
 with open(f'{assets_dir}/version.json') as f:
