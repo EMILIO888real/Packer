@@ -31,7 +31,8 @@ The following options appear in the global `settings.json` file.
 | `open_gitHub_release` | `bool` | `true` | Open the GitHub release page in the default browser after creating a release. |
 | `automatic_error_reporting` | `bool` | `true` | Automatically send error reports to the Packer developers for debugging purposes. |
 | `desktop_notifications` | `bool` | `true` | Show desktop notifications for important events, such as release creation or errors. |
-| notification_sound_path | `str or Path or None` | `1` | Path to a custom sound file to play for desktop notifications. If not set, the first packer notification is used, there are 2 more (1, 2, 3) |
+| `notification_sound_path` | `str or Path or None` | `1` | Path to a custom sound file to play for desktop notifications. If not set, the first packer notification is used, there are 2 more (1, 2, 3) |
+| `notification volume` | `float` | `1.0` | Volume for desktop notification sounds, ranging from 0.0 (mute) to 1.0 (full volume). |
 
 ## Prompt settings
 

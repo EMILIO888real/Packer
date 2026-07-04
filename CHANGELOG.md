@@ -10,6 +10,7 @@
 - A confirmation prompt before deleting all Packer related data when no specific action flags are provided. 
 - More autocomplete options to the CLI, especially suggesting values for some flags, like choosing a project from Packer know projects. 
 - Notification sounds to notifications via `pygame` in the future, there are also plans to use it to create a `GUI`. 
+- New configuration option `notification_volume` to control the volume level of desktop notification sounds. 
 
 ### Changed
 - all `print_and_log` function calls to use correct log levels for problems it's higher, otherwise the default 20/[INFO] is used. 

@@ -125,6 +125,8 @@ class Settings(BaseModel):
         open_gitHub_release (bool): Whether to automatically open the GitHub release page after creating a release (default: True).
         automatic_error_reporting (bool): Whether to automatically report errors to the developers (default: True).
         desktop_notifications (bool): Whether to show desktop notifications for important events (default: True).
+        notification_sound_path (str | Path): Path to the sound file for notifications (default: '1', which maps to a default sound).
+        notification_volume (float): Volume level for notification sounds (default: 1.0, range 0.0 to 1.0).
     '''
 
     text_editor: str = 'code'
@@ -166,6 +168,7 @@ class Settings(BaseModel):
     automatic_error_reporting: bool = True
     desktop_notifications: bool = True
     notification_sound_path: str | Path = '1'
+    notification_volume: float = 1.0
     
 
 settings_path = f'{config_dir}/settings.json'
