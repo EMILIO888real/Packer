@@ -195,6 +195,9 @@ notification_sound = pygame.mixer.Sound(f'{assets_dir}/audio/sounds/new notifica
                                         if len(all_settings.notification_sound_path.strip()) == 1
                                         else all_settings.notification_sound_path)
 
+notification_sound.set_volume(all_settings.notification_volume)
+
+
 projects_configurations: dict[str, dict[str, Any]] | None
 if Path(f'{config_dir}/projects.json').exists():
     with open(f'{config_dir}/projects.json') as f:

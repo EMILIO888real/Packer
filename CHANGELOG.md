@@ -5,6 +5,7 @@
 ### Changed
 
 ### Fixed
+- Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 
 
 ---
 
