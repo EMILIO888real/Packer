@@ -1,26 +1,26 @@
-## [%new_version] - %date
+## [0.17.0] - 2026-07-04
 
 ### Added
-- A new `use_pyinstaller` parameter to control whether PyInstaller-related files and build processes are generated. 
+- [5566536] A new `use_pyinstaller` parameter to control whether PyInstaller-related files and build processes are generated. 
 - desktop notifications for the a new release and packer errors, icon included. 
-- A new `desktop_notifications` setting to enable/disable desktop notifications for important events like release creation or errors. 
-- Documentation for the new setting in both the python docstring and `SETTINGS.md`. 
-- An .ico icon file for windows build. 
-- Command-line argument completion on unix style systems with `argcomplete`, which easily works along `argparse`. 
-- A confirmation prompt before deleting all Packer related data when no specific action flags are provided. 
-- More autocomplete options to the CLI, especially suggesting values for some flags, like choosing a project from Packer know projects. 
-- Notification sounds to notifications via `pygame` in the future, there are also plans to use it to create a `GUI`. 
-- New configuration option `notification_volume` to control the volume level of desktop notification sounds. 
+- [ae6649b] A new `desktop_notifications` setting to enable/disable desktop notifications for important events like release creation or errors. 
+- [ae6649b] Documentation for the new setting in both the python docstring and `SETTINGS.md`. 
+- [0ec1c4e] An .ico icon file for windows build. 
+- [4818a68] Command-line argument completion on unix style systems with `argcomplete`, which easily works along `argparse`. 
+- [bf602e6] A confirmation prompt before deleting all Packer related data when no specific action flags are provided. 
+- [c879d0e] More autocomplete options to the CLI, especially suggesting values for some flags, like choosing a project from Packer know projects. 
+- [9cb3ccf] Notification sounds to notifications via `pygame` in the future, there are also plans to use it to create a `GUI`. 
+- [cb13c1a] New configuration option `notification_volume` to control the volume level of desktop notification sounds [4e224e6]
 
 ### Changed
 - all `print_and_log` function calls to use correct log levels for problems it's higher, otherwise the default 20/[INFO] is used. 
-- `main.spec` to use the .ico file for building the program on Windows. 
-- Moved `user_documents_dir()` to `paths.py`, so both `cli.py` and `setup.py` can both import it instead of them calling the function twice. 
-- Documentation for settings both user and project to use `or`, instead of `|` to show the different types of data acceptable for that setting. 
+- [0ec1c4e] `main.spec` to use the .ico file for building the program on Windows. 
+- [c879d0e] Moved `user_documents_dir()` to `paths.py`, so both `cli.py` and `setup.py` can both import it instead of them calling the function twice. 
+- [9cb3ccf] Documentation for settings both user and project to use `or`, instead of `|` to show the different types of data acceptable for that setting [5999764]
 
 ### Fixed
-- Overly aggressive message filtering removing unnecessary prefixes to modification message in change.py. 
-- Added pygame dependency to the project's dependencies list. 
+- [bdc3dcb] Overly aggressive message filtering removing unnecessary prefixes to modification message in change.py. 
+- [b66fdc2] Added pygame dependency to the project's dependencies list.
 
 ---
 
