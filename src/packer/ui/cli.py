@@ -10,12 +10,11 @@ from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
 from getpass import getuser
 
-from packer.assets.exceptions import global_exception_handler
 from packer.custom_modules.et import resolve_version, normalize_settings_keys
 from packer.custom_modules.etf import simple_prompt, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir
-from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project
+from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, exception_handler
 from packer.core import Packer
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
@@ -159,7 +158,7 @@ def main():
             )
             def packer_exception_handler(exc_type, exc_value, exc_traceback):
                 packer.revert_changes()
-                global_exception_handler(exc_type, exc_value, exc_traceback)
+                exception_handler.handle_exception(exc_type, exc_value, exc_traceback)
 
             sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
 

@@ -24,14 +24,12 @@ from packer.custom_modules.et import tree, delete_upload, init_logger
 from packer.custom_modules.etf import bool_answer, simple_prompt, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
 from packer.config import all_settings, Project, packer_version
 from packer.paths import log_path, data_dir, cache_dir
-from packer.assets.exceptions import global_exception_handler
 from packer.utils import send_notification
 
 
 def thread_excepthook(args):
     sys.excepthook(args.exc_type, args.exc_value, args.exc_traceback)
 
-sys.excepthook = global_exception_handler # replace the default error handler with our own.
 threading.excepthook = thread_excepthook # Also, so other threads access the same handler
 
 def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:

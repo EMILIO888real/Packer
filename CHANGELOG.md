@@ -1,8 +1,12 @@
 ## [%new_version] - %date
 
 ### Added
+- `Global_exception_handler` to `__all__` in `src/packer/__init__.py` to expose the exception handler module. 
+- `global_exception_handler` function to a `Global_exception_handler` class to be able to set it up with the necessary data and run it with it's predefined actions. 
 
 ### Changed
+- All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 
+- `setup.py` to not create `exceptions.py`, but instead if the user wants to use the same style as `Packer`, they can just import it from `Packer`. 
 
 ### Fixed
 - Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 

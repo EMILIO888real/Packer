@@ -9,13 +9,13 @@ from json import load
 from packer.custom_modules.et import resolve_version
 from packer.ui.tui import main as tui
 from packer.ui.cli import main as cli
-from packer.assets.exceptions import global_exception_handler
 from packer.core import Packer
 from packer.custom_modules.etf import stripped_input
 from packer.utils import send_notification
-from packer.config import all_settings
+from packer.config import all_settings, exception_handler
 
 def main():
+
     cli()
     project_directory, project_configuration = tui()
 
@@ -39,7 +39,7 @@ def main():
             packer.revert_changes(False)
             if all_settings.desktop_notifications:
                 send_notification('Packer encountered an error and reverted all changes.', 'error')
-            global_exception_handler(exc_type, exc_value, exc_traceback)
+            exception_handler.handle_exception(exc_type, exc_value, exc_traceback)
 
         sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
         

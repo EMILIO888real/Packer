@@ -31,6 +31,8 @@ __all__ = 'user_settings, default_settings, default_config, all_settings, load, 
 
 from os import environ
 
+from packer.exceptions import Global_exception_handler
+
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # Turns off pygame hello message
 
 from collections.abc import Callable
@@ -43,7 +45,7 @@ import json
 import pygame
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys
-from packer.paths import assets_dir, config_dir
+from packer.paths import assets_dir, config_dir, log_path, error_report_path
 
 
 with open(f'{assets_dir}/version.json') as f:
@@ -194,9 +196,12 @@ pygame.mixer.init()
 notification_sound = pygame.mixer.Sound(f'{assets_dir}/audio/sounds/new notification {all_settings.notification_sound_path}.wav'
                                         if len(all_settings.notification_sound_path.strip()) == 1
                                         else all_settings.notification_sound_path)
-
 notification_sound.set_volume(all_settings.notification_volume)
 
+
+exception_handler = Global_exception_handler(packer_version, log_path, error_report_path,
+                                             'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
+exception_handler.update()
 
 projects_configurations: dict[str, dict[str, Any]] | None
 if Path(f'{config_dir}/projects.json').exists():

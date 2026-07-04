@@ -70,7 +70,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     │       ├── config.py
     │       ├── paths.py
     │       ├── assets/
-    │       │   ├── exceptions.py
     │       │   ├── integrity.json
     │       │   └── version.json
     │       └── ui/
@@ -114,6 +113,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :type license_type: str, optional   
     :param github_auth: Whether to use GitHub authentication for pushing to the remote repository, defaults to False.
     :type github_auth: bool, optional
+    :param use_pyinstaller: Whether to add PyInstaller related files and build process, defaults to True.
+    :type use_pyinstaller: bool, optional
     :return: The URL of the created GitHub repository, if there is one
     :rtype: str | None
     '''
@@ -161,69 +162,6 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
                 print('Hello, world!')
         '''))
 
-    print_and_log('Creating exceptions.py...')
-    with open(f'{root_dir}/assets/exceptions.py', 'w') as f:
-        f.write(dedent(f'''\
-            from datetime import datetime
-            from pathlib import Path
-            import sys
-            from tempfile import TemporaryDirectory
-            from traceback import format_exception
-            from json import dump
-            from shutil import make_archive, copy
-            from {program_name}.config import {program_name}_version
-            from {program_name}.paths import log_path, error_report_path, log_dir
-
-
-            def global_exception_handler(exc_type, exc_value, exc_traceback):
-
-                global log_path
-
-                """
-                Global exception handler for uncaught exceptions.
-
-                :param exc_type: The type of the exception being handled
-                :param exc_value: The exception value (the actual exception object)
-                :param exc_traceback: The traceback object containing the stack trace
-                """
-
-                if issubclass(exc_type, KeyboardInterrupt) or issubclass(exc_type, SystemExit): # Ignore any errors when quitting the program.
-                    return
-                
-                print(f'An error has occurred: Type: {{exc_type}} | Value: {{exc_value}}\\nPlease report this to a developer via Discord or Github!')
-
-                print('Generating an error report...')
-
-                if Path(log_path).exists():
-                    with open(log_path) as f:
-                        content = f.read()
-                    timestamp_index = content.rfind('______Start of the log ') + 23
-                
-                
-
-                error_report = {{'{program_name} version': {program_name}version,
-                                'platform': sys.platform,
-                                'python version': sys.version,
-                                'human notes': input('Could you explain a bit more about the error? What, How or When did the error happen?\\nInput: '),
-                                'traceback': ''.join(format_exception(exc_type, exc_value, exc_traceback)),
-                                'log timestamp': content[timestamp_index: timestamp_index + 26] if 'timestamp_index' in locals() else None}}
-                
-                with open(error_report_path, 'a' if Path(error_report_path).exists() else 'w') as f:
-                    dump(error_report, f)
-                    f.write('\\n') # For the next errors, so it's possible to compound them.
-
-                print('Creating issue archive...')
-                with TemporaryDirectory() as tmp_dir:
-                    copy(error_report_path, f'{{tmp_dir}}/{{error_report_path.name}}')
-                    if 'timestamp_index' in locals():
-                        copy(log_path, f'{{tmp_dir}}/{{log_path.name}}')
-                    make_archive(f'{{log_dir}}/issue {{datetime.date(datetime.now())}}', 'zip', tmp_dir)
-
-                print(f'error report generated at: "{{error_report_path.absolute()}}"')
-                print(f'Created an issue archive with the error report and log associated with it: "{{log_dir}}/issue {{datetime.date(datetime.now())}}.zip".\\nPlease submit this to a developer!')
-                sys.exit(1)
-        '''))
-    
     print_and_log('Creating config.py')
     with open(f'{root_dir}/config.py', 'w') as f:
         f.write(dedent(f'''
@@ -311,13 +249,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     print_and_log('Creating main.py file...')
     with open(f'{root_dir}/main.py', 'w') as f:
         f.write(dedent(f'''\
-            from {program_name}.paths import assets_dir
             from {program_name}.core import {program_name}
-            from {program_name}.assets.exceptions import global_exception_handler
-
-            import sys
-
-            sys.excepthook = global_exception_handler # Update python's default exception handler with our own
 
             def main():
                 {program_name}()
@@ -325,7 +257,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
             if __name__ == '__main__':
                 main()
-        '''))
+            '''))
 
     print_and_log('Creating version.json file...')
     with open(f'{root_dir}/assets/version.json', 'w') as f:
