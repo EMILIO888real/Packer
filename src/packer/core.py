@@ -485,7 +485,7 @@ class Packer():
             self.repo = Github(auth=Auth.Token(self.GITHUB_REPO_TOKEN)).get_repo(self.github_repo_url)
 
             # Keeps polling the repo, until we good.
-            self.print_and_log('Waiting for Github to process the release...')
+            self.print_and_log('Waiting for Github to process the push...')
             while True:
                 try:
                     self.repo.get_commit(sha)
