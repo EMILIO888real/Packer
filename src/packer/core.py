@@ -357,7 +357,7 @@ class Packer():
         project_size = get_folder_size() / (1024 * 1024)
         if metadata.get('project size'):
             self.print_and_log(f'Project size change: {metadata - project_size:.2f} MiB')
-        self.print_and_log(f'{project_size:.2f} MiB')
+        self.print_and_log(f'Full project size: {project_size:.2f} MiB')
 
         self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
