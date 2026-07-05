@@ -7,6 +7,7 @@ A Python automation tool that streamlines Python release workflows: creating opt
 - [Installation](#installation)
 - [Binary Downloads](#binary-downloads)
 - [Usage](#usage)
+- [Demos](#demos)
 - [Configuration](#configuration)
 	- [Settings](#settings)
 	- [Config](#config)
@@ -65,6 +66,12 @@ If the package is installed in your environment, you can also run:
 ```bash
 packer
 ```
+
+## Demos
+
+- `TUI release Demo` - [Watch on youtube](https://youtu.be/dSdyEvqs394)
+- `CLI setup demo` - [Watch on youtube](https://youtu.be/ZC9x80sogzA)
+- `CLI change demo` - [Watch on youtube](https://youtu.be/TEoaclmCq2w)
 
 ## Configuration
 
