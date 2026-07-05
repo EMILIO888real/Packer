@@ -623,6 +623,24 @@ def resolve_version(current_version: dict[str, int], version_input: str) -> dict
         
     return version
 
+def get_folder_size(folder_path: Path = Path()):
+    '''Calculate the total size of a folder and its subfolders in bytes.
+
+    This function recursively calculates the total size of all files within
+    a given folder and its subfolders. It is useful for determining the
+    storage usage of directories in a file system. The function handles
+    symbolic links.
+
+    :param folder_path: The path to the folder for which to calculate the size.
+    :type folder_path: Path
+    :return: The total size of the folder in bytes. Returns 0 if the folder
+             does not exist, is not a directory, or if there are permission
+             errors during traversal.
+    :rtype: int
+    '''
+
+    return sum(f.stat().st_size for f in folder_path.rglob('*') if f.is_file())
+
 if __name__ == '__main__':
     print('This module is not meant to be run directly')
     print('Import it in your program and use the functions from there')

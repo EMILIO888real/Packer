@@ -4,6 +4,7 @@
 - `Global_exception_handler` to `__all__` in `src/packer/__init__.py` to expose the exception handler module. 
 - `global_exception_handler` function to a `Global_exception_handler` class to be able to set it up with the necessary data and run it with it's predefined actions. 
 - Warning filter to ignore AVX2 capability warnings from pygame. 
+- Functionality to calculate and display project size in MiB, including tracking size changes in metadata. 
 
 ### Changed
 - All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 

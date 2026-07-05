@@ -4,7 +4,7 @@ from multiprocessing import Queue
 from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive
 from os import chdir, remove
-from json import dump
+from json import dump, load
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
 from typing import Any, NoReturn, Optional
@@ -20,10 +20,10 @@ import sys
 from pyperclip import copy
 from webbrowser import open_new_tab
 
-from packer.custom_modules.et import tree, delete_upload, init_logger
+from packer.custom_modules.et import get_folder_size, tree, delete_upload, init_logger
 from packer.custom_modules.etf import bool_answer, simple_prompt, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
 from packer.config import all_settings, Project, packer_version
-from packer.paths import log_path, data_dir, cache_dir
+from packer.paths import log_path, data_dir, cache_dir, metadata_file_path
 from packer.utils import send_notification
 
 
@@ -350,7 +350,14 @@ class Packer():
                     self.print_and_log(f'MODIFIED: {diff.a_path}')
         else:
             self.print_and_log('No git tags found. Skipping file changes to latest version...')
-
+        
+        with open(metadata_file_path) as f:
+            metadata: dict = load(f)
+        
+        project_size = get_folder_size() / (1024 * 1024)
+        if metadata.get('project size'):
+            self.print_and_log(f'Project size change: {metadata - project_size:.2f} MiB')
+        self.print_and_log(f'{project_size:.2f} MiB')
 
         self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
@@ -598,6 +605,12 @@ class Packer():
 
             if self.prompt_user('Do you want to revert', 'n'):
                 self.revert_changes()
+            
+            self.print_and_log('Updating metadata.json...')
+            metadata['project size'] = project_size
+            with open(metadata_file_path) as f:
+                dump(metadata)
+
             
         else:
             self.print_and_log('Canceled going further!')
