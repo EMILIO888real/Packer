@@ -45,7 +45,6 @@ def main() -> tuple[str, Project]:
         print(f'Starting with creating a new project, up to {len(signature(tui).parameters)} options.')
         user_setup_data = tui()
         project_directory = user_setup_data[0]
-        program_name = user_setup_data[2]
 
         gofile_user_token = _getpass('1. Gofile user token: ') or None
 
@@ -68,8 +67,7 @@ def main() -> tuple[str, Project]:
                 'github repo token': _getpass('5. Github repo token: '),
                 'gofile user token': gofile_user_token,
                 'gofile folder id': gofile_folder_id,
-                'github repo url': github_repo_url,
-                'program name': program_name
+                'github repo url': github_repo_url
                 }
             }
 

@@ -3,6 +3,7 @@
 This module contains the code for the packer, which is a script that creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.
 '''
 
+from pathlib import Path
 import sys
 from json import load
 
@@ -19,7 +20,7 @@ def main():
     cli()
     project_directory, project_configuration = tui()
 
-    with open(f'{project_directory}/src/{project_configuration.program_name}/assets/version.json') as f:
+    with open(f'{project_directory}/src/{Path(project_directory).name}/assets/version.json') as f:
         version = load(f)
     try:
         new_version = resolve_version(version, stripped_input('New version(M, m, P): '))
@@ -29,7 +30,7 @@ def main():
     try:
         packer = Packer(new_version, version, project_directory,
                         project_configuration.github_repo_token,
-                        project_configuration.program_name, project_configuration.github_repo_url,
+                        project_configuration.github_repo_url,
                         project_configuration.gofile_user_token, project_configuration.gofile_folder_id,
                         None, None,
                         project_configuration.compile_command, project_configuration.before_commands, project_configuration.after_commands, 

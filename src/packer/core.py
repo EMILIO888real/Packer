@@ -76,8 +76,6 @@ class Packer():
     :type FOLDER_ID: str, optional
     :param GITHUB_REPO_TOKEN: The token for the Github repo, used to publish the release.
     :type GITHUB_REPO_TOKEN: str
-    :param program_name: The name of the program, used for naming the archive and the release.
-    :type program_name: str
     :param github_repo_url: The url of the Github repo, used to publish the release and for the social media post. It should be in the format "username/repo".
     :type github_repo_url: str
     :param input_queue: A queue for input operations, used for inter-thread communication.
@@ -103,7 +101,7 @@ class Packer():
     '''
 
     def __init__(self, version: dict, old_version: dict, project_path: str | Path,
-                 GITHUB_REPO_TOKEN: str, program_name: str, github_repo_url: str, 
+                 GITHUB_REPO_TOKEN: str, github_repo_url: str, 
                  GOFILE_USER_TOKEN: str | None = None, FOLDER_ID: str | None = None,
                  input_queue: Queue = None, output_queue: Queue = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
@@ -120,7 +118,7 @@ class Packer():
         self.FOLDER_ID = FOLDER_ID
         self.GITHUB_REPO_TOKEN = GITHUB_REPO_TOKEN
         self.model = model
-        self.program_name = program_name
+        self.program_name = Path(project_path).name
         self.github_repo_url = github_repo_url
         self.compile_command = compile_command
         self.before_commands = before_commands
@@ -137,7 +135,7 @@ class Packer():
         self.git_repo = Repo()
         with open(release_notes_template_path) as f:
             self.release_text = f.read()
-        self.assets_dir = f'./src/{program_name}/assets'
+        self.assets_dir = f'./src/{self.program_name}/assets'
         self.ENTRY_RE = compile(
                 r"^- (Added|Changed|Fixed):\s*(.+)$",
                 MULTILINE
@@ -161,7 +159,7 @@ class Packer():
         
         if not all_settings.skip_git_status:
             if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
-                self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...', 40)
+                self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...', [255, 0, 0], 40)
                 sys.exit()
 
     def run(self):

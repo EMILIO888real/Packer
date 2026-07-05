@@ -138,7 +138,7 @@ def main():
 
             project_config = Project(**normalize_settings_keys(projects_configurations[str(project_path)]))
 
-            with open(f'{project_path}/src/{project_config.program_name}/assets/version.json') as version_handle:
+            with open(f'{project_path}/src/{Path(project_path).name}/assets/version.json') as version_handle:
                 current_version = load(version_handle)
 
             try:
@@ -150,7 +150,7 @@ def main():
             packer = Packer(
                 next_version, current_version, project_path,
                 project_config.github_repo_token,
-                project_config.program_name, project_config.github_repo_url,
+                project_config.github_repo_url,
                 project_config.gofile_user_token, project_config.gofile_folder_id, 
                 None, None, project_config.compile_command,
                 project_config.before_commands, project_config.after_commands,

@@ -9,9 +9,11 @@
 - All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 
 - `setup.py` to not create `exceptions.py`, but instead if the user wants to use the same style as `Packer`, they can just import it from `Packer`. 
 - Enhanced version output (CLI --version) display by adding a decorative ASCII art header with project information (author name, URL, license) using textwrap.dedent for proper formatting. 
+- Removed `program_name` configuration field from `Project` model and related code, replacing it with dynamic extraction from `project_path`. 
 
 ### Fixed
 - Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 
+- `print_and_log` function call for the git directory not being clean to correctly pass the color and then the log level!. 
 
 ---
 

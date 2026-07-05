@@ -73,7 +73,6 @@ class Project(BaseModel):
         gofile_user_token (str): Authentication token for GoFile API.
         gofile_folder_id (str): Target folder ID on GoFile for uploads.
         github_repo_token (str): GitHub personal access token for repository operations.
-        program_name (str): Name of the program/project.
         github_repo_url (str): URL of the GitHub repository.
         before_commands (tuple | None): Commands to execute before the build process.
         after_commands (tuple | None): Commands to execute after the build process.
@@ -88,7 +87,6 @@ class Project(BaseModel):
     gofile_user_token: str | None = None
     gofile_folder_id: str | None = None 
     github_repo_token: str
-    program_name: str
     github_repo_url: str
 
     before_commands: tuple[tuple[str, ...] | Callable, ...] | None = None
