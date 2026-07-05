@@ -12,6 +12,7 @@
 - `setup.py` to not create `exceptions.py`, but instead if the user wants to use the same style as `Packer`, they can just import it from `Packer`. 
 - Enhanced version output (CLI --version) display by adding a decorative ASCII art header with project information (author name, URL, license) using textwrap.dedent for proper formatting. 
 - Removed `program_name` configuration field from `Project` model and related code, replacing it with dynamic extraction from `project_path`. 
+- The logging message from "Generating social media post text..." to "Generating release notes..." in the packer core functionality. 
 
 ### Fixed
 - Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 

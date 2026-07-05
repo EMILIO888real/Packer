@@ -466,7 +466,7 @@ class Packer():
                     else:
                         self._run('sh', '-c', cmd)
 
-            self.print_and_log('Generating social media post text...')
+            self.print_and_log('Generating release notes...')
 
             release_notes_template_data = {
                 'program_name': self.program_name,
