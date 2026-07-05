@@ -350,15 +350,20 @@ class Packer():
                     self.print_and_log(f'MODIFIED: {diff.a_path}')
         else:
             self.print_and_log('No git tags found. Skipping file changes to latest version...')
-        
+
+
         with open(metadata_file_path) as f:
             metadata: dict = load(f)
         
         project_size = get_folder_size() / (1024 * 1024)
-        if metadata.get('project size'):
-            self.print_and_log(f'Project size change: {metadata - project_size:.2f} MiB')
-        self.print_and_log(f'Full project size: {project_size:.2f} MiB')
+        current_project_metadata = metadata.get(str(Path().absolute()), {})
+        if current_project_metadata:
+            project_latest_size = current_project_metadata.get('project size')
+            if project_latest_size:
+                self.print_and_log(f'Project size change: {project_latest_size - project_size:.2f} MiB')
 
+
+        self.print_and_log(f'Full project size: {project_size:.2f} MiB')
         self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
@@ -607,7 +612,11 @@ class Packer():
                 self.revert_changes()
             
             self.print_and_log('Updating metadata.json...')
-            metadata['project size'] = project_size
+            current_project_metadata['project size'] = project_size
+
+
+            metadata[str(Path().absolute())] = current_project_metadata
+            
             with open(metadata_file_path) as f:
                 dump(metadata)
 

@@ -16,6 +16,7 @@
 - Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 
 - `print_and_log` function call for the git directory not being clean to correctly pass the color and then the log level!. 
 - Changed the project size output message from just showing the size to "Full project size: {size} MiB" for better clarity. 
+- Metadata to be sorted and use the same approach as the `projects.json` file having each projects it's own metadata via their local path as a key. 
 
 ---
 
