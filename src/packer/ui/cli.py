@@ -6,6 +6,7 @@ from pprint import pprint
 from shutil import rmtree, which
 import sys
 from subprocess import run
+from textwrap import dedent
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
 from getpass import getuser
@@ -265,7 +266,13 @@ def main():
         print(f'cache_dir: {cache_dir}')
 
     if args.version:
-        print(f'Packer version {packer_version}')
+        print(dedent(f'''
+                      ____            _                 Packer version {packer_version}
+                     |  _ \\ __ _  ___| | _____ _ __     developed by EMILIO
+                     | |_) / _` |/ __| |/ / _ \\ '__|    Project is under the MIT license
+                     |  __/ (_| | (__|   <  __/ |       https://github.com/EMILIO888real/Packer
+                     |_|   \\__,_|\\___|_|\\_\\___|_|   
+                     '''))
 
     if args.saves:
         if projects_configurations:
