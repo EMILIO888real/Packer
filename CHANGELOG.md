@@ -17,6 +17,7 @@
 - Enhanced version output (CLI --version) display by adding a decorative ASCII art header with project information (author name, URL, license) using textwrap.dedent for proper formatting. 
 - Removed `program_name` configuration field from `Project` model and related code, replacing it with dynamic extraction from `project_path`. 
 - The logging message from "Generating social media post text..." to "Generating release notes..." in the packer core functionality. 
+- The print_and_log calls for description and version title to include a color code [144, 213, 255] for better visual distinction in the terminal output. 
 
 ### Fixed
 - Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 

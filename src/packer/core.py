@@ -254,7 +254,7 @@ class Packer():
             self.description_prompt[1 if self.description_prompt[1]['role'] == 'user' else 0]['content'] = self.description_prompt[1]['content'].replace('%latest_changelog', latest_changelog)
             while generate_description:
                 description = chat(self.model, self.description_prompt)['message']['content'].strip()
-                self.print_and_log(description)
+                self.print_and_log(description, [144, 213, 255])
                 generate_description = not self.prompt_user('Is the description all good', 'n')
         else:
             description = 'Write your version description in this file. (press ctrl+a and then start writing your description. After you have written it, save it and close the editor)'
@@ -282,7 +282,7 @@ class Packer():
             while generate_title:
                 version_title = chat(self.model, self.title_prompt,
                                     options={'temperature': 0.8, 'num_predict': 10})['message']['content'].strip().replace('"', '').replace("'", "")
-                self.print_and_log(version_title)
+                self.print_and_log(version_title, [144, 213, 255])
                 generate_title = not self.prompt_user('Is the Version title all good', 'n')
         else:
             version_title = 'Write your version title in this file. (press ctrl+a and then start writing your title. After you have written it, save it and close the editor)'
