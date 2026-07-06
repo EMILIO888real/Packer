@@ -1,3 +1,13 @@
+## [%new_version] - %date
+
+### Added
+
+### Changed
+
+### Fixed
+
+---
+
 ## [0.18.0] - 2026-07-07
 
 ### Added
