@@ -2,6 +2,7 @@
 
 ### Added
 - A new step to verify that the release exists before uploading artifacts. 
+- Error handling with try-except block to catch KeyError when accessing projects dictionary, improving robustness of project selection. 
 
 ### Changed
 

@@ -31,10 +31,14 @@ def main() -> tuple[str, Project]:
         print(f'\t{new_project_index}. new project')
 
         input_project = stripped_input('Project you wish to update: ')
-        if int(input_project) == new_project_index if input_project.isdigit() else input_project == 'new project':
-            project_directory = None
-        else:
-            project_directory = projects[project_names[int(input_project)]] if input_project.isdigit() else projects[input_project]
+        try:
+            if int(input_project) == new_project_index if input_project.isdigit() else input_project == 'new project':
+                project_directory = None
+            else:
+                project_directory = projects[project_names[int(input_project)]] if input_project.isdigit() else projects[input_project]
+        except KeyError:
+            print(f'Couldn\'t find/evaluate the project: {input_project}')
+            exit(1)
     else:
         project_directory = None
 
