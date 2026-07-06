@@ -1,4 +1,4 @@
-from json import dumps, loads
+from json import dump, dumps, loads
 from pathlib import Path
 from typing import Callable
 from subprocess import run
@@ -9,6 +9,7 @@ from packer.paths import config_dir, projects_file_path
 from packer.custom_modules.et import create_gofile_folder, normalize_settings_keys
 from packer.custom_modules.etf import stripped_input, simple_prompt_retries
 from packer.config import Project, _getpass, projects_configurations, all_settings
+from packer.utils import write_encrypted_file
 
 def main() -> tuple[str, Project]:
     '''
@@ -20,7 +21,7 @@ def main() -> tuple[str, Project]:
 
     global projects_configurations
 
-    if projects_configurations is not None:
+    if projects_configurations:
         projects = {str(Path(project_directory).name): project_directory for project_directory in projects_configurations.keys()}
         project_names = list(projects.keys())
         print('Choose a project:')
@@ -97,16 +98,21 @@ def main() -> tuple[str, Project]:
             
             if simple_prompt_retries('Open projects.json', 'n'):
                 run([all_settings.text_editor, '--wait', f'{config_dir}/projects.json'])
-        
 
-        if not projects_file_path.exists():
-            projects_file_path.write_text(dumps(projects_configurations, indent=4))
+        if projects_file_path.exists():
+            final_projects_configurations = loads(projects_file_path.read_text())
+            final_projects_configurations.update(projects_configurations)
         else:
-            existing_projects_configurations = loads(projects_file_path.read_text())
-            existing_projects_configurations.update(projects_configurations)
-            projects_file_path.write_text(dumps(existing_projects_configurations, indent=4))
+            final_projects_configurations = projects_configurations
+
+        if simple_prompt_retries('Encrypt projects.json (sensitive data, like tokens)', 'n'):
+            write_encrypted_file(dumps(projects_configurations, indent=4).encode(), projects_file_path, _getpass('Create a password: ').encode())
+        else:
+            with open(projects_file_path) as f:
+                dump(final_projects_configurations, f, indent=4)
 
         print(f'Project configuration saved at: {config_dir}/projects.json! You can change them later by editing the file or deleting it to go through the setup again.')
+        return (project_directory, Project(**normalize_settings_keys(final_projects_configurations[project_directory])))
 
     
     return (project_directory, Project(**normalize_settings_keys(projects_configurations[project_directory])))

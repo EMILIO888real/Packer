@@ -742,7 +742,7 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     project_directory.rstrip('/')
 
     if not github_pat:
-        github_pat = _getpass('3. Github personal access token (with Administration permissions (contents and workflows (all read and write) are extra optional permissions if you wanna authenticate using PAT)): ').strip() or None
+        github_pat = _getpass('3. Github personal access token (with Administration permissions (contents and workflows (all read and write) are extra optional permissions if you wanna authenticate using PAT)) [None]: ').strip() or None
     
     if not github_repo_url:
         github_repo_url = not github_pat and stripped_input('4. Github repo url (username/repo): ') or None
@@ -753,20 +753,22 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
         author_name = input(f'5. Author name of the program [default to: {default_name}]: ')
         if author_name == '':
             author_name = default_name
-    
-    if not gofile_code:
-        gofile_code = stripped_input('6. GoFile code [None]: ') or None
-    
-    if not license_type:
-        license_type = stripped_input('7. License type: [MIT]: ') or None
-    
-    if not github_auth:
-        github_auth = simple_prompt_retries('8. Authenticate with GitHub using a PAT for pushing', 'n')
-    
-    if not use_pyinstaller:
-        use_pyinstaller = simple_prompt_retries('9. Add pyinstaller related files and build process')
 
-    return [project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code, license_type, github_auth, use_pyinstaller]
+    if simple_prompt_retries('Configure new project in more detail'):
+        if not gofile_code:
+            gofile_code = stripped_input('6. GoFile code [None]: ')
+        
+        if not license_type:
+            license_type = stripped_input('7. License type: [MIT]: ')
+        
+        if not github_auth:
+            github_auth = simple_prompt_retries('8. Authenticate with GitHub using a PAT for pushing', 'n')
+        
+        if not use_pyinstaller:
+            use_pyinstaller = simple_prompt_retries('9. Add pyinstaller related files and build process')
+
+    return [project_directory, author_name, program_name, github_pat, github_repo_url, overwrite,
+            gofile_code or None, license_type or 'MIT', github_auth or False, use_pyinstaller or True] # Extra config
 
 if __name__ == '__main__':
     print('You will need to configure [idk] settings.')

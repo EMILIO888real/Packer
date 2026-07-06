@@ -12,8 +12,7 @@ from packer.ui.tui import main as tui
 from packer.ui.cli import main as cli
 from packer.core import Packer
 from packer.custom_modules.etf import stripped_input
-from packer.utils import send_notification
-from packer.config import all_settings, exception_handler
+from packer.config import all_settings, exception_handler, send_notification
 
 def main():
 

@@ -1,10 +1,12 @@
+from os import urandom
 from pathlib import Path
 from subprocess import run
 from sys import platform
-from plyer import notification
 
-from packer.paths import assets_dir
-from packer.config import notification_sound
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+from base64 import urlsafe_b64encode
 
 
 def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
@@ -27,25 +29,87 @@ def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
             else '.venv/bin/python')
     run([python_exe_path, '-m', 'pip', 'install', *packages], check=True)
 
-
-def send_notification(title: str, message: str, timeout: int = 5):
-    '''
-    Send a desktop notification.
-
-    :param title: the title of the notification
-    :type title: str
-    :param message: the message of the notification
-    :type message: str
-    :param timeout: the duration (in seconds) for which the notification should be displayed
-    :type timeout: int
-    '''
-
-    notification.notify(
-        title=title,
-        message=message,
-        app_name='Packer',
-        app_icon=f'{assets_dir}/images/Packer icon.png',
-        timeout=timeout
+def generate_key_from_password(password: bytes, salt: bytes) -> bytes:
+    '''Derives a secure 32-byte key from a user password and salt.'''
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=480_000, # High iteration count makes brute-forcing computationally expensive
     )
+    # Fernet keys must be url-safe base64 encoded
+    return urlsafe_b64encode(kdf.derive(password))
 
-    notification_sound.play()
+def is_file_encrypted(file_path: str | Path) -> bool:
+    '''
+    Check if a file is encrypted by attempting to read its first few bytes.
+
+    This function tries to read the beginning of a file to determine if it is
+    likely to be encrypted. It does so by checking for a specific encryption
+    signature. The signature is identified by:
+    - Reading the first 20 bytes of the file
+    - Checking that byte at index 16 is 103 ('g')
+    - Checking that bytes at indices 17-19 are 65 ('A')
+    :param file_path: The path to the file to check for encryption
+    :type file_path: str | Path
+    :return: True if the file appears to be encrypted, False otherwise
+    :rtype: bool
+    '''
+
+    with open(file_path, "rb") as f:
+        # Read the first 20 bytes to check the salt alignment and the 'gAAA' header
+        header = f.read(20)
+        
+    if len(header) < 20:
+        return False  # Too small to be our encrypted file
+        
+    # Index 16 must be 103 (ASCII 'g')
+    # Indices 17, 18, 19 must be 65 (ASCII 'A')
+    return header[16] == 103 and header[17:20] == b'AAA'
+
+def write_encrypted_file(data: bytes, path: str | Path, password: bytes):
+    '''
+    Encrypt and write data to a file using a password.
+
+    This function encrypts the provided data using a key derived from the given
+    password and writes the encrypted data to the specified file path. The encryption
+    uses Fernet symmetric encryption, which is secure and well-suited for this purpose.
+
+    :param data: The plaintext data to encrypt and write to the file
+    :type data: bytes
+    :param path: The file path where the encrypted data will be written
+    :type path: str | Path
+    :param password: The password used to derive the encryption key
+    :type password: bytes
+    '''
+    salt = urandom(16)
+
+    # Turn the password + salt into a secure key
+    key = generate_key_from_password(password, salt)
+
+    # Encrypt the data
+    encrypted_data = Fernet(key).encrypt(data)
+
+    # Write BOTH the salt and the encrypted data to the output file.
+    # We put the 16-byte salt at the very beginning so we can grab it during decryption.
+    with open(path, 'wb') as f:
+        f.write(salt)
+        f.write(encrypted_data)
+    
+
+def read_encrypted_file(file_path: str | Path, password: bytes) -> str:
+    # Read the combined file (encryption and actual content)
+    with open(file_path, 'rb') as f:
+        combined_data = f.read()
+
+    # Extract the 16-byte salt from the front, and the rest is the ciphertext
+    extracted_salt = combined_data[:16]
+    extracted_ciphertext = combined_data[16:]
+
+    # Re-derive the exact same key using the password and the extracted salt
+    decryption_key = generate_key_from_password(password, extracted_salt)
+
+    # Decrypt back to original data
+    decrypted_data = Fernet(decryption_key).decrypt(extracted_ciphertext)
+
+    return decrypted_data.decode()

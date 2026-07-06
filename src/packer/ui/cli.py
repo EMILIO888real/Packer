@@ -15,7 +15,7 @@ from packer.custom_modules.et import resolve_version, normalize_settings_keys
 from packer.custom_modules.etf import simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir
-from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, exception_handler
+from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, exception_handler, user_settings
 from packer.core import Packer
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
@@ -220,27 +220,25 @@ def main():
             with AESZipFile(args.import_path) as zf:
                 zf.setpassword(args.import_safe.encode() if args.import_safe else None)
                 zf.extractall(tmp_dir)
-            
-            if projects_file_path.exists():
-                print('Found existing saved projects, merging with imports...')
-                with open(projects_file_path) as f:
-                    existing_projects = load(f)
-                with open(f'{tmp_dir}/projects.json') as f:
-                    imported_projects = load(f)
 
-                existing_projects.update(imported_projects)
-                with open(projects_file_path) as f:
-                    dump(existing_projects)
+            with open(f'{tmp_dir}/projects.json') as f:
+                imported_projects = load(f)
+
+            if projects_configurations:
+                print('Found existing saved projects, merging with imports...')
+
+            projects_configurations.update(imported_projects)
+
+            with open(projects_file_path) as f:
+                dump(projects_configurations)
             
             # Settings file is always created, even if just an empty dict
-            with open(settings_file_path) as f:
-                existing_settings = load(f)
             with open(f'{tmp_dir}/settings.json') as f:
                 imported_settings = load(f)
 
-            existing_settings.update(imported_settings)
+            user_settings.update(imported_settings)
             with open(settings_file_path) as f:
-                dump(existing_settings)
+                dump(user_settings)
             
             rmtree(tmp_dir)
         

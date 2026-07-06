@@ -46,12 +46,16 @@ from shutil import which
 from typing import Any, Sequence
 from pydantic import BaseModel
 from getpass import getpass
+from cryptography.fernet import InvalidToken
+from plyer import notification
+
 import json
 import pygame
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys
-from packer.paths import assets_dir, config_dir, log_path, error_report_path
+from packer.paths import assets_dir, config_dir, log_path, error_report_path, projects_file_path
 from packer.exceptions import Global_exception_handler
+from packer.utils import is_file_encrypted, read_encrypted_file
 
 
 with open(f'{assets_dir}/version.json') as f:
@@ -175,7 +179,7 @@ class Settings(BaseModel):
     desktop_notifications: bool = True
     notification_sound_path: str | Path = '1'
     notification_volume: float = 1.0
-    
+
 
 settings_path = f'{config_dir}/settings.json'
 
@@ -193,6 +197,18 @@ all_settings: Settings = Settings(**normalize_settings_keys(user_settings))
 all_settings.text_editor = which(all_settings.text_editor)
 
 
+def _getpass(prompt: str) -> str:
+    '''
+    Prompt the user for a password with echo_char option using whatever is specified in settings.
+
+    :param prompt: The prompt to display to the user.
+    :type prompt: str
+    :return: The password entered by the user.
+    :rtype: str
+    '''
+    return getpass(prompt, echo_char=all_settings.getpass_echo_char)
+
+
 # All other miscellaneous setup
 
 pygame.mixer.init()
@@ -207,24 +223,27 @@ exception_handler = Global_exception_handler(packer_version, log_path, error_rep
                                              'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
 exception_handler.update()
 
-projects_configurations: dict[str, dict[str, Any]] | None
-if Path(f'{config_dir}/projects.json').exists():
-    with open(f'{config_dir}/projects.json') as f:
-        projects_configurations = json.load(f)
+projects_configurations: dict[str, dict[str, Any]]
+if projects_file_path.exists():
+    if is_file_encrypted(projects_file_path):
+        incorrect_password = True
+        while incorrect_password:
+            try:
+                password = _getpass('Encryption password [skip] ')
+                if password:
+                    projects_configurations = json.loads(read_encrypted_file(projects_file_path, password.encode()))
+                    incorrect_password = False
+                else:
+                    incorrect_password = False
+                    projects_configurations = {}
+            except InvalidToken:
+                print('Incorrect password!')
+    else:
+        with open(projects_file_path) as f:
+            projects_configurations = json.load(f)
 else:
-    projects_configurations = None
+    projects_configurations = {}
 
-
-def _getpass(prompt: str) -> str:
-    '''
-    Prompt the user for a password with echo_char option using whatever is specified in settings.
-
-    :param prompt: The prompt to display to the user.
-    :type prompt: str
-    :return: The password entered by the user.
-    :rtype: str
-    '''
-    return getpass(prompt, echo_char=all_settings.getpass_echo_char)
 
 def find_user_project(name: str) -> Path | None:
     '''
@@ -243,3 +262,26 @@ def find_user_project(name: str) -> Path | None:
             return Path(candidate_path)
     
     return None
+
+
+def send_notification(title: str, message: str, timeout: int = 5):
+    '''
+    Send a desktop notification.
+
+    :param title: the title of the notification
+    :type title: str
+    :param message: the message of the notification
+    :type message: str
+    :param timeout: the duration (in seconds) for which the notification should be displayed
+    :type timeout: int
+    '''
+
+    notification.notify(
+        title=title,
+        message=message,
+        app_name='Packer',
+        app_icon=f'{assets_dir}/images/Packer icon.png',
+        timeout=timeout
+    )
+
+    notification_sound.play()
