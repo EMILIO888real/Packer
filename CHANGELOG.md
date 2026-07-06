@@ -6,6 +6,8 @@
 - Warning filter to ignore AVX2 capability warnings from pygame. 
 - Functionality to calculate and display project size in MiB, including tracking size changes in metadata. 
 - A new "Demos" section to the README with links to three YouTube demonstration videos showing different aspects of the tool's usage. 
+- Exclusion functionality to `get_folder_size` function to exclude all patterns in the .gitignore just like the `tree` function does when generating the integrity file. 
+- New version size, by checking the archive's size. 
 
 ### Changed
 - All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 

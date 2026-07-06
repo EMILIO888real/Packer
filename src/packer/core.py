@@ -355,15 +355,17 @@ class Packer():
         with open(metadata_file_path) as f:
             metadata: dict = load(f)
         
-        project_size = get_folder_size() / (1024 * 1024)
+        project_size = get_folder_size(Path(), exclusions) / (1024 * 1024)
         current_project_metadata = metadata.get(str(Path().absolute()), {})
         if current_project_metadata:
             project_latest_size = current_project_metadata.get('project size')
             if project_latest_size:
                 self.print_and_log(f'Project size change: {project_latest_size - project_size:.2f} MiB')
 
+        self.print_and_log(f'Full project size with exclusions: {project_size:.2f} MiB')
+        self.print_and_log(f'New version\'s size: {Path(f'{cache_dir}/{self.program_name} {self.version}.zip').stat().st_size / (1024 * 1024)} MiB')
 
-        self.print_and_log(f'Full project size: {project_size:.2f} MiB')
+
         self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
