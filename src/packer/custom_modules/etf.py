@@ -921,7 +921,7 @@ def print_bg_colored_text(text: str, red: int, green: int, blue: int, terminal_w
     print(text)
     clear_lines(lines_used(text, terminal_width), clear_formatting=True)
 
-def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str | int = 'y', shorten: set[str] = ('yes', 'no')) -> int:
+def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str | int = 'y', shorten: set[str] = ('yes', 'no')) -> int | None:
     """Prompt the user with a question and return the selected answer.
 
     Returns the user's selected answer as an integer index of the answers list.
@@ -995,7 +995,7 @@ def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str 
         except ValueError:
             return
 
-def bool_answer(answer: str | int) -> bool | None:
+def bool_answer(answer: str | int | None) -> bool | None:
     """Determine if a user's yes/no answer is affirmative.
 
     Determines if a user's answer to a yes/no question is affirmative.
@@ -1005,6 +1005,9 @@ def bool_answer(answer: str | int) -> bool | None:
     :return: True if the answer is affirmative (starts with 'y' or is 1), False otherwise.
     :rtype: bool
     """
+
+    if answer is None:
+        return
 
     if isinstance(answer, str):
         answer = answer.strip().lower()

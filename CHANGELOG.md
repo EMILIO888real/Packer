@@ -25,6 +25,7 @@
 - Metadata to be sorted and use the same approach as the `projects.json` file having each projects it's own metadata via their local path as a key. 
 - Changed log message from "Waiting for Github to process the release..." to "Waiting for Github to process the push..." to better reflect the actual operation being performed. 
 - Output of the new version's size to be rounded to just 2 digits after comma. 
+- `bool_answer` to check if the given answer is None, if so return immediately. 
 
 ---
 
