@@ -9,6 +9,7 @@
 - Exclusion functionality to `get_folder_size` function to exclude all patterns in the .gitignore just like the `tree` function does when generating the integrity file. 
 - New version size, by checking the archive's size. 
 - 'tree' function to __init__.py exports and imported it from packer.custom_modules.et. 
+- `simple_prompt_retries` to add retry logic for user input prompts, instead of immediately assuming False. 
 
 ### Changed
 - All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 

@@ -7,7 +7,7 @@ from inspect import signature
 from packer.setup import main as setup, tui
 from packer.paths import config_dir, projects_file_path
 from packer.custom_modules.et import create_gofile_folder, normalize_settings_keys
-from packer.custom_modules.etf import stripped_input, simple_prompt
+from packer.custom_modules.etf import stripped_input, simple_prompt_retries
 from packer.config import Project, _getpass, projects_configurations, all_settings
 
 def main() -> tuple[str, Project]:
@@ -72,7 +72,7 @@ def main() -> tuple[str, Project]:
             }
 
 
-        if simple_prompt(f'Would you like to edit optional settings', 'n'):
+        if simple_prompt_retries(f'Would you like to edit optional settings', 'n'):
             def prompt_optional_setting(setting: str, text: str = None, key: Callable = lambda x:x) -> None:
                 if text is None:
                     text = setting
@@ -91,7 +91,7 @@ def main() -> tuple[str, Project]:
             print(f'To customize description or title prompt, or any other settings edit the {config_dir}/projects.json file directly. And follow settings structure, check . \
                   You can check out the defaults for examples via Project class documentation.')
             
-            if simple_prompt('Open projects.json', 'n'):
+            if simple_prompt_retries('Open projects.json', 'n'):
                 run([all_settings.text_editor, '--wait', f'{config_dir}/projects.json'])
         
 

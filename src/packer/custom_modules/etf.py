@@ -995,7 +995,7 @@ def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str 
         except ValueError:
             return
 
-def bool_answer(answer: str | int) -> bool:
+def bool_answer(answer: str | int) -> bool | None:
     """Determine if a user's yes/no answer is affirmative.
 
     Determines if a user's answer to a yes/no question is affirmative.
@@ -1030,7 +1030,7 @@ def bool_answer(answer: str | int) -> bool:
             return answer == 1
 
 
-def simple_prompt(question: str, default: str | int = 'y') -> bool:
+def simple_prompt(question: str, default: str | int = 'y') -> bool | None:
     """Prompt the user with a yes/no question and return the answer as a boolean.
 
     Prompts the user with a yes/no question and returns their answer as a boolean value.
@@ -1044,6 +1044,14 @@ def simple_prompt(question: str, default: str | int = 'y') -> bool:
     """
 
     return bool_answer(prompt_user(question, default=default))
+
+def simple_prompt_retries(question: str, default: str | int = 'y', retry_count: int = -1) -> bool | None:
+    attempt = 0
+    answer = simple_prompt(question, default)
+    while answer is None and retry_count != attempt:
+        answer = simple_prompt(question, default)
+        attempt += 1
+    return answer
 
 def stripped_input(prompt: object) -> str:
     """Get user input and strip leading and trailing whitespace.

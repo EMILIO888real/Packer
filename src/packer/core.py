@@ -21,7 +21,7 @@ from pyperclip import copy
 from webbrowser import open_new_tab
 
 from packer.custom_modules.et import get_folder_size, tree, delete_upload, init_logger
-from packer.custom_modules.etf import bool_answer, simple_prompt, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
+from packer.custom_modules.etf import bool_answer, simple_prompt_retries, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
 from packer.config import all_settings, Project, packer_version
 from packer.paths import log_path, data_dir, cache_dir, metadata_file_path
 from packer.utils import send_notification
@@ -796,7 +796,9 @@ class Packer():
         :rtype: bool
         '''
 
-        answer = simple_prompt(question, default)
+        answer = simple_prompt_retries(question, default)
+        while not answer:
+            answer = simple_prompt_retries(question, default)
         self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
 

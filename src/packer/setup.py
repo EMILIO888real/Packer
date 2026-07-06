@@ -18,7 +18,7 @@ from keyword import iskeyword
 
 from packer.utils import pip_install
 from packer.custom_modules.et import init_logger, tree
-from packer.custom_modules.etf import print_colored_text, simple_prompt, stripped_input
+from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
 from packer.config import packer_version, _getpass
 from packer.custom_modules.etf import print_list
 from packer.paths import download_dir, documents_dir
@@ -736,7 +736,7 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
     if overwrite is None:
         overwrite = True
         if Path(project_directory).exists():
-            if not simple_prompt('Directory already exists, overwrite it', 'n'):
+            if not simple_prompt_retries('Directory already exists, overwrite it', 'n'):
                 overwrite = False
 
     project_directory.rstrip('/')
@@ -761,10 +761,10 @@ def tui(project_directory: str = None, author_name: str = None, program_name: st
         license_type = stripped_input('7. License type: [MIT]: ') or None
     
     if not github_auth:
-        github_auth = simple_prompt('8. Authenticate with GitHub using a PAT for pushing', 'n')
+        github_auth = simple_prompt_retries('8. Authenticate with GitHub using a PAT for pushing', 'n')
     
     if not use_pyinstaller:
-        use_pyinstaller = simple_prompt('9. Add pyinstaller related files and build process')
+        use_pyinstaller = simple_prompt_retries('9. Add pyinstaller related files and build process')
 
     return [project_directory, author_name, program_name, github_pat, github_repo_url, overwrite, gofile_code, license_type, github_auth, use_pyinstaller]
 
