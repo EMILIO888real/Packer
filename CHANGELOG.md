@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- A new step to verify that the release exists before uploading artifacts. 
 
 ### Changed
 

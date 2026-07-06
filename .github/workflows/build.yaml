@@ -30,6 +30,21 @@ jobs:
       - name: Build executable
         run: python -m PyInstaller main.spec
 
+      - name: Verify release still exists
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Get the tag name from the ref
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "Checking if release $TAG_NAME exists..."
+          
+          # Use GitHub CLI to check if the release exists
+          if ! gh release view "$TAG_NAME" > /dev/null 2>&1; then
+            echo "::error::Release $TAG_NAME not found. It may have been deleted."
+            exit 1
+          fi
+
       - name: Upload to GitHub Release
         uses: softprops/action-gh-release@v2
         with:
