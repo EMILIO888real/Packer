@@ -619,7 +619,7 @@ class Packer():
 
             metadata[str(Path().absolute())] = current_project_metadata
             
-            with open(metadata_file_path) as f:
+            with open(metadata_file_path, 'w') as f:
                 dump(metadata, f)
 
             

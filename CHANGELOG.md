@@ -29,6 +29,7 @@
 - `bool_answer` to check if the given answer is None, if so return immediately. 
 - F: Removed redundant while loop that was repeatedly prompting for user input until a non-empty answer was provided, simplifying the input handling logic to only request input once. 
 - Metadata file writing by explicitly passing the file handle to the dump function instead of crashing. 
+- Changed file opening mode from read-only to write-only when saving metadata to ensure proper file handling and prevent potential read/write conflicts. 
 
 ---
 
