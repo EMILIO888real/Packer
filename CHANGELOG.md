@@ -1,35 +1,35 @@
-## [%new_version] - %date
+## [0.18.0] - 2026-07-07
 
 ### Added
-- `Global_exception_handler` to `__all__` in `src/packer/__init__.py` to expose the exception handler module. 
-- `global_exception_handler` function to a `Global_exception_handler` class to be able to set it up with the necessary data and run it with it's predefined actions. 
-- Warning filter to ignore AVX2 capability warnings from pygame. 
-- Functionality to calculate and display project size in MiB, including tracking size changes in metadata. 
-- A new "Demos" section to the README with links to three YouTube demonstration videos showing different aspects of the tool's usage. 
-- Exclusion functionality to `get_folder_size` function to exclude all patterns in the .gitignore just like the `tree` function does when generating the integrity file. 
-- New version size, by checking the archive's size. 
-- 'tree' function to __init__.py exports and imported it from packer.custom_modules.et. 
-- `simple_prompt_retries` to add retry logic for user input prompts, instead of immediately assuming False. 
+- [bf77fa4] `Global_exception_handler` to `__all__` in `src/packer/__init__.py` to expose the exception handler module. 
+- [bf77fa4] `global_exception_handler` function to a `Global_exception_handler` class to be able to set it up with the necessary data and run it with it's predefined actions. 
+- [eec6e8b] Warning filter to ignore AVX2 capability warnings from pygame. 
+- [3d3a76b] Functionality to calculate and display project size in MiB, including tracking size changes in metadata. 
+- [6c1a113] A new "Demos" section to the README with links to three YouTube demonstration videos showing different aspects of the tool's usage. 
+- [78d20d2] Exclusion functionality to `get_folder_size` function to exclude all patterns in the .gitignore just like the `tree` function does when generating the integrity file. 
+- [78d20d2] New version size, by checking the archive's size. 
+- [d89627d] 'tree' function to __init__.py exports and imported it from packer.custom_modules.et. 
+- [8aae214] `simple_prompt_retries` to add retry logic for user input prompts, instead of immediately assuming False.
 
 ### Changed
-- All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 
-- `setup.py` to not create `exceptions.py`, but instead if the user wants to use the same style as `Packer`, they can just import it from `Packer`. 
-- Enhanced version output (CLI --version) display by adding a decorative ASCII art header with project information (author name, URL, license) using textwrap.dedent for proper formatting. 
-- Removed `program_name` configuration field from `Project` model and related code, replacing it with dynamic extraction from `project_path`. 
-- The logging message from "Generating social media post text..." to "Generating release notes..." in the packer core functionality. 
-- The print_and_log calls for description and version title to include a color code [144, 213, 255] for better visual distinction in the terminal output. 
+- [bf77fa4] All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 
+- [bf77fa4] `setup.py` to not create `exceptions.py`, but instead if the user wants to use the same style as `Packer`, they can just import it from `Packer`. 
+- [af45dea] Enhanced version output (CLI --version) display by adding a decorative ASCII art header with project information (author name, URL, license) using textwrap.dedent for proper formatting. 
+- [8ce6d97] Removed `program_name` configuration field from `Project` model and related code, replacing it with dynamic extraction from `project_path`. 
+- [b355d63] The logging message from "Generating social media post text..." to "Generating release notes..." in the packer core functionality. 
+- [b25e320] The print_and_log calls for description and version title to include a color code [144, 213, 255] for better visual distinction in the terminal output.
 
 ### Fixed
-- Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 
-- `print_and_log` function call for the git directory not being clean to correctly pass the color and then the log level!. 
-- Changed the project size output message from just showing the size to "Full project size: {size} MiB" for better clarity. 
-- Metadata to be sorted and use the same approach as the `projects.json` file having each projects it's own metadata via their local path as a key. 
-- Changed log message from "Waiting for Github to process the release..." to "Waiting for Github to process the push..." to better reflect the actual operation being performed. 
-- Output of the new version's size to be rounded to just 2 digits after comma. 
-- `bool_answer` to check if the given answer is None, if so return immediately. 
-- F: Removed redundant while loop that was repeatedly prompting for user input until a non-empty answer was provided, simplifying the input handling logic to only request input once. 
-- Metadata file writing by explicitly passing the file handle to the dump function instead of crashing. 
-- Changed file opening mode from read-only to write-only when saving metadata to ensure proper file handling and prevent potential read/write conflicts. 
+- [9daf7ab] Actually wrote the logic for setting the volume of the notification sound based on the user's settings. 
+- [8ce6d97] `print_and_log` function call for the git directory not being clean to correctly pass the color and then the log level!. 
+- [6e8c475] Changed the project size output message from just showing the size to "Full project size: {size} MiB" for better clarity. 
+- [62c7a8e] Metadata to be sorted and use the same approach as the `projects.json` file having each projects it's own metadata via their local path as a key. 
+- [d2be477] Changed log message from "Waiting for Github to process the release..." to "Waiting for Github to process the push..." to better reflect the actual operation being performed. 
+- [d89627d] Output of the new version's size to be rounded to just 2 digits after comma. 
+- [1b5d9ca] `bool_answer` to check if the given answer is None, if so return immediately. 
+- [d3a056f] F: Removed redundant while loop that was repeatedly prompting for user input until a non-empty answer was provided, simplifying the input handling logic to only request input once. 
+- [a18e7df] Metadata file writing by explicitly passing the file handle to the dump function instead of crashing. 
+- [578486b] Changed file opening mode from read-only to write-only when saving metadata to ensure proper file handling and prevent potential read/write conflicts.
 
 ---
 
