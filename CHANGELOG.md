@@ -8,6 +8,7 @@
 - A new "Demos" section to the README with links to three YouTube demonstration videos showing different aspects of the tool's usage. 
 - Exclusion functionality to `get_folder_size` function to exclude all patterns in the .gitignore just like the `tree` function does when generating the integrity file. 
 - New version size, by checking the archive's size. 
+- 'tree' function to __init__.py exports and imported it from packer.custom_modules.et. 
 
 ### Changed
 - All use cases and modules to import from config.py the handler which is imported from exceptions.py and just set up and configured in config.py. 
@@ -22,6 +23,7 @@
 - Changed the project size output message from just showing the size to "Full project size: {size} MiB" for better clarity. 
 - Metadata to be sorted and use the same approach as the `projects.json` file having each projects it's own metadata via their local path as a key. 
 - Changed log message from "Waiting for Github to process the release..." to "Waiting for Github to process the push..." to better reflect the actual operation being performed. 
+- Output of the new version's size to be rounded to just 2 digits after comma. 
 
 ---
 

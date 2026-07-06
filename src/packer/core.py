@@ -363,7 +363,7 @@ class Packer():
                 self.print_and_log(f'Project size change: {project_latest_size - project_size:.2f} MiB')
 
         self.print_and_log(f'Full project size with exclusions: {project_size:.2f} MiB')
-        self.print_and_log(f'New version\'s size: {Path(f'{cache_dir}/{self.program_name} {self.version}.zip').stat().st_size / (1024 * 1024)} MiB')
+        self.print_and_log(f'New version\'s size: {Path(f'{cache_dir}/{self.program_name} {self.version}.zip').stat().st_size / (1024 * 1024):.2f} MiB')
 
 
         self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
