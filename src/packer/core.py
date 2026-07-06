@@ -797,8 +797,6 @@ class Packer():
         '''
 
         answer = simple_prompt_retries(question, default)
-        while not answer:
-            answer = simple_prompt_retries(question, default)
         self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
 

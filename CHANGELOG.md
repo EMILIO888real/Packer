@@ -26,6 +26,7 @@
 - Changed log message from "Waiting for Github to process the release..." to "Waiting for Github to process the push..." to better reflect the actual operation being performed. 
 - Output of the new version's size to be rounded to just 2 digits after comma. 
 - `bool_answer` to check if the given answer is None, if so return immediately. 
+- F: Removed redundant while loop that was repeatedly prompting for user input until a non-empty answer was provided, simplifying the input handling logic to only request input once. 
 
 ---
 
