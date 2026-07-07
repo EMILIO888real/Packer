@@ -26,7 +26,7 @@ def _clear_path(path: str | Path) -> None:
     print(f'Cleared {path}')
 
 def get_project_names(**kwargs):
-    return [Path(project).name for project in projects_configurations.keys()]
+    return [Path(project).name for project in projects_configurations.get_w_tui().keys()]
 
 def get_new_version(**kwargs):
     return ['M', 'm', 'p']
@@ -136,7 +136,7 @@ def main():
                 print(f'No such project found: {user_chosen_project}')
                 sys.exit(1)
 
-            project_config = Project(**normalize_settings_keys(projects_configurations[str(project_path)]))
+            project_config = Project(**normalize_settings_keys(projects_configurations.get_w_tui()[str(project_path)]))
 
             with open(f'{project_path}/src/{Path(project_path).name}/assets/version.json') as version_handle:
                 current_version = load(version_handle)
@@ -224,13 +224,13 @@ def main():
             with open(f'{tmp_dir}/projects.json') as f:
                 imported_projects = load(f)
 
-            if projects_configurations:
+            if projects_configurations.get_w_tui():
                 print('Found existing saved projects, merging with imports...')
 
-            projects_configurations.update(imported_projects)
+            projects_configurations.get_w_tui().update(imported_projects)
 
             with open(projects_file_path) as f:
-                dump(projects_configurations)
+                dump(projects_configurations.get_w_tui())
             
             # Settings file is always created, even if just an empty dict
             with open(f'{tmp_dir}/settings.json') as f:
@@ -273,8 +273,8 @@ def main():
                      '''))
 
     if args.saves:
-        if projects_configurations:
-            print_list(list(projects_configurations.keys()))
+        if projects_configurations.get_w_tui():
+            print_list(list(projects_configurations.get_w_tui().keys()))
         else:
             print('No projects saved!')
     
@@ -283,7 +283,7 @@ def main():
 
     if args.projects:
         SENSITIVE_CONTENT = ('gofile user token', 'gofile folder id', 'github repo token')
-        for project, project_settings in projects_configurations.items():
+        for project, project_settings in projects_configurations.get_w_tui().items():
             print(f'Project: {Path(project).name}')
             for setting_key, settings_value in project_settings.items():
                 print(f'\t{setting_key}: {f'{(len(settings_value) - 4) * '*'}{settings_value[-4:]}' if setting_key in SENSITIVE_CONTENT else settings_value}')

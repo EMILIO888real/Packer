@@ -4,12 +4,15 @@
 - A new step to verify that the release exists before uploading artifacts. 
 - Error handling with try-except block to catch KeyError when accessing projects dictionary, improving robustness of project selection. 
 - Cryptography dependency and implemented encryption/decryption functionality for projects.json file to secure sensitive data like tokens. 
+- Refactored project configurations handling into a `_Projects_configurations_manager` class to improve architecture, including logic to get the config, setting it and an easy function `get_w_tui`. 
 
 ### Changed
 - Notification-related logic so it now lives in the shared configuration layer instead of the older utility path. 
 - The import/merge behavior so imported project and settings data are applied more directly to the active configuration. 
 - The setup flow to offer more flexible prompts and safer default handling for optional details. 
 - Project configuration loading so encrypted project files are handled differently from plain JSON files. 
+- All usages of `projects_configurations` to use the new manager's methods (`get()` and `get_w_tui()`) instead of direct dictionary access, ensuring proper handling of encrypted files and password validation. 
+- The TUI logic to use the new configuration manager for project selection and configuration updates, ensuring consistent access patterns across the application. 
 
 ### Fixed
 - Project data persistence so existing saved projects are merged and written more reliably. 

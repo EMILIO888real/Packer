@@ -19,10 +19,8 @@ def main() -> tuple[str, Project]:
     :rtype: tuple
     '''
 
-    global projects_configurations
-
-    if projects_configurations:
-        projects = {str(Path(project_directory).name): project_directory for project_directory in projects_configurations.keys()}
+    if projects_configurations.get_w_tui():
+        projects = {str(Path(project_directory).name): project_directory for project_directory in projects_configurations.get_w_tui().keys()}
         project_names = list(projects.keys())
         print('Choose a project:')
         for i in range(len(project_names)):
@@ -67,7 +65,7 @@ def main() -> tuple[str, Project]:
 
 
         print('Now go over to Github and create a PAT and enter it below.')
-        projects_configurations = {
+        new_projects_configurations = {
             project_directory: {
                 'github repo token': _getpass('5. Github repo token: '),
                 'gofile user token': gofile_user_token,
@@ -83,7 +81,7 @@ def main() -> tuple[str, Project]:
                     text = setting
                 setting = stripped_input(f'{text} [{Project.model_fields[setting.replace(' ', '_')].default}]: ')
                 if setting:
-                    projects_configurations[project_directory][setting] = key(setting)
+                    new_projects_configurations[project_directory][setting] = key(setting)
 
             def split_str(x: str) -> list[str]:
                 return x.split(' ')
@@ -101,12 +99,12 @@ def main() -> tuple[str, Project]:
 
         if projects_file_path.exists():
             final_projects_configurations = loads(projects_file_path.read_text())
-            final_projects_configurations.update(projects_configurations)
+            final_projects_configurations.update(new_projects_configurations)
         else:
-            final_projects_configurations = projects_configurations
+            final_projects_configurations = new_projects_configurations
 
         if simple_prompt_retries('Encrypt projects.json (sensitive data, like tokens)', 'n'):
-            write_encrypted_file(dumps(projects_configurations, indent=4).encode(), projects_file_path, _getpass('Create a password: ').encode())
+            write_encrypted_file(dumps(new_projects_configurations, indent=4).encode(), projects_file_path, _getpass('Create a password: ').encode())
         else:
             with open(projects_file_path) as f:
                 dump(final_projects_configurations, f, indent=4)
@@ -115,4 +113,4 @@ def main() -> tuple[str, Project]:
         return (project_directory, Project(**normalize_settings_keys(final_projects_configurations[project_directory])))
 
     
-    return (project_directory, Project(**normalize_settings_keys(projects_configurations[project_directory])))
+    return (project_directory, Project(**normalize_settings_keys(projects_configurations.get_w_tui()[project_directory])))

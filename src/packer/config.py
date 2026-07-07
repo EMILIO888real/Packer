@@ -223,27 +223,37 @@ exception_handler = Global_exception_handler(packer_version, log_path, error_rep
                                              'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
 exception_handler.update()
 
-projects_configurations: dict[str, dict[str, Any]]
-if projects_file_path.exists():
-    if is_file_encrypted(projects_file_path):
-        incorrect_password = True
-        while incorrect_password:
-            try:
-                password = _getpass('Encryption password [skip] ')
-                if password:
-                    projects_configurations = json.loads(read_encrypted_file(projects_file_path, password.encode()))
-                    incorrect_password = False
-                else:
-                    incorrect_password = False
-                    projects_configurations = {}
-            except InvalidToken:
-                print('Incorrect password!')
-    else:
-        with open(projects_file_path) as f:
-            projects_configurations = json.load(f)
-else:
-    projects_configurations = {}
+class _Projects_configurations_manager():
+    def __init__(self):
+        if projects_file_path.exists():
+            if is_file_encrypted(projects_file_path):
+                self.content = 'encrypted'
+            else:
+                with open(projects_file_path) as f:
+                    self.content = json.load(f)
+        else:
+            self.content = {}
 
+    def get(self) -> dict[str, dict[str, Any]] | str:
+        return self.content
+    
+    def get_w_tui(self) -> dict[str, dict[str, Any]]:
+        if self.content == 'encrypted':
+            incorrect_password = True
+            while incorrect_password:
+                try:
+                    self.decrypt(_getpass('Encryption password: '))
+                    incorrect_password = False
+                except InvalidToken:
+                    print('Incorrect password!')
+            return self.content
+        else:
+            return self.content
+
+    def decrypt(self, password: str) -> None:
+         self.content = json.loads(read_encrypted_file(projects_file_path, password.encode()))
+
+projects_configurations = _Projects_configurations_manager()
 
 def find_user_project(name: str) -> Path | None:
     '''
@@ -257,7 +267,7 @@ def find_user_project(name: str) -> Path | None:
     '''
 
     name.lower()
-    for candidate_path in projects_configurations.keys():
+    for candidate_path in projects_configurations.get().keys():
         if Path(candidate_path).name.lower() == name:
             return Path(candidate_path)
     
