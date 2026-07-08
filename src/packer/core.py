@@ -257,7 +257,11 @@ class Packer():
             while generate_description:
                 description = []
                 stream = chat(self.model, self.description_prompt, stream=True)
-                self.stream_output_chunk(next(stream).message.content.lstrip(), 'version description output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
+
+                first_chunk = next(stream).message.content.lstrip()
+                description.append(first_chunk)
+                self.stream_output_chunk(first_chunk, 'version description output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
+
                 for chunk in stream:
                     chunk = chunk.message.content
                     self.stream_output_chunk(chunk, 'version description output', GENERATING_COLOR)
@@ -292,7 +296,10 @@ class Packer():
             while generate_title:
                 version_title = []
                 stream = chat(self.model, self.title_prompt, options={'temperature': 0.8, 'num_predict': 10}, stream=True)
-                self.stream_output_chunk(next(stream).message.content.lstrip(), 'version title output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
+
+                first_chunk = first_chunk = next(stream).message.content.lstrip()
+                version_title.append(first_chunk)
+                self.stream_output_chunk(first_chunk, 'version title output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
                 for chunk in stream:
                     chunk = chunk.message.content
                     self.stream_output_chunk(chunk, 'version title output', GENERATING_COLOR)

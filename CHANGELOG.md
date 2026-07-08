@@ -26,6 +26,7 @@
 - Increased smooth_output_speed from 0.01 to 0.005 in settings configuration. 
 - Added flush=True parameter to print and print_colored_text calls in _stream_print method to ensure immediate output flushing. 
 - Version title generation by added the stream parameter to it as well, instead of just for the version description, *I forgot*. 
+- Added logic to collect and store the first chunk of stream output for both version description and version title generation. 
 
 ---
 
