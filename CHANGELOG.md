@@ -1,32 +1,32 @@
-## [%new_version] - %date
+## [0.19.0] - 2026-07-08
 
 ### Added
-- A new step to verify that the release exists before uploading artifacts. 
-- Error handling with try-except block to catch KeyError when accessing projects dictionary, improving robustness of project selection. 
-- Cryptography dependency and implemented encryption/decryption functionality for projects.json file to secure sensitive data like tokens. 
-- Refactored project configurations handling into a `_Projects_configurations_manager` class to improve architecture, including logic to get the config, setting it and an easy function `get_w_tui`. 
-- Smooth output settings (smooth_output, smooth_output_speed) to control delayed text printing. 
-- Streaming output functionality for description and title generation, allowing real-time display of AI responses. 
+- [6211d70] A new step to verify that the release exists before uploading artifacts. 
+- [27fc292] Error handling with try-except block to catch KeyError when accessing projects dictionary, improving robustness of project selection. 
+- [091fcef] Cryptography dependency and implemented encryption/decryption functionality for projects.json file to secure sensitive data like tokens. 
+- [8742357] Refactored project configurations handling into a `_Projects_configurations_manager` class to improve architecture, including logic to get the config, setting it and an easy function `get_w_tui`. 
+- [b83adfa] Smooth output settings (smooth_output, smooth_output_speed) to control delayed text printing. 
+- [0c605b2] Streaming output functionality for description and title generation, allowing real-time display of AI responses.
 
 ### Changed
-- Notification-related logic so it now lives in the shared configuration layer instead of the older utility path. 
-- The import/merge behavior so imported project and settings data are applied more directly to the active configuration. 
-- The setup flow to offer more flexible prompts and safer default handling for optional details. 
-- Project configuration loading so encrypted project files are handled differently from plain JSON files. 
-- All usages of `projects_configurations` to use the new manager's methods (`get()` and `get_w_tui()`) instead of direct dictionary access, ensuring proper handling of encrypted files and password validation. 
-- The TUI logic to use the new configuration manager for project selection and configuration updates, ensuring consistent access patterns across the application. 
-- `cinematic_dialogue` function to `print_with_delay` and simplified it significantly. 
-- Stream_output calls to extract and pass chunk.message.content directly instead of the entire chunk object for both version description and version title generation flows. 
-- Renamed `self.stream_output` to `self.stream_output_chunk` and for the 2 other helper functions the same and updated all references to use the new naming convention. 
-- Added initial chunk handling to remove leading whitespace. 
+- [091fcef] Notification-related logic so it now lives in the shared configuration layer instead of the older utility path. 
+- [091fcef] The import/merge behavior so imported project and settings data are applied more directly to the active configuration. 
+- [091fcef] The setup flow to offer more flexible prompts and safer default handling for optional details. 
+- [091fcef] Project configuration loading so encrypted project files are handled differently from plain JSON files. 
+- [8742357] All usages of `projects_configurations` to use the new manager's methods (`get()` and `get_w_tui()`) instead of direct dictionary access, ensuring proper handling of encrypted files and password validation. 
+- [8742357] The TUI logic to use the new configuration manager for project selection and configuration updates, ensuring consistent access patterns across the application. 
+- [b83adfa] `cinematic_dialogue` function to `print_with_delay` and simplified it significantly. 
+- [c7b0700] Stream_output calls to extract and pass chunk.message.content directly instead of the entire chunk object for both version description and version title generation flows. 
+- [78a3cd9] Renamed `self.stream_output` to `self.stream_output_chunk` and for the 2 other helper functions the same and updated all references to use the new naming convention. 
+- [78a3cd9] Added initial chunk handling to remove leading whitespace.
 
 ### Fixed
-- Project data persistence so existing saved projects are merged and written more reliably. 
-- Setup handling for empty or missing values so the flow behaves more gracefully. 
-- Increased smooth_output_speed from 0.01 to 0.005 in settings configuration. 
-- Added flush=True parameter to print and print_colored_text calls in _stream_print method to ensure immediate output flushing. 
-- Version title generation by added the stream parameter to it as well, instead of just for the version description, *I forgot*. 
-- Added logic to collect and store the first chunk of stream output for both version description and version title generation. 
+- [091fcef] Project data persistence so existing saved projects are merged and written more reliably. 
+- [091fcef] Setup handling for empty or missing values so the flow behaves more gracefully. 
+- [c7b0700] Increased smooth_output_speed from 0.01 to 0.005 in settings configuration. 
+- [504f4d7] Added flush=True parameter to print and print_colored_text calls in _stream_print method to ensure immediate output flushing. 
+- [78a3cd9] Version title generation by added the stream parameter to it as well, instead of just for the version description, *I forgot*. 
+- [d470e12] Added logic to collect and store the first chunk of stream output for both version description and version title generation.
 
 ---
 
