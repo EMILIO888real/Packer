@@ -151,6 +151,7 @@ class Packer():
             all_settings.verbose = False
         self.print_and_log = self._print_and_log if all_settings.verbose else self._log_and_output_queue
         self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
+        self.stream_output = self._stream_queue if input_queue else self._stream_print
 
         # Relies on some setup actions
         if Path().cwd() != Path(project_path):
@@ -250,11 +251,18 @@ class Packer():
             with open(self.chosen_description_path) as f:
                 description = f.read()
 
+        GENERATING_COLOR = [144, 213, 255]
         if self.description_prompt is not None:
             self.description_prompt[1 if self.description_prompt[1]['role'] == 'user' else 0]['content'] = self.description_prompt[1]['content'].replace('%latest_changelog', latest_changelog)
             while generate_description:
-                description = chat(self.model, self.description_prompt)['message']['content'].strip()
-                self.print_and_log(description, [144, 213, 255])
+                description = []
+                stream = chat(self.model, self.description_prompt, stream=True)
+                for chunk in stream:
+                    self.stream_output(chunk.message.content, 'version description output', GENERATING_COLOR)
+                    description.append(chunk)
+                self._finish_stream()
+                description = ''.join(description)
+                self.log_action(description)
                 generate_description = not self.prompt_user('Is the description all good', 'n')
         else:
             description = 'Write your version description in this file. (press ctrl+a and then start writing your description. After you have written it, save it and close the editor)'
@@ -280,9 +288,14 @@ class Packer():
         if self.title_prompt is not None:
             self.title_prompt[1]['content'] = self.title_prompt[1 if self.title_prompt[1]['role'] == 'user' else 0]['content'].replace('%latest_changelog', latest_changelog)
             while generate_title:
-                version_title = chat(self.model, self.title_prompt,
-                                    options={'temperature': 0.8, 'num_predict': 10})['message']['content'].strip().replace('"', '').replace("'", "")
-                self.print_and_log(version_title, [144, 213, 255])
+                version_title = []
+                stream = chat(self.model, self.title_prompt, options={'temperature': 0.8, 'num_predict': 10})
+                for chunk in stream:
+                    self.stream_output(chunk.message.content, 'version title output', GENERATING_COLOR)
+                    version_title.append(chunk)
+                self._finish_stream()
+                version_title = ''.join(version_title)
+                self.log_action(version_title)
                 generate_title = not self.prompt_user('Is the Version title all good', 'n')
         else:
             version_title = 'Write your version title in this file. (press ctrl+a and then start writing your title. After you have written it, save it and close the editor)'
@@ -673,6 +686,23 @@ class Packer():
             self.git_repo.delete_tag(self.version)
         if exit:
             sys.exit()
+    
+    def _stream_queue(self, chunk: str, type: str, color: list[int] | None = None):
+        self.output_queue.put({'type': type, 'chunk': chunk, 'color': color})
+
+
+    def _stream_print(self, chunk: str, type: str, color: list[int] | None = None):
+        if color:
+            print_colored_text(chunk, color, end='')
+        else:
+            print(chunk, end='')
+    
+    def _finish_stream(self):
+        if self.output_queue:
+            self.output_queue.put('Stream finished!')
+        else:
+            print()
+        
 
     def _revert_git_head(self, commit_count: int):
         '''
@@ -802,19 +832,6 @@ class Packer():
         answer = simple_prompt_retries(question, default)
         self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
-
-    def _just_log(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
-        '''
-        Logs text to the packer log file without printing it.
-
-        :param text: The text to be logged.
-        :param color: The color to use for printing (not used in logging).
-        :type color: Optional[Sequence[int]]
-        :param level: The logging level to use.
-        :type level: int
-        '''
-
-        self.log_action(text, level)
 
     def _log_and_output_queue(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
         '''

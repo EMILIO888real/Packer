@@ -6,6 +6,7 @@
 - Cryptography dependency and implemented encryption/decryption functionality for projects.json file to secure sensitive data like tokens. 
 - Refactored project configurations handling into a `_Projects_configurations_manager` class to improve architecture, including logic to get the config, setting it and an easy function `get_w_tui`. 
 - Smooth output settings (smooth_output, smooth_output_speed) to control delayed text printing. 
+- Streaming output functionality for description and title generation, allowing real-time display of AI responses. 
 
 ### Changed
 - Notification-related logic so it now lives in the shared configuration layer instead of the older utility path. 
