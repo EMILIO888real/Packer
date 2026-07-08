@@ -5,6 +5,7 @@
 - Error handling with try-except block to catch KeyError when accessing projects dictionary, improving robustness of project selection. 
 - Cryptography dependency and implemented encryption/decryption functionality for projects.json file to secure sensitive data like tokens. 
 - Refactored project configurations handling into a `_Projects_configurations_manager` class to improve architecture, including logic to get the config, setting it and an easy function `get_w_tui`. 
+- Smooth output settings (smooth_output, smooth_output_speed) to control delayed text printing. 
 
 ### Changed
 - Notification-related logic so it now lives in the shared configuration layer instead of the older utility path. 
@@ -13,6 +14,7 @@
 - Project configuration loading so encrypted project files are handled differently from plain JSON files. 
 - All usages of `projects_configurations` to use the new manager's methods (`get()` and `get_w_tui()`) instead of direct dictionary access, ensuring proper handling of encrypted files and password validation. 
 - The TUI logic to use the new configuration manager for project selection and configuration updates, ensuring consistent access patterns across the application. 
+- `cinematic_dialogue` function to `print_with_delay` and simplified it significantly. 
 
 ### Fixed
 - Project data persistence so existing saved projects are merged and written more reliably. 

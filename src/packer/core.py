@@ -19,9 +19,10 @@ from string import Template
 import sys
 from pyperclip import copy
 from webbrowser import open_new_tab
+from itertools import cycle
 
 from packer.custom_modules.et import get_folder_size, tree, delete_upload, init_logger
-from packer.custom_modules.etf import bool_answer, simple_prompt_retries, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor
+from packer.custom_modules.etf import bool_answer, simple_prompt_retries, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor, print_with_delay
 from packer.config import all_settings, Project, packer_version, send_notification
 from packer.paths import log_path, data_dir, cache_dir, metadata_file_path
 
@@ -727,14 +728,17 @@ class Packer():
         return results
 
     def _print_and_log(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20):
-            '''Prints the text and logs it to the packer log file.'''
+        '''Prints the text and logs it to the packer log file.'''
 
+        if all_settings.smooth_output:
+            print_with_delay(text, cycle([color]), all_settings.smooth_output_speed)
+        else:
             if color:
                 print_colored_text(text, color)
             else:
                 print(text)
-            self.log_action(text, level)
-    
+        self.log_action(text, level)
+        
     def _send_queue_request(self, question: str, default: str | int = 'y') -> str | int:
         '''
         Sends a question to the input queue for processing.

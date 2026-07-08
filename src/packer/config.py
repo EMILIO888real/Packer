@@ -179,6 +179,8 @@ class Settings(BaseModel):
     desktop_notifications: bool = True
     notification_sound_path: str | Path = '1'
     notification_volume: float = 1.0
+    smooth_output: bool = True
+    smooth_output_speed: float = 0.01
 
 
 settings_path = f'{config_dir}/settings.json'

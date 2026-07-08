@@ -17,6 +17,7 @@ Note: Some functions are Linux-specific.
 """
 
 from collections.abc import Callable
+from itertools import cycle
 from math import ceil
 from typing import Any, Optional
 from threading import Thread, Event
@@ -315,50 +316,29 @@ class Loading_animations():
             self.text = text
         self.run()
 
-def cinematic_dialogue(dialogs: dict, dialogs_type: str, dialogs_index: int, wait: bool = True, delay: float = 0.03, randomize_color: bool = True, do_reset_formatting: bool = True, hidden_cursor: bool = False,
-                       wait_time: float = 1.0, clear_text_on_finish: bool = True) -> None:
+def print_with_delay(text: str, colors: cycle[list[int]] = cycle([None]), delay: float = 0.03, end='\n') -> None:
     """Print a cinematic dialogue with a delay between each character.
 
-    Displays text character by character with optional color randomization and formatting.
+    Displays text character one at a time after a delay with optional colors
 
-    :param dialogs: Dictionary with keys as dialogue types and values as lists of dialogues.
-    :type dialogs: dict
-    :param dialogs_type: Type of dialogue to print.
-    :type dialogs_type: str
-    :param dialogs_index: Index of dialogue to print.
-    :type dialogs_index: int
-    :param wait: If True, waits for the specified time before moving on.
-    :type wait: bool
+    :param text: The text to print with delay.
+    :type text: str
+    :param colors: Cycle of color to apply to characters.
+    :type colors: cycle[list[int]]
     :param delay: Delay between each character in seconds.
     :type delay: float
-    :param randomize_color: If True, randomizes the color of the text.
-    :type randomize_color: bool
-    :param do_reset_formatting: If True, resets the formatting of the text after printing.
-    :type do_reset_formatting: bool
-    :param hidden_cursor: If True, hides the cursor during the animation.
-    :type hidden_cursor: bool
-    :param wait_time: Time to wait before moving on to the next part of code in seconds.
-    :type wait_time: float
-    :param clear_text_on_finish: If True, clears the text after printing.
-    :type clear_text_on_finish: bool
+    :param end: Character to append at the end of the text.
+    :type end: str
     """
-    if hidden_cursor:
-        hide_cursor()
 
-    for i in dialogs[dialogs_type][dialogs_index]:
-        if randomize_color:
-            change_color([randint(0, 255), randint(0, 255), randint(0, 255)])
-        print(i, end = '', flush = True)
+    for char in text:
+        color = next(colors)
+        if color:
+            print_colored_text(char, color, flush=True, end='')
+        else:
+            print(char, flush=True, end='')
         sleep(delay)
-    if wait:
-        sleep(wait_time)
-    if do_reset_formatting:
-        reset_formatting()
-    if clear_text_on_finish:
-        print()
-        clear_lines(1)
-    if hidden_cursor:
-        show_cursor()
+    print(end=end)
 
 
 def dissolve_text(text: str = 'Average sentence is about this long, not really longer!', delay: float = 0.04,
@@ -477,7 +457,7 @@ def dissolve_text(text: str = 'Average sentence is about this long, not really l
             if randomize_color: # randomize the color of the text
                 change_color([randint(0, 255), randint(0, 255), randint(0, 255)])
             if cinematic_display: # cinematic display of the text
-                cinematic_dialogue({'text': [dissolved_text]}, 'text', 0, False, cinematic_delay, single_character_color, do_reset_formatting=False, clear_text_on_finish=dynamic_cinematic_display)
+                print_with_delay(dissolved_text, delay=cinematic_delay, end='\r')
                 if not dynamic_cinematic_display:
                     print(end='\r')
             if multiple_lines:
