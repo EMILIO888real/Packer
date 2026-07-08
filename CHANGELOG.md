@@ -22,6 +22,7 @@
 - Project data persistence so existing saved projects are merged and written more reliably. 
 - Setup handling for empty or missing values so the flow behaves more gracefully. 
 - Increased smooth_output_speed from 0.01 to 0.005 in settings configuration. 
+- Added flush=True parameter to print and print_colored_text calls in _stream_print method to ensure immediate output flushing. 
 
 ---
 

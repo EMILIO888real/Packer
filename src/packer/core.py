@@ -695,9 +695,9 @@ class Packer():
 
     def _stream_print(self, chunk: str, type: str, color: list[int] | None = None):
         if color:
-            print_colored_text(chunk, color, end='')
+            print_colored_text(chunk, color, flush=True, end='')
         else:
-            print(chunk, end='')
+            print(chunk, end='', flush=True)
     
     def _finish_stream(self):
         if self.output_queue:
