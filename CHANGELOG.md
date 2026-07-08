@@ -16,10 +16,12 @@
 - All usages of `projects_configurations` to use the new manager's methods (`get()` and `get_w_tui()`) instead of direct dictionary access, ensuring proper handling of encrypted files and password validation. 
 - The TUI logic to use the new configuration manager for project selection and configuration updates, ensuring consistent access patterns across the application. 
 - `cinematic_dialogue` function to `print_with_delay` and simplified it significantly. 
+- Stream_output calls to extract and pass chunk.message.content directly instead of the entire chunk object for both version description and version title generation flows. 
 
 ### Fixed
 - Project data persistence so existing saved projects are merged and written more reliably. 
 - Setup handling for empty or missing values so the flow behaves more gracefully. 
+- Increased smooth_output_speed from 0.01 to 0.005 in settings configuration. 
 
 ---
 

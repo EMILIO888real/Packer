@@ -258,7 +258,8 @@ class Packer():
                 description = []
                 stream = chat(self.model, self.description_prompt, stream=True)
                 for chunk in stream:
-                    self.stream_output(chunk.message.content, 'version description output', GENERATING_COLOR)
+                    chunk = chunk.message.content
+                    self.stream_output(chunk, 'version description output', GENERATING_COLOR)
                     description.append(chunk)
                 self._finish_stream()
                 description = ''.join(description)
@@ -291,7 +292,8 @@ class Packer():
                 version_title = []
                 stream = chat(self.model, self.title_prompt, options={'temperature': 0.8, 'num_predict': 10})
                 for chunk in stream:
-                    self.stream_output(chunk.message.content, 'version title output', GENERATING_COLOR)
+                    chunk = chunk.message.content
+                    self.stream_output(chunk, 'version title output', GENERATING_COLOR)
                     version_title.append(chunk)
                 self._finish_stream()
                 version_title = ''.join(version_title)
