@@ -17,12 +17,15 @@
 - The TUI logic to use the new configuration manager for project selection and configuration updates, ensuring consistent access patterns across the application. 
 - `cinematic_dialogue` function to `print_with_delay` and simplified it significantly. 
 - Stream_output calls to extract and pass chunk.message.content directly instead of the entire chunk object for both version description and version title generation flows. 
+- Renamed `self.stream_output` to `self.stream_output_chunk` and for the 2 other helper functions the same and updated all references to use the new naming convention. 
+- Added initial chunk handling to remove leading whitespace. 
 
 ### Fixed
 - Project data persistence so existing saved projects are merged and written more reliably. 
 - Setup handling for empty or missing values so the flow behaves more gracefully. 
 - Increased smooth_output_speed from 0.01 to 0.005 in settings configuration. 
 - Added flush=True parameter to print and print_colored_text calls in _stream_print method to ensure immediate output flushing. 
+- Version title generation by added the stream parameter to it as well, instead of just for the version description, *I forgot*. 
 
 ---
 

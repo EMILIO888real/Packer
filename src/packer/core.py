@@ -151,7 +151,7 @@ class Packer():
             all_settings.verbose = False
         self.print_and_log = self._print_and_log if all_settings.verbose else self._log_and_output_queue
         self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
-        self.stream_output = self._stream_queue if input_queue else self._stream_print
+        self.stream_output_chunk = self._stream_queue_chunk if input_queue else self._stream_print_chunk
 
         # Relies on some setup actions
         if Path().cwd() != Path(project_path):
@@ -257,16 +257,17 @@ class Packer():
             while generate_description:
                 description = []
                 stream = chat(self.model, self.description_prompt, stream=True)
+                self.stream_output_chunk(next(stream).message.content.lstrip(), 'version description output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
                 for chunk in stream:
                     chunk = chunk.message.content
-                    self.stream_output(chunk, 'version description output', GENERATING_COLOR)
+                    self.stream_output_chunk(chunk, 'version description output', GENERATING_COLOR)
                     description.append(chunk)
                 self._finish_stream()
                 description = ''.join(description)
                 self.log_action(description)
                 generate_description = not self.prompt_user('Is the description all good', 'n')
         else:
-            description = 'Write your version description in this file. (press ctrl+a and then start writing your description. After you have written it, save it and close the editor)'
+            description = 'Write your version description in this file. (select all text [usually ctrl+a] and then start writing your description. After you have written it, save it and close the editor)'
         
         with open(self.chosen_description_path, 'w') as f:
             f.write(description)
@@ -290,17 +291,18 @@ class Packer():
             self.title_prompt[1]['content'] = self.title_prompt[1 if self.title_prompt[1]['role'] == 'user' else 0]['content'].replace('%latest_changelog', latest_changelog)
             while generate_title:
                 version_title = []
-                stream = chat(self.model, self.title_prompt, options={'temperature': 0.8, 'num_predict': 10})
+                stream = chat(self.model, self.title_prompt, options={'temperature': 0.8, 'num_predict': 10}, stream=True)
+                self.stream_output_chunk(next(stream).message.content.lstrip(), 'version title output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
                 for chunk in stream:
                     chunk = chunk.message.content
-                    self.stream_output(chunk, 'version title output', GENERATING_COLOR)
+                    self.stream_output_chunk(chunk, 'version title output', GENERATING_COLOR)
                     version_title.append(chunk)
                 self._finish_stream()
                 version_title = ''.join(version_title)
                 self.log_action(version_title)
                 generate_title = not self.prompt_user('Is the Version title all good', 'n')
         else:
-            version_title = 'Write your version title in this file. (press ctrl+a and then start writing your title. After you have written it, save it and close the editor)'
+            version_title = 'Write your version title in this file. (select all text [usually ctrl+a] and then start writing your title. After you have written it, save it and close the editor)'
     
         with open(self.chosen_title_path, 'w') as f:
             f.write(version_title)
@@ -689,11 +691,11 @@ class Packer():
         if exit:
             sys.exit()
     
-    def _stream_queue(self, chunk: str, type: str, color: list[int] | None = None):
+    def _stream_queue_chunk(self, chunk: str, type: str, color: list[int] | None = None):
         self.output_queue.put({'type': type, 'chunk': chunk, 'color': color})
 
 
-    def _stream_print(self, chunk: str, type: str, color: list[int] | None = None):
+    def _stream_print_chunk(self, chunk: str, type: str, color: list[int] | None = None):
         if color:
             print_colored_text(chunk, color, flush=True, end='')
         else:
