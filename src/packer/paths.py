@@ -15,6 +15,6 @@ data_dir = user_data_dir('packer', 'EMILIO', ensure_exists=True)
 cache_dir = user_cache_dir('packer', 'EMILIO', ensure_exists=True)
 download_dir = user_downloads_dir()
 documents_dir = user_documents_dir()
-metadata_file_path = Path(f'{data_dir}/metadata.json')
-if not metadata_file_path.exists():
-    metadata_file_path.write_text('{}')
+metadata_path = Path(f'{data_dir}/metadata.json')
+if not metadata_path.exists():
+    metadata_path.write_text('{}')

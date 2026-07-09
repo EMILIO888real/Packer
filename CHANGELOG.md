@@ -2,9 +2,12 @@
 
 ### Added
 - `format_size` function in `et` to able to easily format bytes into a string version of other sizes, like KiB, MiB and so on up to TiB. 
+- New configuration settings for cache and log size thresholds, along with auto-clear flags for both. The auto clearing runs after a release process in the run method of the `Packer` class. Thresholds are also displayed, but don't automatically clear in the CLI `-p` flag. 
+- Saving the software archive version size in `metadata.json` to be able to compare in the next `run` method execution for the change in size. 
 
 ### Changed
 - `-p` flag in the CLI to also display the size of the item whether it's a file or a folder. Also made the path's relative to Home to shorten them. 
+- `CLI` `-p` flag output to be colorful for the thresholds and also added `metadata.json` as one of the file paths. 
 
 ### Fixed
 

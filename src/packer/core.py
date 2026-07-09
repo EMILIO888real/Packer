@@ -3,7 +3,7 @@ from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive
-from os import chdir, remove
+from os import chdir, listdir, remove
 from json import dump, load
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
@@ -21,10 +21,10 @@ from pyperclip import copy
 from webbrowser import open_new_tab
 from itertools import cycle
 
-from packer.custom_modules.et import get_folder_size, tree, delete_upload, init_logger
+from packer.custom_modules.et import format_size, get_folder_size, tree, delete_upload, init_logger
 from packer.custom_modules.etf import bool_answer, simple_prompt_retries, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor, print_with_delay
 from packer.config import all_settings, Project, packer_version, send_notification
-from packer.paths import log_path, data_dir, cache_dir, metadata_file_path
+from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
 
 
 def thread_excepthook(args):
@@ -376,18 +376,23 @@ class Packer():
             self.print_and_log('No git tags found. Skipping file changes to latest version...')
 
 
-        with open(metadata_file_path) as f:
+        with open(metadata_path) as f:
             metadata: dict = load(f)
-        
-        project_size = get_folder_size(Path(), exclusions) / (1024 * 1024)
         current_project_metadata = metadata.get(str(Path().absolute()), {})
+        
+        project_size = get_folder_size(Path(), exclusions)
+        version_size = Path(f'{cache_dir}/{self.program_name} {self.version}.zip').stat().st_size
+
         if current_project_metadata:
             project_latest_size = current_project_metadata.get('project size')
             if project_latest_size:
-                self.print_and_log(f'Project size change: {project_latest_size - project_size:.2f} MiB')
+                self.print_and_log(f'Project size change: {format_size(project_latest_size - project_size)}')
+            last_versions_size = current_project_metadata.get('versions size')
+            if last_versions_size:
+                self.print_and_log(f'New versions size change: {format_size(last_versions_size - version_size)}')
 
-        self.print_and_log(f'Full project size with exclusions: {project_size:.2f} MiB')
-        self.print_and_log(f'New version\'s size: {Path(f'{cache_dir}/{self.program_name} {self.version}.zip').stat().st_size / (1024 * 1024):.2f} MiB')
+        self.print_and_log(f'Full project size with exclusions: {format_size(project_size)}')
+        self.print_and_log(f'New version\'s size: {format_size(version_size)}')
 
 
         self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
@@ -562,6 +567,28 @@ class Packer():
             self.print_and_log('Cleaning up cache...')
             if self.run_pyinstaller:
                 rmtree(f'{cache_dir}/dist')
+            
+            if all_settings.auto_clear_cache and get_folder_size(Path(cache_dir)) > all_settings.cache_size_threshold:
+                self.print_and_log(f'Deleting cache folder, over threshold [{format_size(all_settings.cache_size_threshold)}]...')
+                rmtree(cache_dir)
+            
+            if all_settings.auto_clear_logs and get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
+                self.print_and_log(f'Cleaning logs folder, over threshold: [{format_size(all_settings.logs_size_threshold)}]...')
+
+                def _get_timestamp(file: str) -> datetime:
+                    if 'error report' in file:
+                        file = file.rstrip('.json').lstrip('error report ')
+                    else:
+                        file = file.rstrip('.log')
+                    
+                    return datetime.strptime(file, '%Y-%m-%d')
+
+                files = sorted(listdir(log_dir), key=_get_timestamp)
+
+                while get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
+                    file = files.pop(0)
+                    remove(f'{log_dir}/{file}')
+                    self.print_and_log(f'Removed {file}')
 
             if self.compile_command != None:
                 rmtree(f'{cache_dir}/main.dist')
@@ -639,11 +666,12 @@ class Packer():
             
             self.print_and_log('Updating metadata.json...')
             current_project_metadata['project size'] = project_size
+            current_project_metadata['version size'] = version_size
 
 
             metadata[str(Path().absolute())] = current_project_metadata
             
-            with open(metadata_file_path, 'w') as f:
+            with open(metadata_path, 'w') as f:
                 dump(metadata, f)
 
             

@@ -181,6 +181,10 @@ class Settings(BaseModel):
     notification_volume: float = 1.0
     smooth_output: bool = True
     smooth_output_speed: float = 0.005
+    logs_size_threshold: int = 104_857_000 # 100 MiB
+    cache_size_threshold: int = 1_073_741_824 # 1 GiB
+    auto_clear_cache: bool = False
+    auto_clear_logs: bool = True
 
 
 settings_path = f'{config_dir}/settings.json'

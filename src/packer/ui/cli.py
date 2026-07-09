@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from collections.abc import Callable
 from json import dump, load
 from os import mkdir
 from pathlib import Path
@@ -12,9 +13,9 @@ from argcomplete import autocomplete
 from getpass import getuser
 
 from packer.custom_modules.et import resolve_version, normalize_settings_keys, get_folder_size, format_size
-from packer.custom_modules.etf import simple_prompt_retries, stripped_input
+from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
-from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir
+from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir, metadata_path
 from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, exception_handler, user_settings
 from packer.core import Packer
 from packer.setup import main as setup, tui
@@ -254,18 +255,27 @@ def main():
 
 
     if args.paths:
-        def format_entry(name: str, path: Path | str):
+        def create_entry(name: str, path: Path | str) -> tuple[str, int]:
             path = Path(path)
-            return f'{name}: ~/{path.relative_to(Path().home())} ({format_size(get_folder_size(path) if path.is_dir else path.stat().st_size if path.exists() else None)})'
-
-        print(format_entry('root_dir', root_dir))
-        print(format_entry('assets_dir', assets_dir))
-        print(format_entry('config_dir', config_dir))
-        print(format_entry('log_dir', log_dir))
-        print(format_entry('data_dir', data_dir))
-        print(format_entry('cache_dir', cache_dir))
-        print(format_entry('log_path', log_path))
-        print(format_entry('error_report_path', error_report_path))
+            return (f'{name}: ~/{path.relative_to(Path().home())}', (get_folder_size(path) if path.is_dir else path.stat().st_size) if path.exists() else None)
+        
+        def format_entry(entry: tuple[str, float]) -> str:
+            return f'{entry[0]} ({format_size(entry[1])})'
+        
+        def print_colored_entry(entry: tuple, color: Callable):
+            print(entry[0], end=' (')
+            print_colored_text(format_size(entry[1]), color(entry), end='')
+            print(')')
+        
+        print(format_entry(create_entry('root_dir', root_dir)))
+        print(format_entry(create_entry('assets_dir', assets_dir)))
+        print(format_entry(create_entry('config_dir', config_dir)))
+        print_colored_entry(create_entry('log_dir', log_dir), lambda entry:[255, 0, 0] if all_settings.logs_size_threshold < entry[1] else [0, 255, 0])
+        print(format_entry(create_entry('data_dir', data_dir)))
+        print_colored_entry(create_entry('cache_dir', cache_dir), lambda entry:[255, 0, 0] if all_settings.cache_size_threshold < entry[1] else [0, 255, 0])
+        print(format_entry(create_entry('log_path', log_path)))
+        print(format_entry(create_entry('error_report_path', error_report_path)))
+        print(format_entry(create_entry('metadata_path', metadata_path)))
 
     if args.version:
         print(dedent(f'''
