@@ -623,7 +623,7 @@ def resolve_version(current_version: dict[str, int], version_input: str) -> dict
         
     return version
 
-def get_folder_size(folder_path: Path, exclusions: tuple[str] = ()):
+def get_folder_size(folder_path: Path, exclusions: tuple[str] = ()) -> int:
     '''Calculate the total size of a folder and its subfolders in bytes.
 
     This function recursively calculates the total size of all files within
@@ -651,6 +651,28 @@ def get_folder_size(folder_path: Path, exclusions: tuple[str] = ()):
             if allowed:
                 result += item.stat().st_size
     return result
+
+def format_size(size_bytes: int, precision: int = 2) -> str:
+    '''
+    Format a size in bytes into a human-readable string with appropriate units.
+
+    Converts a size given in bytes into a human-readable format using units such as
+    B (bytes), KiB (kibibyte), MiB (mebibytes), GiB (gibibytes), and TiB (tebibyte).
+    The result is rounded to two decimal places for clarity and readability.
+
+    :param size_bytes: The size in bytes to be formatted.
+    :type size_bytes: int
+    :return: A formatted string representing the size with appropriate units (e.g., '1.23 MiB').
+    :rtype: str
+    '''
+
+    if size_bytes is None:
+        return 'N/A'
+    for unit in ['B', 'KiB', 'MiB', 'GiB']:
+        if size_bytes < 1024:
+            return f'{size_bytes:.{precision}f} {unit}'
+        size_bytes /= 1024
+    return f'{size_bytes:.{precision}f} TiB'
 
 if __name__ == '__main__':
     print('This module is not meant to be run directly')

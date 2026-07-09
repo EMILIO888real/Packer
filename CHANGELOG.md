@@ -1,8 +1,10 @@
 ## [%new_version] - %date
 
 ### Added
+- `format_size` function in `et` to able to easily format bytes into a string version of other sizes, like KiB, MiB and so on up to TiB. 
 
 ### Changed
+- `-p` flag in the CLI to also display the size of the item whether it's a file or a folder. Also made the path's relative to Home to shorten them. 
 
 ### Fixed
 

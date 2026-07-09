@@ -11,7 +11,7 @@ from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
 from getpass import getuser
 
-from packer.custom_modules.et import resolve_version, normalize_settings_keys
+from packer.custom_modules.et import resolve_version, normalize_settings_keys, get_folder_size, format_size
 from packer.custom_modules.etf import simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir
@@ -254,14 +254,18 @@ def main():
 
 
     if args.paths:
-        print(f'root_dir: {root_dir}')
-        print(f'assets_dir: {assets_dir}')
-        print(f'config_dir: {config_dir}')
-        print(f'log_dir: {log_dir}')
-        print(f'log_path: {log_path}')
-        print(f'error_report_path: {error_report_path}')
-        print(f'data_dir: {data_dir}')
-        print(f'cache_dir: {cache_dir}')
+        def format_entry(name: str, path: Path | str):
+            path = Path(path)
+            return f'{name}: ~/{path.relative_to(Path().home())} ({format_size(get_folder_size(path) if path.is_dir else path.stat().st_size if path.exists() else None)})'
+
+        print(format_entry('root_dir', root_dir))
+        print(format_entry('assets_dir', assets_dir))
+        print(format_entry('config_dir', config_dir))
+        print(format_entry('log_dir', log_dir))
+        print(format_entry('data_dir', data_dir))
+        print(format_entry('cache_dir', cache_dir))
+        print(format_entry('log_path', log_path))
+        print(format_entry('error_report_path', error_report_path))
 
     if args.version:
         print(dedent(f'''
