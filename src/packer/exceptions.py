@@ -8,6 +8,7 @@ from requests import post, exceptions
 from pyperclip import copy
 from webbrowser import open_new_tab
 from urllib import parse
+from pdb import post_mortem
 
 from packer.custom_modules.etf import print_colored_text, prompt_user
 
@@ -68,6 +69,11 @@ class Global_exception_handler:
                 elif self.developer_email:
                     print('Specify your email if needed and hit send')
                     self.prompt_user_to_email(error_report)
+        
+        if prompt_user('Enter interactive debugger', default='n'):
+            print('Entering post-mortem session...')
+            post_mortem(exc_traceback)
+
         sys.exit(1)
 
     def report_error(self, error_report: dict[str: Any]) -> bool:
