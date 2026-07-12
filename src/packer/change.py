@@ -10,8 +10,11 @@ from ollama import chat
 from packer.config import all_settings
 
 def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag, modification_types: list[str] = ['c'],
-         overall_description: str = None, ai_summary: bool = True, verbose: bool = True,
-         bullet_summary_prompt = all_settings.changes_summary_prompt, high_level_summary_prompt = all_settings.high_level_summary_prompt, model: str = all_settings.model):
+         overall_description: str = None,
+         ai_summary: bool = True,
+         check_todo: bool = True, todo_rel_path: str = '/dev/TODO.md', list_start_identifier: str = 'before committing', list_end_identifier: str = '#',
+         bullet_summary_prompt = all_settings.changes_summary_prompt, high_level_summary_prompt = all_settings.high_level_summary_prompt,
+         model: str = all_settings.model, verbose: bool = True):
     '''
     Opens a temporary file in the specified text editor for describing the project's modification
 
@@ -40,6 +43,20 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
     :param model: The AI model to use for generating summaries (default is all_settings.model)
     :type model: str
     '''
+
+    if check_todo:
+        with open(f'{git_directory}{todo_rel_path}') as f:
+            content = f.read().lower()
+
+        list_start = content.find(list_start_identifier)
+        list_end = content.find(list_end_identifier, list_start)
+
+        before_committing_list = content[list_start + 17:list_end].lstrip(':').strip()
+
+        if before_committing_list:
+            print(f'{list_start_identifier} task/s found, please delete them from the list once finished!\nList:\n{before_committing_list}')
+            return
+    
 
     text_editor = which(text_editor)
 

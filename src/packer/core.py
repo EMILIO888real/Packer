@@ -107,7 +107,8 @@ class Packer():
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['before_commands'].default, after_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['after_commands'].default,
                  model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
-                 release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default
+                 release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default,
+                 check_todo: bool = True, todo_rel_path: str = 'dev/TODO.md', list_start_identifier: str = 'before next release', list_end_identifier: str = '#'
                 ):
         # parameter initialization
         self.input_queue = input_queue
@@ -137,11 +138,11 @@ class Packer():
             self.release_text = f.read()
         self.assets_dir = f'./src/{self.program_name}/assets'
         self.ENTRY_RE = compile(
-                r"^- (Added|Changed|Fixed):\s*(.+)$",
+                r'^- (Added|Changed|Fixed):\s*(.+)$',
                 MULTILINE
             )
         self.SINGLE_RE = compile(
-            r"^(Added|Changed|Fixed):\s*(.+)$"
+            r'^(Added|Changed|Fixed):\s*(.+)$'
         )
         self.run_pyinstaller = any(Path().glob('*.spec'))
 
@@ -161,7 +162,20 @@ class Packer():
         if not all_settings.skip_git_status:
             if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
                 self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...', [255, 0, 0], 40)
-                sys.exit()
+                sys.exit(1)
+        
+        if check_todo:
+            with open(f'{todo_rel_path}') as f:
+                content = f.read().lower()
+
+            list_start = content.find(list_start_identifier)
+            list_end = content.find(list_end_identifier, list_start)
+
+            todo_list = content[list_start + 17:list_end].lstrip(':').strip()
+
+            if todo_list:
+                self.print_and_log(f'{list_start_identifier} task/s found, please delete them from the list once finished!\n{list_start_identifier} List:\n{todo_list}\nExiting...', [255, 0, 0], 40)
+                sys.exit(1)
 
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
@@ -724,7 +738,7 @@ class Packer():
             self.print_and_log('Deleting local git tag...')
             self.git_repo.delete_tag(self.version)
         if exit:
-            sys.exit()
+            sys.exit(1)
     
     def _stream_queue_chunk(self, chunk: str, type: str, color: list[int] | None = None):
         self.output_queue.put({'type': type, 'chunk': chunk, 'color': color})

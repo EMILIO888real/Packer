@@ -7,6 +7,7 @@
 - An interactive debugger in the `Global_exception_handler`, if the user wants to try launching a post-mortem session to explore the problem further. 
 - The CLI `--no-ai` flag to the `change` command. If specified disables AI summaries for the change command. 
 - `input_queue` and `output_queue` to the `Global_exception_handler` to be able to use it easily in other interfaces as well, like a GUI and so on. 
+- Functionality to check for TODO lists before committing/packing, with configurable paths and identifiers. 
 
 ### Changed
 - `-p` flag in the CLI to also display the size of the item whether it's a file or a folder. Also made the path's relative to Home to shorten them. 
