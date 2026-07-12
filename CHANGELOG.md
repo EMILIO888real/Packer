@@ -8,12 +8,14 @@
 - The CLI `--no-ai` flag to the `change` command. If specified disables AI summaries for the change command. 
 - `input_queue` and `output_queue` to the `Global_exception_handler` to be able to use it easily in other interfaces as well, like a GUI and so on. 
 - Functionality to check for TODO lists before committing/packing, with configurable paths and identifiers. 
+- `description_prompt_kwargs` and `title_prompt_kwargs` configuration options to the Project model with default empty dict and specific options for title prompt. 
 
 ### Changed
 - `-p` flag in the CLI to also display the size of the item whether it's a file or a folder. Also made the path's relative to Home to shorten them. 
 - `CLI` `-p` flag output to be colorful for the thresholds and also added `metadata.json` as one of the file paths. 
 - Updated `Global_exception_handler` to dynamically handle all std IO actions, like printing and requesting input to use queue if provided. 
 - `prompt_user` to `simple_prompt` to simplify the code, since the prompts in the program are simple. 
+- Moved `options` with temperature and word limitations to the kwargs, of `Project` settings, so they are more configurable. 
 
 ### Fixed
 

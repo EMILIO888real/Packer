@@ -107,6 +107,7 @@ class Packer():
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['before_commands'].default, after_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['after_commands'].default,
                  model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
+                 description_prompt_kwargs: dict[Any, Any] = Project.model_fields['description_prompt_kwargs'].default, title_prompt_kwargs: dict[Any, Any] = Project.model_fields['title_prompt_kwargs'].default,
                  release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default,
                  check_todo: bool = True, todo_rel_path: str = 'dev/TODO.md', list_start_identifier: str = 'before next release', list_end_identifier: str = '#'
                 ):
@@ -127,6 +128,8 @@ class Packer():
         self.description_prompt = description_prompt
         self.title_prompt = title_prompt
         self.changelog_git_hash = changelog_git_hash
+        self.title_prompt_kwargs = title_prompt_kwargs
+        self.description_prompt_kwargs = description_prompt_kwargs
 
         # Actions needed to run once, (setup actions)
         self.terminal_width = get_terminal_size().columns
@@ -270,7 +273,7 @@ class Packer():
             self.description_prompt[1 if self.description_prompt[1]['role'] == 'user' else 0]['content'] = self.description_prompt[1]['content'].replace('%latest_changelog', latest_changelog)
             while generate_description:
                 description = []
-                stream = chat(self.model, self.description_prompt, stream=True)
+                stream = chat(self.model, self.description_prompt, stream=True, **self.description_prompt_kwargs)
 
                 first_chunk = next(stream).message.content.lstrip()
                 description.append(first_chunk)
@@ -309,7 +312,7 @@ class Packer():
             self.title_prompt[1]['content'] = self.title_prompt[1 if self.title_prompt[1]['role'] == 'user' else 0]['content'].replace('%latest_changelog', latest_changelog)
             while generate_title:
                 version_title = []
-                stream = chat(self.model, self.title_prompt, options={'temperature': 0.8, 'num_predict': 10}, stream=True)
+                stream = chat(self.model, self.title_prompt, stream=True, **self.title_prompt_kwargs)
 
                 first_chunk = first_chunk = next(stream).message.content.lstrip()
                 version_title.append(first_chunk)

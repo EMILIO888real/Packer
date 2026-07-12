@@ -107,6 +107,8 @@ class Project(BaseModel):
     ]
     release_notes_template_path: str | Path = Path(f'{assets_dir}/RELEASE.md')
     changelog_git_hash: bool = True
+    description_prompt_kwargs: dict = {}
+    title_prompt_kwargs: dict = {'options': {'temperature': 0.8, 'num_predict': 10}}
 
 
 class Settings(BaseModel):
