@@ -174,7 +174,7 @@ class Packer():
             list_start = content.find(list_start_identifier)
             list_end = content.find(list_end_identifier, list_start)
 
-            todo_list = content[list_start + 17:list_end].lstrip(':').strip()
+            todo_list = content[list_start + len(list_start_identifier):list_end].lstrip(':').strip()
 
             if todo_list:
                 self.print_and_log(f'{list_start_identifier} task/s found, please delete them from the list once finished!\n{list_start_identifier} List:\n{todo_list}\nExiting...', [255, 0, 0], 40)

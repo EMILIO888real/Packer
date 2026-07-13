@@ -18,6 +18,7 @@
 - Moved `options` with temperature and word limitations to the kwargs, of `Project` settings, so they are more configurable. 
 
 ### Fixed
+- List parsing logic to use `len(list_start_identifier)` instead of hardcoded offset `17` for extracting task lists, improving robustness when the identifier length changes. 
 
 ---
 

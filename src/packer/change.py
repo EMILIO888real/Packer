@@ -51,7 +51,7 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
         list_start = content.find(list_start_identifier)
         list_end = content.find(list_end_identifier, list_start)
 
-        before_committing_list = content[list_start + 17:list_end].lstrip(':').strip()
+        before_committing_list = content[list_start + len(list_start_identifier):list_end].lstrip(':').strip()
 
         if before_committing_list:
             print(f'{list_start_identifier} task/s found, please delete them from the list once finished!\nList:\n{before_committing_list}')
