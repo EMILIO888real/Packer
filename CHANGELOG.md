@@ -9,6 +9,8 @@
 - `input_queue` and `output_queue` to the `Global_exception_handler` to be able to use it easily in other interfaces as well, like a GUI and so on. 
 - Functionality to check for TODO lists before committing/packing, with configurable paths and identifiers. 
 - `description_prompt_kwargs` and `title_prompt_kwargs` configuration options to the Project model with default empty dict and specific options for title prompt. 
+- New configuration option `suggestions_prompt` for customizing AI suggestion prompts. 
+- Text editor integration for input handling across the application. 
 
 ### Changed
 - `-p` flag in the CLI to also display the size of the item whether it's a file or a folder. Also made the path's relative to Home to shorten them. 
@@ -16,6 +18,8 @@
 - Updated `Global_exception_handler` to dynamically handle all std IO actions, like printing and requesting input to use queue if provided. 
 - `prompt_user` to `simple_prompt` to simplify the code, since the prompts in the program are simple. 
 - Moved `options` with temperature and word limitations to the kwargs, of `Project` settings, so they are more configurable. 
+- Refactored the text editor interaction logic in `change.py` to use a centralized `_input_via_text_editor` function instead of manually handling temporary files. 
+- Simplified text editor usage by removing `which()` checks and direct path resolution. 
 
 ### Fixed
 - List parsing logic to use `len(list_start_identifier)` instead of hardcoded offset `17` for extracting task lists, improving robustness when the identifier length changes. 

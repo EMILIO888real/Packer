@@ -22,13 +22,14 @@ from importlib.resources.abc import Traversable
 from importlib import import_module
 import sys
 from collections.abc import Collection
-from os import execl, replace, listdir, mkdir
+from os import execl, remove, replace, listdir, mkdir
+from tempfile import NamedTemporaryFile
 from typing import Any, Optional, Union
 from pathlib import Path
 from json import JSONDecodeError, load
 from datetime import datetime, timedelta
 from shutil import ignore_patterns, which, copy2, copytree
-from subprocess import Popen
+from subprocess import Popen, run
 import logging
 from dirhash import dirhash
 from requests import get, post, delete, put
@@ -673,6 +674,30 @@ def format_size(size_bytes: int, precision: int = 2) -> str:
             return f'{size_bytes:.{precision}f} {unit}'
         size_bytes /= 1024
     return f'{size_bytes:.{precision}f} TiB'
+
+def input_via_text_editor(text:str = '', text_editor: str = 'code', wait_flag: str = '--wait') -> str:
+    '''
+    Open a text editor for user input and return the edited text.
+
+    :param text: Initial text to populate the editor with.
+    :type text: str
+    :param text_editor: The text editor to use for opening the file (default is 'code').
+    :type text_editor: str
+    :param wait_flag: The flag to pass to the editor to wait for it to close (default is '--wait').
+    :type wait_flag: str
+    :return: The text after editing in the text editor.
+    :rtype: str
+    '''
+
+    with NamedTemporaryFile('r', delete=False) as tf:
+        temp_path = tf.name
+    with open(temp_path, 'w') as f:
+        f.write(text)
+    run([text_editor, wait_flag, temp_path])
+    with open(temp_path, 'r') as f:
+        text = f.read().strip()
+    remove(temp_path)
+    return text
 
 if __name__ == '__main__':
     print('This module is not meant to be run directly')

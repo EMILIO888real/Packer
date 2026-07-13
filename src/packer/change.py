@@ -1,15 +1,12 @@
-from os import remove
-from shutil import which
 from string import Template
 from subprocess import run
-from tempfile import NamedTemporaryFile
 from pathlib import Path
 from git import Repo
 from ollama import chat
 
-from packer.config import all_settings
+from packer.config import _input_via_text_editor, all_settings
 
-def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag, modification_types: list[str] = ['c'],
+def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
          overall_description: str = None,
          ai_summary: bool = True,
          check_todo: bool = True, todo_rel_path: str = '/dev/TODO.md', list_start_identifier: str = 'before committing', list_end_identifier: str = '#',
@@ -24,16 +21,20 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
 
     :param git_directory: The root directory of the project (default is '.')
     :type git_directory: str | Path
-    :param text_editor: The text editor to use for opening the file (default is 'code')
-    :type text_editor: str
-    :param wait_flag: The flag to pass to the editor to wait for it to close (default is '--wait')
-    :type wait_flag: str
     :param modification_types: The types of modifications to record (a = added, c = changed, f = fixed) (default is ['c'])
     :type modification_types: list[str]
     :param overall_description: The overall description of the modifications, if there are multiple (default is None)
     :type overall_description: str
     :param ai_summary: Whether to generate an AI summary of the changes (default is True)
     :type ai_summary: bool
+    :param check_todo: Whether to check for TODO items before committing (default is True)
+    :type check_todo: bool
+    :param todo_rel_path: The relative path to the TODO file (default is '/dev/TODO.md')
+    :type todo_rel_path: str
+    :param list_start_identifier: The identifier for the start of the TODO list (default is 'before committing')
+    :type list_start_identifier: str
+    :param list_end_identifier: The identifier for the end of the TODO list (default is '#')
+    :type list_end_identifier: str
     :param verbose: Whether to print verbose output (default is True)
     :type verbose: bool
     :param bullet_summary_prompt: The prompt template for generating bullet point summaries (default is all_settings.changes_summary_prompt)
@@ -56,15 +57,12 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
         if before_committing_list:
             print(f'{list_start_identifier} task/s found, please delete them from the list once finished!\nList:\n{before_committing_list}')
             return
-    
 
-    text_editor = which(text_editor)
+
+    repo = Repo(git_directory)
+    diff_text = repo.git.diff(unified=3)
 
     if ai_summary:
-        repo = Repo(git_directory)
-
-        diff_text = repo.git.diff(unified=3)
-
         # Update prompts with runtime data
         summary_data = {
                 'diff': diff_text,
@@ -100,19 +98,14 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
     messages = []
 
     for i, modification_type in enumerate(modification_types):
-        with NamedTemporaryFile('r', delete=False) as tf:
-            temp_path = tf.name
-        
+
         if ai_summary:
             bullet_summary_list = bullet_summary.splitlines()
-            with open(temp_path, 'w') as f:
-                f.write(bullet_summary_list[i] if len(bullet_summary_list) > i else 'AI didn\'t generate anything...')
+            message = bullet_summary_list[i] if len(bullet_summary_list) > i else 'AI didn\'t generate anything...'
+        else:
+            message = ''
 
-        run([text_editor, wait_flag, temp_path])
-
-        with open(temp_path) as f:
-            message = f.read().strip()
-        remove(temp_path)
+        message = _input_via_text_editor(message)
 
         match modification_type:
             case 'a':
@@ -142,20 +135,7 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
             f.write(full_changelog)
 
     if len(messages) > 1:
-        with NamedTemporaryFile('r', delete=False) as tf:
-            temp_path = tf.name
-        if ai_summary:
-            with open(temp_path, 'w') as f:
-                f.write(high_level_summary)
-        else:
-            with open(temp_path, 'w') as f:
-                f.write(overall_description)
-        run([text_editor, wait_flag, temp_path])
-        with open(temp_path, 'r') as f:
-            high_level_summary = f.read().strip()
-        remove(temp_path)
-
-        git_message = f'feat: {high_level_summary if ai_summary else overall_description}\n\n'
+        git_message = f'feat: {_input_via_text_editor(high_level_summary if ai_summary else overall_description)}\n\n'
         for message in messages:
             git_message += f'- {message[0]}: {message[1]}\n'
     else:
@@ -165,13 +145,16 @@ def main(git_directory: str | Path = '.', text_editor: str = all_settings.text_e
     run(['git', 'commit', '-m', git_message.strip()])
     run(['git', 'push'])
 
-def tui(changes: list[str] | None = None, overall_description: str | None = None):
+def tui(changes: list[str] | None = None, overall_description: str | None = None, ai_suggestions: bool = True):
     '''
     Launches a text-based user interface for creating project change logs and committing them.
 
     This function is intended to be used as an entry point for a TUI that guides the user
     through creating changelog entries and committing them to the repository.
     '''
+
+    if ai_suggestions:
+        print(f'AI suggestions:\n{generate_suggestions()}')
 
     if not changes:
         amount = int(input('Enter the amount of changes: '))
@@ -189,6 +172,23 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
             overall_description = None
 
     return (changes, overall_description)
+
+def generate_suggestions(git_directory: str | Path = '.', suggestions_prompt = all_settings.suggestions_prompt, model: str = all_settings.model, verbose: bool = True):
+    '''
+    :param ai_suggestion: Whether to generate AI suggestions for the changes (default is True)
+    :type ai_suggestion: bool
+    '''
+    repo = Repo(git_directory)
+    diff_text = repo.git.diff(unified=3)
+    
+    suggestions_prompt[1]['content'] = Template(suggestions_prompt[1 if suggestions_prompt[1]['role'] == 'user' else 0]['content']).substitute({'diff': diff_text})
+
+    if verbose:
+        print('Generating AI suggestions...')
+    return chat(
+        model=model,
+        messages=suggestions_prompt
+    )['message']['content'].strip()
 
 if __name__ == '__main__':
     output = tui()

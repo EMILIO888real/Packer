@@ -52,7 +52,7 @@ from plyer import notification
 import json
 import pygame
 
-from packer.custom_modules.et import format_version_text, normalize_settings_keys
+from packer.custom_modules.et import format_version_text, normalize_settings_keys, input_via_text_editor
 from packer.paths import assets_dir, config_dir, log_path, error_report_path, projects_file_path
 from packer.exceptions import Global_exception_handler
 from packer.utils import is_file_encrypted, read_encrypted_file
@@ -187,6 +187,19 @@ class Settings(BaseModel):
     cache_size_threshold: int = 1_073_741_824 # 1 GiB
     auto_clear_cache: bool = False
     auto_clear_logs: bool = True
+    suggestions_prompt: list[dict[str, str]] = [
+        {'role': 'system', 'content': (
+            'You are writing a very short release-note style summary of a git diff. '
+            'Focus only on meaningful user-facing or architectural changes that are actually present. '
+            'Do not mention implementation details, parameter names, config keys, helper functions, file names, or line-by-line edits. '
+            'Group the summary into the fewest useful sections: Added, Changed, and/or Fixed. '
+            'Only include a section if there is at least one real bullet for it. '
+            'Never write a section that says "No fixes", "No changes", or similar placeholders. '
+            'If there is no genuine fix in the diff, omit the Fixed section entirely. '
+            'Write 1-3 bullets per included section, each as a concise high-level statement. '
+            'Keep the response short and avoid repetition.'
+        )},
+        {'role': 'user', 'content': '$diff'}]
 
 
 settings_path = f'{config_dir}/settings.json'
@@ -216,6 +229,17 @@ def _getpass(prompt: str) -> str:
     '''
     return getpass(prompt, echo_char=all_settings.getpass_echo_char)
 
+def _input_via_text_editor(text: str) -> str:
+    '''
+    Prompt the user for input using a text editor, as specified in the global settings.
+
+    :param text: The initial text to display in the editor.
+    :type text: str
+    :return: The text entered by the user in the editor.
+    :rtype: str
+    '''
+
+    return input_via_text_editor(text, all_settings.text_editor, all_settings.wait_flag)
 
 # All other miscellaneous setup
 
