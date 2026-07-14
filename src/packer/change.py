@@ -151,6 +151,13 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
 
     This function is intended to be used as an entry point for a TUI that guides the user
     through creating changelog entries and committing them to the repository.
+
+    :param changes: A list of modification types (a = added, c = changed, f = fixed) (default is None)
+    :type changes: list[str] | None
+    :param overall_description: An overall description of the modifications, if there are multiple (default is None)
+    :type overall_description: str | None
+    :param ai_suggestions: Whether to generate AI suggestions for the changes (default is True)
+    :type ai_suggestions: bool
     '''
 
     if ai_suggestions:
@@ -175,8 +182,14 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
 
 def generate_suggestions(git_directory: str | Path = '.', suggestions_prompt = all_settings.suggestions_prompt, model: str = all_settings.model, verbose: bool = True):
     '''
-    :param ai_suggestion: Whether to generate AI suggestions for the changes (default is True)
-    :type ai_suggestion: bool
+    Generates AI suggestions for the changes based on the current git diff.
+
+    :param git_directory: The root directory of the project (default is '.')
+    :type git_directory: str | Path
+    :param suggestions_prompt: The prompt template for generating AI suggestions (default is all_settings.suggestions_prompt)
+    :type suggestions_prompt: list[dict]
+    :param model: The AI model to use for generating suggestions (default is all_settings.model)
+    :type model: str
     '''
     repo = Repo(git_directory)
     diff_text = repo.git.diff(unified=3)

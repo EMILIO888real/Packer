@@ -108,7 +108,7 @@ Possible problems might arise in that case, please back up your project before r
 
 ## Feedback and Suggestions
 
-Please open issues or pull requests on the project's GitHub repository, or email [emilspro888@gmail.com] suggested improvements and bugs.
+Please open issues or pull requests on the project's GitHub repository, or email [emilspro888@gmail.com] to suggest improvements or report bugs.
 
 ## Honorable mentions
 

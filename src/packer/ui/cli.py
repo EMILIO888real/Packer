@@ -103,7 +103,8 @@ def main():
     change_command_parser.add_argument('-p', '--project', dest='change_project', help='Specify the project').completer = get_project_names
     change_command_parser.add_argument('-c', '--changes', dest='change_changes', help='Specify the changes')
     change_command_parser.add_argument('-o', '--overall-description', dest='change_overall_description', help='Specify the overall description, only in use if there are more than 1 change')
-    change_command_parser.add_argument('-n', '--no-ai', dest='change_ai_summary', action='store_true', help='Disable AI summary')
+    change_command_parser.add_argument('-m', '--ai-summary', dest='change_ai_summary', action='store_true', help='Disable AI summary')
+    change_command_parser.add_argument('-s', '--ai-suggestions', dest='change_ai_suggestions', action='store_true', help='Disable AI suggestions')
 
 
     autocomplete(parser)
@@ -248,7 +249,7 @@ def main():
             user_chosen_project = args.change_project if args.change_project else Path().cwd().name
             project = find_user_project(user_chosen_project)
             if project:
-                output = change_tui(args.change_changes, args.change_overall_description)
+                output = change_tui(args.change_changes, args.change_overall_description, not args.change_ai_suggestions)
                 change(project, modification_types=output[0], overall_description=output[1], ai_summary=not args.change_ai_summary)
             else:
                 print(f'I couldn\'t find your project: {user_chosen_project}')

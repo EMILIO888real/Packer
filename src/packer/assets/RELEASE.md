@@ -15,8 +15,8 @@ When downloading, please choose the correct build for your operating system:
 
 | File Name | Platform | Description |
 | --- | --- | --- |
-| `packer` | Linux/macOS | Executable for Unix-based systems. |
-| `packer.exe` | Windows | Executable for Windows systems. |
+| `$program_name` | Linux/macOS | Executable for Unix-based systems. |
+| `$program_name.exe` | Windows | Executable for Windows systems. |
 
 ### To install:
 
@@ -44,7 +44,7 @@ git clone https://github.com/${github_repo_url} --depth 1
 
 Using `--depth 1` creates a "shallow clone," which only downloads the latest commit, saving you significant time and storage space compared to a full repository clone.
 
-While downloading the pre-compiled binaries (like `packer` or `packer.exe`) is usually the fastest way to get started, cloning the repository allows you to easily pull future updates with `git pull` as they are released.
+While downloading the pre-compiled binaries (like `$program_name` or `$program_name.exe`) is usually the fastest way to get started, cloning the repository allows you to easily pull future updates with `git pull` as they are released.
 
 ## Verification
 
@@ -55,7 +55,7 @@ To ensure the integrity of the downloaded files, you can verify their SHA256 che
 * **Windows (PowerShell):**
 Open PowerShell and run the following command:
 ```powershell
-Get-FileHash .\packer.exe -Algorithm SHA256
+Get-FileHash .\$program_name.exe -Algorithm SHA256
 
 ```
 
@@ -63,7 +63,7 @@ Get-FileHash .\packer.exe -Algorithm SHA256
 * **Linux/macOS (Terminal):**
 Open your terminal and run:
 ```bash
-sha256sum packer
+sha256sum $program_name
 
 ```
 

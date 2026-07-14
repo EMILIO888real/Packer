@@ -109,7 +109,8 @@ class Packer():
                  model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
                  description_prompt_kwargs: dict[Any, Any] = Project.model_fields['description_prompt_kwargs'].default, title_prompt_kwargs: dict[Any, Any] = Project.model_fields['title_prompt_kwargs'].default,
                  release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default,
-                 check_todo: bool = True, todo_rel_path: str = 'dev/TODO.md', list_start_identifier: str = 'before next release', list_end_identifier: str = '#'
+                 check_todo: bool = Project.model_fields['check_todo'].default, todo_rel_path: str = Project.model_fields['todo_rel_path'].default,
+                 list_start_identifier: str = Project.model_fields['list_start_identifier'].default, list_end_identifier: str = Project.model_fields['list_end_identifier'].default
                 ):
         # parameter initialization
         self.input_queue = input_queue

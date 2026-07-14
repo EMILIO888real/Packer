@@ -86,6 +86,12 @@ class Project(BaseModel):
         title_prompt (list[dict] | None): Prompt template for generating release titles.
         release_notes_template_path (str | Path): Path to the release notes template file.
         changelog_git_hash (bool): Whether to include git hash in changelog (default: True).
+        description_prompt_kwargs (dict): Additional keyword arguments for the description prompt.
+        title_prompt_kwargs (dict): Additional keyword arguments for the title prompt.
+        check_todo (bool): Whether to check for TODO items in the project (default: True).
+        todo_rel_path (str): Relative path to the TODO file in the project.
+        list_start_identifier (str): Identifier marking the start of the TODO list section.
+        list_end_identifier (str): Identifier marking the end of the TODO list section.
     '''
 
     gofile_user_token: str | None = None
@@ -109,6 +115,10 @@ class Project(BaseModel):
     changelog_git_hash: bool = True
     description_prompt_kwargs: dict = {}
     title_prompt_kwargs: dict = {'options': {'temperature': 0.8, 'num_predict': 10}}
+    check_todo: bool = True
+    todo_rel_path: str = 'dev/TODO.md'
+    list_start_identifier: str = 'before next release'
+    list_end_identifier: str = '#'
 
 
 class Settings(BaseModel):

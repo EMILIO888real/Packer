@@ -271,20 +271,33 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating a TODO.md file...')
     with open('dev/TODO.md', 'w') as f:
-        f.write(dedent('''\
-            # TODO
+        f.write(dedent(f'''\
+            # {program_name} TODO
 
-            - [ ] Update the README.md file, especially the Github and GoFile URL, if they aren't complete, replace None with the required info, for Github username/repo. And for GoFile folder URL
-            - [ ] Update the CHANGELOG.md file, if not using packer's change.py
-            - [ ] Update the ROADMAP.md file
+            ## BEFORE NEXT RELEASE:
+
+            - [ ] Update the README.md file, especially the Github and GoFile URL, if they aren't complete, replace None with the required info, for Github username/repo and for GoFile folder URL
             - [ ] Update the pyproject.toml file
+
+            ## BEFORE COMMITTING:
+
+            - [ ] Update the CHANGELOG.md file, if not using packer's change.py
             - [ ] Check and update the .gitignore if necessary
             - [ ] Checkout docs folder and remove or update the files that will be in use
+            
+            ## NORMAL TODO:
+
+            - [ ] Update the ROADMAP.md file
+            - [ ] Update the Github's repository settings or other fields, for example the temporary description created by Packer, recommended to use the same short description that you use in your pyproject.toml file
+            - [ ] Update GoFile folder properties like the description or other things
+
+            ### BIG TODO:
+                       
+            ### POSSIBLE:
+
             - [ ] Remove the paths.py file, if you won't need user tied paths to your software, *useful to remove for a library for example*
             - [ ] Update the main `__init__.py` module if you are going to have your python package importable
             - [ ] Remove the `UI` folder if you don't plan on building UI for your package, *useful to remove for a library for example*
-            - [ ] Update the Github's repository settings or other fields, for example the temporary description created by Packer, recommended to use the same short description that you use in your pyproject.toml file
-            - [ ] Update GoFile folder properties like the description or other things
                        
             ## Tips
             
