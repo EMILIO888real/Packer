@@ -675,12 +675,14 @@ def format_size(size_bytes: int, precision: int = 2) -> str:
         size_bytes /= 1024
     return f'{size_bytes:.{precision}f} TiB'
 
-def input_via_text_editor(text:str = '', text_editor: str = 'code', wait_flag: str = '--wait') -> str:
+def input_via_text_editor(text: str = '', file_path: str = None, text_editor: str = 'code', wait_flag: str = '--wait') -> str:
     '''
     Open a text editor for user input and return the edited text.
 
     :param text: Initial text to populate the editor with.
     :type text: str
+    :param file_path: Optional path to a file to use for editing. If not provided, a temporary file will be created.
+    :type file_path: str
     :param text_editor: The text editor to use for opening the file (default is 'code').
     :type text_editor: str
     :param wait_flag: The flag to pass to the editor to wait for it to close (default is '--wait').
@@ -689,14 +691,21 @@ def input_via_text_editor(text:str = '', text_editor: str = 'code', wait_flag: s
     :rtype: str
     '''
 
-    with NamedTemporaryFile('r', delete=False) as tf:
-        temp_path = tf.name
-    with open(temp_path, 'w') as f:
+    if not file_path:
+        with NamedTemporaryFile('w', delete=False) as tf:
+            tmp_path = tf.name
+
+    with open(file_path or tmp_path, 'w') as f:
         f.write(text)
-    run([text_editor, wait_flag, temp_path])
-    with open(temp_path, 'r') as f:
+    cmd = [text_editor, file_path or tmp_path]
+    if wait_flag:
+        cmd.insert(1, wait_flag)
+    run(cmd)
+    with open(file_path or tmp_path, 'r') as f:
         text = f.read().strip()
-    remove(temp_path)
+
+    if not file_path:
+        remove(tmp_path)
     return text
 
 if __name__ == '__main__':

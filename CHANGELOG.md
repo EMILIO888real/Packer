@@ -3,13 +3,18 @@
 ### Added
 - Various documentation updates to reflect new features and options in the project configuration. 
 - `--ai-suggestions` parameter to the `CLI` for disabling AI suggestions in the `change` command. 
+- Optional file path parameter for text editor input function to use existing files, if None it wil act as before and create it's own temporary file. 
 
 ### Changed
 - The latest parameters of `Packer`, like, `check_todo`, `todo_rel_path`, `list_start_identifier`, and `list_end_identifier` have been moved to `Project` class in config.py, Packer just references them from there. This change was made to be able to have settings validation. 
 - TODO in `setup.py` to have sections for all entries, like before committing, before release and so on. This will help in organizing the setup process and ensuring that all necessary steps are completed before committing or releasing the package, Packer also checks these by default. 
+- `main` function in `change.py` now accepts `text_editor` and `wait_flag` parameters. 
+- `input_via_text_editor` function in `config.py` now delegates to the module-level function with additional parameters. 
 
 ### Fixed
 - Release notes template to use program name variable instead of hardcoded 'packer' and 'packer.exe'. 
+- Proper handling of temporary files in text editor input, ensuring cleanup when not using existing files. 
+- Correct passing of wait flag to text editor commands when specified. 
 
 ---
 

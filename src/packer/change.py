@@ -6,8 +6,8 @@ from ollama import chat
 
 from packer.config import _input_via_text_editor, all_settings
 
-def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
-         overall_description: str = None,
+def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'], overall_description: str = None,
+         text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag,
          ai_summary: bool = True,
          check_todo: bool = True, todo_rel_path: str = '/dev/TODO.md', list_start_identifier: str = 'before committing', list_end_identifier: str = '#',
          bullet_summary_prompt = all_settings.changes_summary_prompt, high_level_summary_prompt = all_settings.high_level_summary_prompt,
@@ -44,6 +44,17 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
     :param model: The AI model to use for generating summaries (default is all_settings.model)
     :type model: str
     '''
+
+    def input_via_text_editor(message: str) -> str:
+        '''
+        Opens a temporary file in the specified text editor for user input.
+
+        :param message: The initial message to display in the text editor
+        :type message: str
+        :return: The user's input from the text editor
+        :rtype: str
+        '''
+        return _input_via_text_editor(message, text_editor=text_editor, wait_flag=wait_flag)
 
     if check_todo:
         with open(f'{git_directory}{todo_rel_path}') as f:
@@ -105,7 +116,7 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
         else:
             message = ''
 
-        message = _input_via_text_editor(message)
+        message = input_via_text_editor(message)
 
         match modification_type:
             case 'a':
@@ -135,7 +146,7 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
             f.write(full_changelog)
 
     if len(messages) > 1:
-        git_message = f'feat: {_input_via_text_editor(high_level_summary if ai_summary else overall_description)}\n\n'
+        git_message = f'feat: {input_via_text_editor(high_level_summary if ai_summary else overall_description)}\n\n'
         for message in messages:
             git_message += f'- {message[0]}: {message[1]}\n'
     else:

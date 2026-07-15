@@ -21,7 +21,7 @@ from pyperclip import copy
 from webbrowser import open_new_tab
 from itertools import cycle
 
-from packer.custom_modules.et import format_size, get_folder_size, tree, delete_upload, init_logger
+from packer.custom_modules.et import format_size, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
 from packer.custom_modules.etf import bool_answer, simple_prompt_retries, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor, print_with_delay
 from packer.config import all_settings, Project, packer_version, send_notification
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
@@ -290,15 +290,8 @@ class Packer():
                 generate_description = not self.prompt_user('Is the description all good', 'n')
         else:
             description = 'Write your version description in this file. (select all text [usually ctrl+a] and then start writing your description. After you have written it, save it and close the editor)'
-        
-        with open(self.chosen_description_path, 'w') as f:
-            f.write(description)
-        text_editor_description_cmd = [all_settings.text_editor, str(self.chosen_description_path)]
-        if all_settings.wait_flag:
-            text_editor_description_cmd.insert(1, all_settings.wait_flag)
-        self._run(text_editor_description_cmd)
-        with open(self.chosen_description_path) as f:
-            description = f.read()
+
+        description = input_via_text_editor(description, str(self.chosen_description_path))
 
 
         self.print_and_log('Generating a version title...')
@@ -328,15 +321,8 @@ class Packer():
                 generate_title = not self.prompt_user('Is the Version title all good', 'n')
         else:
             version_title = 'Write your version title in this file. (select all text [usually ctrl+a] and then start writing your title. After you have written it, save it and close the editor)'
-    
-        with open(self.chosen_title_path, 'w') as f:
-            f.write(version_title)
-        text_editor_title_cmd = [all_settings.text_editor, str(self.chosen_title_path)]
-        if all_settings.wait_flag:
-            text_editor_title_cmd.insert(1, all_settings.wait_flag)
-        self._run(text_editor_title_cmd)
-        with open(self.chosen_title_path) as f:
-            version_title = f.read()
+
+        version_title = input_via_text_editor(version_title, str(self.chosen_title_path))
 
 
         self.print_and_log('Updating pyproject.toml...')

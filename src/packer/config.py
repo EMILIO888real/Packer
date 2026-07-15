@@ -239,17 +239,23 @@ def _getpass(prompt: str) -> str:
     '''
     return getpass(prompt, echo_char=all_settings.getpass_echo_char)
 
-def _input_via_text_editor(text: str) -> str:
+def _input_via_text_editor(text: str, file_path: str = None, text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag) -> str:
     '''
     Prompt the user for input using a text editor, as specified in the global settings.
 
     :param text: The initial text to display in the editor.
     :type text: str
+    :param file_path: Optional path to a temporary file to use for the editor session.
+    :type file_path: str | None
+    :param text_editor: The text editor to use (default is the one specified in global settings).
+    :type text_editor: str
+    :param wait_flag: Optional flag to pass to the text editor to make it wait for the user to finish editing (default is the one specified in global settings).
+    :type wait_flag: str | None
     :return: The text entered by the user in the editor.
     :rtype: str
     '''
 
-    return input_via_text_editor(text, all_settings.text_editor, all_settings.wait_flag)
+    return input_via_text_editor(text, file_path, text_editor, wait_flag)
 
 # All other miscellaneous setup
 
