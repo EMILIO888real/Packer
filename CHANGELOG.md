@@ -4,6 +4,7 @@
 - Various documentation updates to reflect new features and options in the project configuration. 
 - `--ai-suggestions` parameter to the `CLI` for disabling AI suggestions in the `change` command. 
 - Optional file path parameter for text editor input function to use existing files, if None it wil act as before and create it's own temporary file. 
+- Streaming to GitHub assets and GoFile uploads. 
 
 ### Changed
 - The latest parameters of `Packer`, like, `check_todo`, `todo_rel_path`, `list_start_identifier`, and `list_end_identifier` have been moved to `Project` class in config.py, Packer just references them from there. This change was made to be able to have settings validation. 

@@ -3,7 +3,7 @@ from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive
-from os import chdir, listdir, remove
+from os import chdir, listdir, remove, path
 from json import dump, load
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
@@ -45,9 +45,9 @@ def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
     :rtype: dict
     '''
 
-    with open(file_path, 'rb') as file_handle:
+    with open(file_path, 'rb') as f:
         files = {
-            'file': (file_path.name, file_handle)
+            'file': f
         }
 
         data = {
@@ -559,13 +559,14 @@ class Packer():
                 waiting_for_pyinstaller_bundling.set()
                 pyinstaller_done.wait()
 
-                self.git_release.upload_asset(path=f'{cache_dir}/dist/{self.program_name}', content_type='application/octet-stream')
+                self._upload_github_asset(Path(f'{cache_dir}/dist/{self.program_name}'), 'application/octet')
 
             if self.compile_command != None:
                 self.print_and_log('Waiting for Nuitka to finish...')
                 waiting_for_compile_command.set()
                 compile_command_done.wait()
-                self.git_release.upload_asset(path=f'{cache_dir}{self.program_name} [nuitka].zip', content_type='application/zip')
+
+                self._upload_github_asset(Path(f'{self.program_name} [nuitka].zip'), 'application/zip')
 
 
             self.print_and_log('Cleaning up cache...')
@@ -729,6 +730,13 @@ class Packer():
             self.git_repo.delete_tag(self.version)
         if exit:
             sys.exit(1)
+    
+    def _upload_github_asset(self, file_path: Path, content_type: str):
+        with open(file_path, 'rb') as f:
+            self.git_release.upload_asset_from_memory(f,
+                                                        path.getsize(f),
+                                                        file_path.name,
+                                                        f'{content_type}-stream')
     
     def _stream_queue_chunk(self, chunk: str, type: str, color: list[int] | None = None):
         self.output_queue.put({'type': type, 'chunk': chunk, 'color': color})
