@@ -3,7 +3,7 @@ from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive
-from os import chdir, listdir, remove, path
+from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
@@ -149,6 +149,8 @@ class Packer():
             r'^(Added|Changed|Fixed):\s*(.+)$'
         )
         self.run_pyinstaller = any(Path().glob('*.spec'))
+        self.cache_dir = f'{cache_dir}/{self.program_name}'
+        makedirs(self.cache_dir, exist_ok=True)
 
 
         # Settings related actions
@@ -341,9 +343,9 @@ class Packer():
             tomlkit.dump(config, f)
 
 
-        if Path(f'{cache_dir}/{self.program_name} {old_version_text}.zip').exists():
+        if Path(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip').exists():
             self.print_and_log('Removing old archive...')
-            remove(f'{cache_dir}/{self.program_name} {old_version_text}.zip')
+            remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
 
 
         self.print_and_log('Getting exclusions from .gitignore...')
@@ -358,7 +360,7 @@ class Packer():
 
 
         self.print_and_log('Creating an archive of the current git repository...')
-        with open(f'{cache_dir}/{self.program_name} {self.version}.zip', 'wb') as fp:
+        with open(f'{self.cache_dir}/{self.program_name} {self.version}.zip', 'wb') as fp:
             self.git_repo.archive(fp, format='zip')
 
 
@@ -385,7 +387,7 @@ class Packer():
         current_project_metadata = metadata.get(str(Path().absolute()), {})
         
         project_size = get_folder_size(Path(), exclusions)
-        version_size = Path(f'{cache_dir}/{self.program_name} {self.version}.zip').stat().st_size
+        version_size = Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').stat().st_size
 
         if current_project_metadata:
             project_latest_size = current_project_metadata.get('project size')
@@ -399,7 +401,7 @@ class Packer():
         self.print_and_log(f'New version\'s size: {format_size(version_size)}')
 
 
-        self.print_and_log(f'Archive saved at: {cache_dir}/{self.program_name} {self.version}.zip')
+        self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
             if self.compile_command != None:
@@ -408,7 +410,7 @@ class Packer():
                 compile_command_done = self._Popen(self.compile_command, waiting_for_compile_command)
 
                 self.print_and_log('Creating archive of the compiled program...')
-                make_archive(f'{cache_dir}/{self.program_name} [nuitka]', 'zip', f'{cache_dir}/main.dist')
+                make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
 
             
             if self.run_pyinstaller:
@@ -417,8 +419,8 @@ class Packer():
                 pyinstaller_done = self._Popen([sys.executable,
                             '-m',
                             'PyInstaller', 'main.spec',
-                            '--distpath', f'{cache_dir}/dist',
-                            '--workpath', f'{cache_dir}/build'], waiting_for_pyinstaller_bundling)
+                            '--distpath', f'{self.cache_dir}/dist',
+                            '--workpath', f'{self.cache_dir}/build'], waiting_for_pyinstaller_bundling)
             
             if self.GOFILE_USER_TOKEN and self.FOLDER_ID:
                 self.print_and_log('Uploading archive to Gofile...')
@@ -433,7 +435,7 @@ class Packer():
                             if not self.prompt_user('Has the problem been resolved'):
                                 self.revert_changes()
 
-                        response = upload_gofile_file(Path(f'{cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
+                        response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
                         if response.get('status') != 'ok' or not response.get('data'):
                             self.print_and_log(f'GoFile upload returned an invalid response: {response}', 40)
                             self.revert_changes()
@@ -559,7 +561,7 @@ class Packer():
                 waiting_for_pyinstaller_bundling.set()
                 pyinstaller_done.wait()
 
-                self._upload_github_asset(Path(f'{cache_dir}/dist/{self.program_name}'), 'application/octet')
+                self._upload_github_asset(Path(f'{self.cache_dir}/dist/{self.program_name}'), 'application/octet')
 
             if self.compile_command != None:
                 self.print_and_log('Waiting for Nuitka to finish...')
@@ -571,11 +573,11 @@ class Packer():
 
             self.print_and_log('Cleaning up cache...')
             if self.run_pyinstaller:
-                rmtree(f'{cache_dir}/dist')
+                rmtree(f'{self.cache_dir}/dist')
             
-            if all_settings.auto_clear_cache and get_folder_size(Path(cache_dir)) > all_settings.cache_size_threshold:
+            if all_settings.auto_clear_cache and get_folder_size(Path(self.cache_dir)) > all_settings.cache_size_threshold:
                 self.print_and_log(f'Deleting cache folder, over threshold [{format_size(all_settings.cache_size_threshold)}]...')
-                rmtree(cache_dir)
+                rmtree(self.cache_dir)
             
             if all_settings.auto_clear_logs and get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
                 self.print_and_log(f'Cleaning logs folder, over threshold: [{format_size(all_settings.logs_size_threshold)}]...')
@@ -596,8 +598,8 @@ class Packer():
                     self.print_and_log(f'Removed {file}')
 
             if self.compile_command != None:
-                rmtree(f'{cache_dir}/main.dist')
-                remove(f'{cache_dir}{self.program_name} [nuitka].zip')
+                rmtree(f'{self.cache_dir}/main.dist')
+                remove(f'{self.cache_dir}{self.program_name} [nuitka].zip')
 
             self.print_and_log('Writing social media post text to a file...')
             with open(f'{data_dir}/social media post.md', 'w') as f:
@@ -689,9 +691,9 @@ class Packer():
 
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
-        if Path(f'{cache_dir}/{self.program_name} {self.version}.zip').exists():
+        if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
             self.print_and_log('Removing archive...', [255, 255, 0])
-            remove(f'{cache_dir}/{self.program_name} {self.version}.zip')
+            remove(f'{self.cache_dir}/{self.program_name} {self.version}.zip')
 
         if hasattr(self, 'file_id'):
             self.print_and_log('Deleting uploaded copy...', [255, 255, 0])

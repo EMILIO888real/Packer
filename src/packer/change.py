@@ -172,7 +172,10 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
     '''
 
     if ai_suggestions:
-        print(f'AI suggestions:\n{generate_suggestions()}')
+        try:
+            print(f'AI suggestions:\n{generate_suggestions()}')
+        except KeyboardInterrupt:
+            print('Skipping AI suggestions...')
 
     if not changes:
         amount = int(input('Enter the amount of changes: '))
