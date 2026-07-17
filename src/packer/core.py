@@ -688,6 +688,8 @@ class Packer():
             
             with open(metadata_path, 'w') as f:
                 dump(metadata, f)
+            
+            self.buffer_queue.join()
 
             
         else:

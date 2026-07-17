@@ -1,6 +1,7 @@
 ## [%new_version] - %date
 
 ### Added
+- A new method call `self.buffer_queue.join()` at the end the `run` method to ensure waiting for the output to finish before returning and possibly exiting. 
 
 ### Changed
 
