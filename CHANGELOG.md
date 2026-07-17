@@ -24,6 +24,8 @@
 - Changed the smooth output threading `Queue` object to be one of the queue modules instead of Multiprocessing. 
 - `"versions size"` to `"version size"` key of the metadata.json to actually check and compare to last version's size. 
 - Waiting for the printing to finish before prompting for anything through stdin. 
+- Added a wait condition before streaming compile or bundling commands via `_Popen`. 
+- The upload_asset_from_memory method now uses `path.getsize(file_path)` instead of `path.getsize(f)` to get file size in the _upload_github_asset function. 
 
 ---
 

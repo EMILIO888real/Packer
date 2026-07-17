@@ -748,7 +748,7 @@ class Packer():
     def _upload_github_asset(self, file_path: Path, content_type: str):
         with open(file_path, 'rb') as f:
             self.git_release.upload_asset_from_memory(f,
-                                                        path.getsize(f),
+                                                        path.getsize(file_path),
                                                         file_path.name,
                                                         f'{content_type}-stream')
     
@@ -962,6 +962,8 @@ class Packer():
         :return: An event that is set when the subprocess is done.
         :rtype: Event
         '''
+
+        self.buffer_queue.join()
 
         done = threading.Event()
 
