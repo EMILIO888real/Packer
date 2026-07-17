@@ -906,6 +906,7 @@ class Packer():
         :rtype: bool
         '''
 
+        self.buffer_queue.join()
         answer = simple_prompt_retries(question, default)
         self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer

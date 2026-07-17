@@ -22,6 +22,7 @@
 - Correct passing of wait flag to text editor commands when specified. 
 - Changed the smooth output threading `Queue` object to be one of the queue modules instead of Multiprocessing. 
 - `"versions size"` to `"version size"` key of the metadata.json to actually check and compare to last version's size. 
+- Waiting for the printing to finish before prompting for anything through stdin. 
 
 ---
 
