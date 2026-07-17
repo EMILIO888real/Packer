@@ -156,6 +156,11 @@ class Packer():
         # Settings related actions
         if input_queue:
             all_settings.verbose = False
+        if all_settings.smooth_output:
+            self.buffer_queue = Queue()
+            self.finished_output = threading.Event()
+            threading.Thread(target=self._process_print, daemon=True).start()
+
         self.print_and_log = self._print_and_log if all_settings.verbose else self._log_and_output_queue
         self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
         self.stream_output_chunk = self._stream_queue_chunk if input_queue else self._stream_print_chunk
@@ -168,7 +173,7 @@ class Packer():
         if not all_settings.skip_git_status:
             if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
                 self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...', [255, 0, 0], 40)
-                sys.exit(1)
+                self._exit(1)
         
         if check_todo:
             with open(f'{todo_rel_path}') as f:
@@ -181,7 +186,7 @@ class Packer():
 
             if todo_list:
                 self.print_and_log(f'{list_start_identifier} task/s found, please delete them from the list once finished!\n{list_start_identifier} List:\n{todo_list}\nExiting...', [255, 0, 0], 40)
-                sys.exit(1)
+                self._exit(1)
 
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
@@ -280,6 +285,7 @@ class Packer():
 
                 first_chunk = next(stream).message.content.lstrip()
                 description.append(first_chunk)
+                self._wait_output_buffer()
                 self.stream_output_chunk(first_chunk, 'version description output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
 
                 for chunk in stream:
@@ -312,6 +318,7 @@ class Packer():
 
                 first_chunk = first_chunk = next(stream).message.content.lstrip()
                 version_title.append(first_chunk)
+                self._wait_output_buffer()
                 self.stream_output_chunk(first_chunk, 'version title output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
                 for chunk in stream:
                     chunk = chunk.message.content
@@ -731,7 +738,15 @@ class Packer():
             self.print_and_log('Deleting local git tag...')
             self.git_repo.delete_tag(self.version)
         if exit:
-            sys.exit(1)
+            self._exit(1)
+        
+    def _exit(self, code: int = None):
+        self._wait_output_buffer()
+        sys.exit(code)
+    
+    def _wait_output_buffer(self):
+        while self.buffer_queue.qsize() != 0 or not self.finished_output.is_set():
+                    sleep(0.001)
     
     def _upload_github_asset(self, file_path: Path, content_type: str):
         with open(file_path, 'rb') as f:
@@ -809,12 +824,24 @@ class Packer():
             return results
         
         return results
+    
+    def _process_print(self):
+        while True:
+            self.finished_output.clear()
+            text = self.buffer_queue.get()
+            print_with_delay(text['text'], cycle([text['color']]), all_settings.smooth_output_speed / (self.buffer_queue.qsize() + 1))
+            i = 0
+            while self.buffer_queue.qsize() == 0:
+                i += 1
+                if i == 100:
+                    self.finished_output.set()
+                sleep(0.001)
 
     def _print_and_log(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20):
         '''Prints the text and logs it to the packer log file.'''
 
         if all_settings.smooth_output:
-            print_with_delay(text, cycle([color]), all_settings.smooth_output_speed)
+            self.buffer_queue.put({'text': text, 'color': color})
         else:
             if color:
                 print_colored_text(text, color)

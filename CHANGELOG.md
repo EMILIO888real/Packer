@@ -7,6 +7,7 @@
 - Streaming to GitHub assets and GoFile uploads. 
 - Option to skip AI suggestions via keyboard interrupts (ctrl+c). 
 - `Packer` class now creates a project specific cache dir to allow running multiple instances. 
+- Threading for smooth output to allow the program to run at near full speed instead of creating artificial slow down for looks, also dynamic speed is possible with this approach. 
 
 ### Changed
 - The latest parameters of `Packer`, like, `check_todo`, `todo_rel_path`, `list_start_identifier`, and `list_end_identifier` have been moved to `Project` class in config.py, Packer just references them from there. This change was made to be able to have settings validation. 
