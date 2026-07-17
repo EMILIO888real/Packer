@@ -14,6 +14,7 @@
 - TODO in `setup.py` to have sections for all entries, like before committing, before release and so on. This will help in organizing the setup process and ensuring that all necessary steps are completed before committing or releasing the package, Packer also checks these by default. 
 - `main` function in `change.py` now accepts `text_editor` and `wait_flag` parameters. 
 - `input_via_text_editor` function in `config.py` now delegates to the module-level function with additional parameters. 
+- Simplified and sped up the logic for waiting the buffer to be processed and emptied. 
 
 ### Fixed
 - Release notes template to use program name variable instead of hardcoded 'packer' and 'packer.exe'. 

@@ -285,7 +285,7 @@ class Packer():
 
                 first_chunk = next(stream).message.content.lstrip()
                 description.append(first_chunk)
-                self._wait_output_buffer()
+                self.buffer_queue.join()
                 self.stream_output_chunk(first_chunk, 'version description output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
 
                 for chunk in stream:
@@ -318,7 +318,7 @@ class Packer():
 
                 first_chunk = first_chunk = next(stream).message.content.lstrip()
                 version_title.append(first_chunk)
-                self._wait_output_buffer()
+                self.buffer_queue.join()
                 self.stream_output_chunk(first_chunk, 'version title output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
                 for chunk in stream:
                     chunk = chunk.message.content
@@ -741,12 +741,8 @@ class Packer():
             self._exit(1)
         
     def _exit(self, code: int = None):
-        self._wait_output_buffer()
+        self.buffer_queue.join()
         sys.exit(code)
-    
-    def _wait_output_buffer(self):
-        while self.buffer_queue.qsize() != 0 or not self.finished_output.is_set():
-                    sleep(0.001)
     
     def _upload_github_asset(self, file_path: Path, content_type: str):
         with open(file_path, 'rb') as f:
@@ -827,15 +823,15 @@ class Packer():
     
     def _process_print(self):
         while True:
-            self.finished_output.clear()
             text = self.buffer_queue.get()
-            print_with_delay(text['text'], cycle([text['color']]), all_settings.smooth_output_speed / (self.buffer_queue.qsize() + 1))
-            i = 0
-            while self.buffer_queue.qsize() == 0:
-                i += 1
-                if i == 100:
-                    self.finished_output.set()
-                sleep(0.001)
+            try:
+                print_with_delay(
+                    text["text"],
+                    cycle([text["color"]]),
+                    all_settings.smooth_output_speed / (self.buffer_queue.qsize() + 1)
+                )
+            finally:
+                self.buffer_queue.task_done()
 
     def _print_and_log(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20):
         '''Prints the text and logs it to the packer log file.'''
