@@ -1,31 +1,31 @@
-## [%new_version] - %date
+## [0.21.0] - 2026-07-17
 
 ### Added
-- Various documentation updates to reflect new features and options in the project configuration. 
-- `--ai-suggestions` parameter to the `CLI` for disabling AI suggestions in the `change` command. 
-- Optional file path parameter for text editor input function to use existing files, if None it wil act as before and create it's own temporary file. 
-- Streaming to GitHub assets and GoFile uploads. 
-- Option to skip AI suggestions via keyboard interrupts (ctrl+c). 
-- `Packer` class now creates a project specific cache dir to allow running multiple instances. 
-- Threading for smooth output to allow the program to run at near full speed instead of creating artificial slow down for looks, also dynamic speed is possible with this approach. 
+- [16f98aa] Various documentation updates to reflect new features and options in the project configuration. 
+- [16f98aa] `--ai-suggestions` parameter to the `CLI` for disabling AI suggestions in the `change` command. 
+- [7b4af00] Optional file path parameter for text editor input function to use existing files, if None it wil act as before and create it's own temporary file. 
+- [d3a7d56] Streaming to GitHub assets and GoFile uploads. 
+- [f15bb84] Option to skip AI suggestions via keyboard interrupts (ctrl+c). 
+- [f15bb84] `Packer` class now creates a project specific cache dir to allow running multiple instances. 
+- [feff634] Threading for smooth output to allow the program to run at near full speed instead of creating artificial slow down for looks, also dynamic speed is possible with this approach.
 
 ### Changed
-- The latest parameters of `Packer`, like, `check_todo`, `todo_rel_path`, `list_start_identifier`, and `list_end_identifier` have been moved to `Project` class in config.py, Packer just references them from there. This change was made to be able to have settings validation. 
-- TODO in `setup.py` to have sections for all entries, like before committing, before release and so on. This will help in organizing the setup process and ensuring that all necessary steps are completed before committing or releasing the package, Packer also checks these by default. 
-- `main` function in `change.py` now accepts `text_editor` and `wait_flag` parameters. 
-- `input_via_text_editor` function in `config.py` now delegates to the module-level function with additional parameters. 
-- Simplified and sped up the logic for waiting the buffer to be processed and emptied. 
-- The `format_size` function to handle negative size values. 
+- [16f98aa] The latest parameters of `Packer`, like, `check_todo`, `todo_rel_path`, `list_start_identifier`, and `list_end_identifier` have been moved to `Project` class in config.py, Packer just references them from there. This change was made to be able to have settings validation. 
+- [16f98aa] TODO in `setup.py` to have sections for all entries, like before committing, before release and so on. This will help in organizing the setup process and ensuring that all necessary steps are completed before committing or releasing the package, Packer also checks these by default. 
+- [7b4af00] `main` function in `change.py` now accepts `text_editor` and `wait_flag` parameters. 
+- [7b4af00] `input_via_text_editor` function in `config.py` now delegates to the module-level function with additional parameters. 
+- [70bd993] Simplified and sped up the logic for waiting the buffer to be processed and emptied. 
+- [3f21cd7] The `format_size` function to handle negative size values.
 
 ### Fixed
-- Release notes template to use program name variable instead of hardcoded 'packer' and 'packer.exe'. 
-- Proper handling of temporary files in text editor input, ensuring cleanup when not using existing files. 
-- Correct passing of wait flag to text editor commands when specified. 
-- Changed the smooth output threading `Queue` object to be one of the queue modules instead of Multiprocessing. 
-- `"versions size"` to `"version size"` key of the metadata.json to actually check and compare to last version's size. 
-- Waiting for the printing to finish before prompting for anything through stdin. 
-- Added a wait condition before streaming compile or bundling commands via `_Popen`. 
-- The upload_asset_from_memory method now uses `path.getsize(file_path)` instead of `path.getsize(f)` to get file size in the _upload_github_asset function. 
+- [16f98aa] Release notes template to use program name variable instead of hardcoded 'packer' and 'packer.exe'. 
+- [7b4af00] Proper handling of temporary files in text editor input, ensuring cleanup when not using existing files. 
+- [7b4af00] Correct passing of wait flag to text editor commands when specified. 
+- [3923266] Changed the smooth output threading `Queue` object to be one of the queue modules instead of Multiprocessing. 
+- [6a29654] `"versions size"` to `"version size"` key of the metadata.json to actually check and compare to last version's size. 
+- [7120d68] Waiting for the printing to finish before prompting for anything through stdin. 
+- [b392cf1] Added a wait condition before streaming compile or bundling commands via `_Popen`. 
+- [b392cf1] The upload_asset_from_memory method now uses `path.getsize(file_path)` instead of `path.getsize(f)` to get file size in the _upload_github_asset function.
 
 ---
 
