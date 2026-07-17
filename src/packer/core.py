@@ -20,6 +20,7 @@ import sys
 from pyperclip import copy
 from webbrowser import open_new_tab
 from itertools import cycle
+import queue
 
 from packer.custom_modules.et import format_size, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
 from packer.custom_modules.etf import bool_answer, simple_prompt_retries, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor, print_with_delay
@@ -157,7 +158,7 @@ class Packer():
         if input_queue:
             all_settings.verbose = False
         if all_settings.smooth_output:
-            self.buffer_queue = Queue()
+            self.buffer_queue = queue.Queue()
             self.finished_output = threading.Event()
             threading.Thread(target=self._process_print, daemon=True).start()
 

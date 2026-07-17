@@ -20,6 +20,7 @@
 - Release notes template to use program name variable instead of hardcoded 'packer' and 'packer.exe'. 
 - Proper handling of temporary files in text editor input, ensuring cleanup when not using existing files. 
 - Correct passing of wait flag to text editor commands when specified. 
+- Changed the smooth output threading `Queue` object to be one of the queue modules instead of Multiprocessing. 
 
 ---
 
