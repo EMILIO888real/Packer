@@ -398,10 +398,10 @@ class Packer():
         version_size = Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').stat().st_size
 
         if current_project_metadata:
-            project_latest_size = current_project_metadata.get('project size')
+            project_latest_size: int = current_project_metadata.get('project size')
             if project_latest_size:
                 self.print_and_log(f'Project size change: {format_size(project_latest_size - project_size)}')
-            last_versions_size = current_project_metadata.get('versions size')
+            last_versions_size: int = current_project_metadata.get('version size')
             if last_versions_size:
                 self.print_and_log(f'New versions size change: {format_size(last_versions_size - version_size)}')
 
