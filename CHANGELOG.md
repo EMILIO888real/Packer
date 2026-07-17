@@ -15,6 +15,7 @@
 - `main` function in `change.py` now accepts `text_editor` and `wait_flag` parameters. 
 - `input_via_text_editor` function in `config.py` now delegates to the module-level function with additional parameters. 
 - Simplified and sped up the logic for waiting the buffer to be processed and emptied. 
+- The `format_size` function to handle negative size values. 
 
 ### Fixed
 - Release notes template to use program name variable instead of hardcoded 'packer' and 'packer.exe'. 

@@ -669,11 +669,15 @@ def format_size(size_bytes: int, precision: int = 2) -> str:
 
     if size_bytes is None:
         return 'N/A'
+
+    sign = '-' if size_bytes < 0 else ''
+    magnitude = abs(size_bytes)
+
     for unit in ['B', 'KiB', 'MiB', 'GiB']:
-        if size_bytes < 1024:
-            return f'{size_bytes:.{precision}f} {unit}'
-        size_bytes /= 1024
-    return f'{size_bytes:.{precision}f} TiB'
+        if magnitude < 1024:
+            return f'{sign}{magnitude:.{precision}f} {unit}'
+        magnitude /= 1024
+    return f'{sign}{magnitude:.{precision}f} TiB'
 
 def input_via_text_editor(text: str = '', file_path: str = None, text_editor: str = 'code', wait_flag: str = '--wait') -> str:
     '''
