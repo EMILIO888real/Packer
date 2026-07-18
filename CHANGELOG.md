@@ -2,8 +2,11 @@
 
 ### Added
 - A new method call `self.buffer_queue.join()` at the end the `run` method to ensure waiting for the output to finish before returning and possibly exiting. 
+- Setup for user settings if the file is missing in `config.py`, by prompting for the 3 required settings with also searching for available and offering Packer defaults as an option as well. 
+- Proper Invalid settings output, instead of triggering an exception now Packer displays the problematic setting with the type of problem and a message attached in a nice colorful clean output. 
 
 ### Changed
+- `text editor`, `wait flag` and `model` user settings to be mandatory set, since the user might not be using or installing Packer defaults. 
 
 ### Fixed
 

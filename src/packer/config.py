@@ -32,6 +32,8 @@ __all__ = 'user_settings, default_settings, default_config, all_settings, load, 
 from os import environ
 from warnings import filterwarnings
 
+from packer.custom_modules.etf import print_colored_text
+
 filterwarnings(
     "ignore",
     message=r".*Your system is avx2 capable but pygame was not built with support for it.*",
@@ -44,13 +46,15 @@ from collections.abc import Callable
 from pathlib import Path
 from shutil import which
 from typing import Any, Sequence
-from pydantic import BaseModel
+from pydantic import BaseModel, ValidationError
 from getpass import getpass
 from cryptography.fernet import InvalidToken
 from plyer import notification
+from sys import exit
 
 import json
 import pygame
+import ollama
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys, input_via_text_editor
 from packer.paths import assets_dir, config_dir, log_path, error_report_path, projects_file_path
@@ -151,8 +155,8 @@ class Settings(BaseModel):
         notification_volume (float): Volume level for notification sounds (default: 1.0, range 0.0 to 1.0).
     '''
 
-    text_editor: str = 'code'
-    wait_flag: str | None = '--wait'
+    text_editor: str
+    wait_flag: str | None
     verbose: bool = True
     skip_git_status: bool = False
     changes_summary_prompt: list[dict[str, str]] = [
@@ -183,7 +187,7 @@ class Settings(BaseModel):
     )},
         {'role': 'user', 'content': '$bullet_summary'},
     ]
-    model: str = 'mistral'
+    model: str
     getpass_echo_char: str | None = None
     copy_github_release_clipboard: bool = True
     open_gitHub_release: bool = True
@@ -212,16 +216,68 @@ class Settings(BaseModel):
         {'role': 'user', 'content': '$diff'}]
 
 
+EDITORS = [
+    ('Visual Studio Code', 'code', '--wait'),
+    ('Cursor', 'cursor', '--wait'),
+    ('VS Code Insiders', 'code-insiders', '--wait'),
+    ('Notepad++', 'notepad++', None),
+    ('Neovim', 'nvim', None),
+    ('Vim', 'vim', None),
+    ('Nano', 'nano', None),
+    ('Emacs', 'emacs', None),
+]
+
 settings_path = f'{config_dir}/settings.json'
 
 if not Path(settings_path).exists():
+    print('Let\'s set up some basic settings\n')
+    settings = {}
+
+    available = [
+        (name, exe, wait_flag)
+        for name, exe, wait_flag in EDITORS
+        if which(exe)
+    ]
+    print('Found text editors:')
+    for text_editor in available:
+        print_colored_text(f'  {text_editor[0]} [{text_editor[1]}]')
+    settings['text_editor'] = input('Text editor [code] ') or 'code'
+
+    for text_editor in available:
+        if settings['text_editor'] == text_editor[1]:
+            settings['wait_flag'] = text_editor[2]
+            break
+    else:
+        settings['wait_flag'] = input('Wait flag: ')
+
+    response = ollama.list()
+    models = [model.model for model in response.models]
+
+    print('Found ollama AI models:')
+    for model in models:
+        print_colored_text(f'  {model}')
+    
+    settings['model'] = input('Model [mistral:latest] ') or 'mistral:latest'
+
     with open(settings_path, 'w') as f:
-        f.write('{}')
+        json.dump(settings, f)
 
 with open(settings_path) as f:
     user_settings = json.load(f)
 
-all_settings: Settings = Settings(**normalize_settings_keys(user_settings))
+try:
+    all_settings: Settings = Settings(**normalize_settings_keys(user_settings))
+except ValidationError as e:
+    print_colored_text('There are problems with the user settings:', [255, 0, 0])
+    for error in e.errors():
+        print_colored_text(f'{error['loc'][0]}:', end='\n  ')
+
+        print(f'Problem type: ', end='')
+        print_colored_text(error['type'], [255, 0, 0], end='\n  ')
+
+        print('Message: ', end='')
+        print_colored_text(error['msg'], [0, 255, 0])
+    exit()
 
 
 # All setup for settings
