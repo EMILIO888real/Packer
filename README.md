@@ -94,7 +94,8 @@ See [docs/PROJECT.md](docs/PROJECT.md#L1) for notes about adding custom assets a
 
 ## Warning
 
-Possible problems might arise in that case, please back up your project before running for the first time and even if packer messed up, it won't destroy or corrupt your project so GL fixing it! Here is also a guide for manually reverting a release in case it fails catastrophically: [docs/MANUAL_REVERT.md](docs/MANUAL_REVERT.md#L1).
+- Possible problems might arise in that case, please back up your project before running for the first time and even if packer messed up, it won't destroy or corrupt your project so GL fixing it! Here is also a guide for manually reverting a release in case it fails catastrophically: [docs/MANUAL_REVERT.md](docs/MANUAL_REVERT.md#L1).
+- Note that automatic error reporting is enabled by default. *You can disable it in the settings*
 
 ## Features
 

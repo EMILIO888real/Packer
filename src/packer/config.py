@@ -230,7 +230,7 @@ EDITORS = [
 settings_path = f'{config_dir}/settings.json'
 
 if not Path(settings_path).exists():
-    print('Let\'s set up some basic settings\n')
+    print('Let\'s set up some basic settings [2-3]\n')
     settings = {}
 
     available = [
@@ -238,29 +238,42 @@ if not Path(settings_path).exists():
         for name, exe, wait_flag in EDITORS
         if which(exe)
     ]
-    print('Found text editors:')
-    for text_editor in available:
-        print_colored_text(f'  {text_editor[0]} [{text_editor[1]}]')
-    settings['text_editor'] = input('Text editor [code] ') or 'code'
+    if available:
+        default_text_editor = available[0][1]
+        print('Found text editors:')
+        for text_editor in available:
+            print_colored_text(f'  {text_editor[0]} [{text_editor[1]}]')
+    else:
+        default_text_editor = None
+
+    settings['text_editor'] = input(f'1. Text editor {f'[{default_text_editor}]' if default_text_editor else ''} ') or default_text_editor
 
     for text_editor in available:
         if settings['text_editor'] == text_editor[1]:
             settings['wait_flag'] = text_editor[2]
             break
     else:
-        settings['wait_flag'] = input('Wait flag: ')
+        settings['wait_flag'] = input('2. Wait flag: ')
 
     response = ollama.list()
     models = [model.model for model in response.models]
 
-    print('Found ollama AI models:')
-    for model in models:
-        print_colored_text(f'  {model}')
+    if models:
+        default_model = 'mistral:latest' if 'mistral:latest' in models else models[0]
+        print('Found ollama AI models:')
+        for model in models:
+            print_colored_text(f'  {model}')
+    else:
+        default_model = None
     
-    settings['model'] = input('Model [mistral:latest] ') or 'mistral:latest'
+    settings['model'] = input(f'3. Model {f'[{default_model}]' if default_model else ''} ') or default_model
 
     with open(settings_path, 'w') as f:
-        json.dump(settings, f)
+        json.dump(settings, f, indent=4)
+    
+    print_colored_text('Note that automatic error reporting is enabled by default', [255, 255])
+    print_colored_text('Settings saved at: ', [0, 255, 0], end='')
+    print_colored_text(settings_path, [255, 105, 180])
 
 with open(settings_path) as f:
     user_settings = json.load(f)
@@ -277,7 +290,9 @@ except ValidationError as e:
 
         print('Message: ', end='')
         print_colored_text(error['msg'], [0, 255, 0])
-    exit()
+    print(f'Settings: ', end='')
+    print_colored_text(settings_path, [255, 105, 180])
+    exit(1)
 
 
 # All setup for settings
