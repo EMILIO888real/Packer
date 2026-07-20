@@ -77,9 +77,12 @@ class Global_exception_handler:
                     print('Specify your email if needed and hit send')
                     self.self.prompt_user_to_email(error_report)
         
-        if self.prompt_user('Enter interactive debugger', default='n'):
-            print('Entering post-mortem session...')
-            post_mortem(exc_traceback)
+        try:
+            if self.prompt_user('Enter interactive debugger', default='n'):
+                print('Entering post-mortem session...')
+                post_mortem(exc_traceback)
+        except KeyboardInterrupt:
+            pass
 
         sys.exit(1)
 

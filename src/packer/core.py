@@ -23,7 +23,7 @@ from itertools import cycle
 import queue
 
 from packer.custom_modules.et import format_size, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
-from packer.custom_modules.etf import bool_answer, simple_prompt_retries, hide_cursor, print_bg_colored_text, print_colored_text, show_cursor, print_with_delay
+from packer.custom_modules.etf import bool_answer, clear_lines, lines_used, simple_prompt_retries, print_bg_colored_text, print_colored_text, print_with_delay
 from packer.config import all_settings, Project, packer_version, send_notification
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
 
@@ -134,7 +134,6 @@ class Packer():
         self.description_prompt_kwargs = description_prompt_kwargs
 
         # Actions needed to run once, (setup actions)
-        self.terminal_width = get_terminal_size().columns
         self.logger = init_logger('packer', 'EMILIO')
         self.chosen_description_path = Path(f'{data_dir}/chosen description.md')
         self.chosen_title_path = Path(f'{data_dir}/chosen version title.md')
@@ -967,18 +966,23 @@ class Packer():
 
         self.buffer_queue.join()
 
+
+        # setup
+        def print_with_background(text):
+            print_bg_colored_text(text, all_settings.stream_background_color)
+        output_text = print_with_background if all_settings.stream_background_color else print
         done = threading.Event()
+
 
         def thread_function(done: threading.Event):
             process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
 
-            hide_cursor()
             for text in process.stdout:
                 text = text.rstrip('\n')
                 self.log_action(text)
                 if waiting.is_set():
-                    print_bg_colored_text(text, 255, 192, 203, self.terminal_width)
-            show_cursor()
+                    output_text(text)
+                    clear_lines(lines_used(text, get_terminal_size().columns), clear_formatting=True)
 
             process.wait()
             done.set()

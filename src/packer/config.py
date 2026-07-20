@@ -214,6 +214,7 @@ class Settings(BaseModel):
             'Keep the response short and avoid repetition.'
         )},
         {'role': 'user', 'content': '$diff'}]
+    stream_background_color: list[int] | None = [44, 44, 44]
 
 
 EDITORS = [

@@ -853,7 +853,7 @@ def scrollable_text_display(text: str = 'You can even win a reward! Awesome righ
     message_thread = Thread(target=main, daemon=True)
     message_thread.start()
 
-def set_background_color(red: int, green: int, blue: int) -> None:
+def set_background_color(color: list[int]) -> None:
     """Set the terminal background color using RGB values.
 
     Sets the background color using ANSI escape codes.
@@ -865,7 +865,7 @@ def set_background_color(red: int, green: int, blue: int) -> None:
     :param blue: The blue component of the RGB color (0-255).
     :type blue: int
     """
-    print(f'\033[48;2;{red};{green};{blue}m', end='')
+    print(f'\033[48;2;{color[0]};{color[1]};{color[2]}m', end='')
 
 def lines_used(text: str, width: int) -> int:
     """Calculate the number of lines text would occupy with a given width.
@@ -881,7 +881,7 @@ def lines_used(text: str, width: int) -> int:
     """
     return sum(max(1, ceil(len(line) / width)) for line in text.splitlines() or [text])
 
-def print_bg_colored_text(text: str, red: int, green: int, blue: int, terminal_width: int) -> None:
+def print_bg_colored_text(text: str, color: list[int]) -> None:
     """Print text with a colored background.
 
     Prints text with the specified background color and clears appropriately.
@@ -897,9 +897,8 @@ def print_bg_colored_text(text: str, red: int, green: int, blue: int, terminal_w
     :param terminal_width: The width of the terminal in characters for line wrapping calculation.
     :type terminal_width: int
     """
-    set_background_color(red, green, blue)
+    set_background_color(color)
     print(text)
-    clear_lines(lines_used(text, terminal_width), clear_formatting=True)
 
 def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str | int = 'y', shorten: set[str] = ('yes', 'no')) -> int | None:
     """Prompt the user with a question and return the selected answer.

@@ -5,11 +5,15 @@
 - Setup for user settings if the file is missing in `config.py`, by prompting for the 3 required settings with also searching for available and offering Packer defaults as an option as well. 
 - Proper Invalid settings output, instead of triggering an exception now Packer displays the problematic setting with the type of problem and a message attached in a nice colorful clean output. 
 - Colors to a lot of the output. 
+- Introduced a new settings `stream_background_color` in the global settings for configuring streamed commands output background color. 
+- The ability to skip `interactive debugger` in the exception handler with a keyboard interrupt (ctrl+c), *no need to answer in that case*. 
 
 ### Changed
 - `text editor`, `wait flag` and `model` user settings to be mandatory set, since the user might not be using or installing Packer defaults. 
 - Default value handling for the text editor and AI model to display the first found option, for text editors this is enhanced since it looks for a few presets. 
 - Settings saving to have nice indentation and mention automatic error reporting with a path to the settings file. 
+- All background color printing functionality in `etf.py` to be less rigid, more modular and simpler to use. 
+- Terminal clearing logic to instead of only check at the constructor the terminal size to determine the amount of lines to clear, but instead each time it prints them making it possible to adjust the terminal size while the stream is going without any visual artifacts. 
 
 ### Fixed
 
