@@ -7,6 +7,7 @@
 - Colors to a lot of the output. 
 - Introduced a new settings `stream_background_color` in the global settings for configuring streamed commands output background color. 
 - The ability to skip `interactive debugger` in the exception handler with a keyboard interrupt (ctrl+c), *no need to answer in that case*. 
+- Dynamically fetch licenses from GitHub for autocomplete in the CLI using the rest API. 
 
 ### Changed
 - `text editor`, `wait flag` and `model` user settings to be mandatory set, since the user might not be using or installing Packer defaults. 

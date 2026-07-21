@@ -8,6 +8,7 @@ from shutil import rmtree, which
 import sys
 from subprocess import run
 from textwrap import dedent
+from github import Github
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
 from getpass import getuser
@@ -39,7 +40,8 @@ def get_wait_flags(**kwargs):
     return ['--wait']
 
 def get_license_types(**kwargs):
-    return ['MIT', 'Apache-2.0', 'GPL-3.0', 'BSD-3-Clause', 'Unlicense']
+    g = Github()
+    return [github_license.key for github_license in g.get_licenses()]
 
 def get_author_names(**kwargs):
     return [getuser()]
