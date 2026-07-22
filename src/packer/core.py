@@ -67,8 +67,6 @@ class Packer():
     
     :param version: The new version of the program.
     :type version: dict
-    :param old_version: The previous version of the program.
-    :type old_version: dict
     :param project_path: The path to the project directory.
     :type project_path: str | Path
     :param GOFILE_USER_TOKEN: The user token for Gofile, used to upload the archive.
@@ -101,7 +99,7 @@ class Packer():
     :type changelog_git_hash: bool, optional
     '''
 
-    def __init__(self, version: dict, old_version: dict, project_path: str | Path,
+    def __init__(self, version: dict, project_path: str | Path,
                  GITHUB_REPO_TOKEN: str, github_repo_url: str, 
                  GOFILE_USER_TOKEN: str | None = None, FOLDER_ID: str | None = None,
                  input_queue: Queue = None, output_queue: Queue = None,
@@ -117,7 +115,6 @@ class Packer():
         self.input_queue = input_queue
         self.output_queue = output_queue
         self.version = version
-        self.old_version = old_version
         self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
         self.FOLDER_ID = FOLDER_ID
         self.GITHUB_REPO_TOKEN = GITHUB_REPO_TOKEN
@@ -151,6 +148,8 @@ class Packer():
         self.run_pyinstaller = any(Path().glob('*.spec'))
         self.cache_dir = f'{cache_dir}/{self.program_name}'
         makedirs(self.cache_dir, exist_ok=True)
+        with open(f'{project_path}/src/{self.program_name}/assets/version.json') as f:
+            self.old_version = load(f)
 
 
         # Settings related actions

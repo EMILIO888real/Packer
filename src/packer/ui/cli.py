@@ -13,12 +13,12 @@ from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
 from getpass import getuser
 
+from packer import actions
 from packer.custom_modules.et import resolve_version, normalize_settings_keys, get_folder_size, format_size
 from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir, metadata_path
-from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, exception_handler, user_settings
-from packer.core import Packer
+from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
 
@@ -141,34 +141,16 @@ def main():
                 print(f'No such project found: {user_chosen_project}')
                 sys.exit(1)
 
-            project_config = Project(**normalize_settings_keys(projects_configurations.get_w_tui()[str(project_path)]))
-
-            with open(f'{project_path}/src/{Path(project_path).name}/assets/version.json') as version_handle:
-                current_version = load(version_handle)
+            with open(f'{project_path}/src/{project_path.name}/assets/version.json') as f:
+                current_version = load(f)
 
             try:
-                next_version = resolve_version(current_version, args.run_version if args.run_version else stripped_input('New version(M, m, P): '))
-            except ValueError as exc:
-                print(f'Invalid version input: {exc}')
-                sys.exit(1)
+                chosen_version = resolve_version(current_version, args.run_version if args.run_version else stripped_input('New version(M, m, P): '))
+            except ValueError as e:
+                print(f'Invalid version input: {e}')
+                exit(1)
 
-            packer = Packer(
-                next_version, current_version, project_path,
-                project_config.github_repo_token,
-                project_config.github_repo_url,
-                project_config.gofile_user_token, project_config.gofile_folder_id, 
-                None, None, project_config.compile_command,
-                project_config.before_commands, project_config.after_commands,
-                project_config.model, project_config.description_prompt, project_config.title_prompt,
-                project_config.release_notes_template_path, project_config.changelog_git_hash,
-            )
-            def packer_exception_handler(exc_type, exc_value, exc_traceback):
-                packer.revert_changes()
-                exception_handler.handle_exception(exc_type, exc_value, exc_traceback)
-
-            sys.excepthook = packer_exception_handler # replace the global exception handler with packer's to revert changes in case Packer was running.
-
-            packer.run()
+            actions.run(chosen_version, project_path, Project(**normalize_settings_keys(projects_configurations.get_w_tui()[str(project_path)])))
 
         
         case 'edit':

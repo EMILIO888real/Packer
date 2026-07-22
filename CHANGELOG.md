@@ -8,6 +8,7 @@
 - Introduced a new settings `stream_background_color` in the global settings for configuring streamed commands output background color. 
 - The ability to skip `interactive debugger` in the exception handler with a keyboard interrupt (ctrl+c), *no need to answer in that case*. 
 - Dynamically fetch licenses from GitHub for autocomplete in the CLI using the rest API. 
+- `actions.py` a new module for storing actions the user can choose to do in any of the provided interfaces, like CLI, TUI and in the future a GUI and a proper TUI with textual or some other fancy TUI library. 
 
 ### Changed
 - `text editor`, `wait flag` and `model` user settings to be mandatory set, since the user might not be using or installing Packer defaults. 
@@ -15,6 +16,10 @@
 - Settings saving to have nice indentation and mention automatic error reporting with a path to the settings file. 
 - All background color printing functionality in `etf.py` to be less rigid, more modular and simpler to use. 
 - Terminal clearing logic to instead of only check at the constructor the terminal size to determine the amount of lines to clear, but instead each time it prints them making it possible to adjust the terminal size while the stream is going without any visual artifacts. 
+- Removed the `old_version` parameter from `Packer` constructor, since `Packer` can just get it himself dymanicly during boot up. 
+- Completely changed `main.py` to be much leaner and not so mixed up with the terminal interfaces or any interfaces for that matter, instead it just runs 2 functions `tui` and `cli`, the 2 interfaces and in the future the gui interface as well, possibly by main, possibly by cli via a flag. 
+- `CLI` and `TUI` to use the only action stored in `actions.py` for now `run` which just runs the main `Packer` class on whatever project chosen that is saved in packer configs. 
+- `TUI` now also includes the prompt for a new version prompt which allows the TUI instead of returning values, but run actions himself. 
 
 ### Fixed
 

@@ -1,12 +1,14 @@
-from json import dump, dumps, loads
+from json import dump, dumps, loads, load
 from pathlib import Path
 from typing import Callable
 from subprocess import run
 from inspect import signature
+from sys import exit
 
+from packer import actions
 from packer.setup import main as setup, tui
 from packer.paths import config_dir, projects_file_path
-from packer.custom_modules.et import create_gofile_folder, normalize_settings_keys
+from packer.custom_modules.et import create_gofile_folder, normalize_settings_keys, resolve_version
 from packer.custom_modules.etf import stripped_input, simple_prompt_retries
 from packer.config import Project, _getpass, projects_configurations, all_settings
 from packer.utils import write_encrypted_file
@@ -15,7 +17,7 @@ def main() -> tuple[str, Project]:
     '''
     Main function for the TUI. This script handles user input and performs various tasks based on the input. It includes options to create a new Go file or folder, setup configurations, manage assets, and interact with custom modules. The function also provides interactive prompts for user inputs and processes these inputs accordingly.
 
-    :return: project directory and the settings associated with that project.
+    :return: project directory and the settings associated with that project, as well the user chosen version.
     :rtype: tuple
     '''
 
@@ -110,7 +112,16 @@ def main() -> tuple[str, Project]:
                 dump(final_projects_configurations, f, indent=4)
 
         print(f'Project configuration saved at: {config_dir}/projects.json! You can change them later by editing the file or deleting it to go through the setup again.')
-        return (project_directory, Project(**normalize_settings_keys(final_projects_configurations[project_directory])))
+        exit()
 
-    
-    return (project_directory, Project(**normalize_settings_keys(projects_configurations.get_w_tui()[project_directory])))
+
+    with open(f'{project_directory}/src/{Path(project_directory).name}/assets/version.json') as f:
+        current_version = load(f)
+
+    try:
+        next_version = resolve_version(current_version, stripped_input('New version(M, m, P): '))
+    except ValueError as exc:
+        print(f'Invalid version input: {exc}')
+        exit(1)
+
+    actions.run(next_version, project_directory, Project(**normalize_settings_keys(projects_configurations.get_w_tui()[project_directory])))
