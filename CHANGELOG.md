@@ -20,6 +20,9 @@
 - Completely changed `main.py` to be much leaner and not so mixed up with the terminal interfaces or any interfaces for that matter, instead it just runs 2 functions `tui` and `cli`, the 2 interfaces and in the future the gui interface as well, possibly by main, possibly by cli via a flag. 
 - `CLI` and `TUI` to use the only action stored in `actions.py` for now `run` which just runs the main `Packer` class on whatever project chosen that is saved in packer configs. 
 - `TUI` now also includes the prompt for a new version prompt which allows the TUI instead of returning values, but run actions himself. 
+- Moved all terminal like interface logic for prompting or outputting missing settings in the cli.py module instead of config.py, so that the info can be injected into any interface, only downside of this approach is the forced default settings in case of any problem to them like missing values or validation problems, might change in the future. 
+- The forced settings to be enforced in a softer way instead of the setting pydantic object outright having no default value for the 3 settings, it does, but config.py looks if the user has provided these settings if not add them as a status that any interface can use to display and prompt for the missing settings. 
+- Reworked the logic around settings to validate and check and use fallbacks or defaults to complete defaults settings in config.py in case of any problems. 
 
 ### Fixed
 

@@ -9,6 +9,8 @@ import sys
 from subprocess import run
 from textwrap import dedent
 from github import Github
+import ollama
+from pydantic import ValidationError
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
 from getpass import getuser
@@ -18,7 +20,7 @@ from packer.custom_modules.et import resolve_version, normalize_settings_keys, g
 from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir, metadata_path
-from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings
+from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings, all_settings_status
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
 
@@ -58,6 +60,7 @@ def main():
     parser.add_argument('-s', '--saves', action='store_true', help='Displays all saved projects')
     parser.add_argument('-c', '--config', action='store_true', help='Displays the saved configuration or packer settings')
     parser.add_argument('--projects', action='store_true', help='Displays the saved configurations of projects')
+    parser.add_argument('-g', '--gui', action='store_true', help='Launches the GUI interface')
 
     clear_command_parser = subparsers.add_parser('clear', help='Clear data produced (cache, saves and so on)')
     clear_command_parser.add_argument('-c', '--cache', action='store_true', help='Clear cache data')
@@ -240,6 +243,89 @@ def main():
                 sys.exit(1)
 
 
+    # Put the gui here
+
+    if not args.gui:
+
+        if type(all_settings_status) == list and all_settings_status != []:
+            print_colored_text(f'Missing some mandatory settings: {all_settings_status}', [255, 0, 0])
+            print_colored_text('Defaulted to default values for missing settings for this session', [255, 255, 0])
+
+            print(f'Let\'s set up some basic settings [{len(all_settings_status)}]\n')
+            settings = {}
+
+            if 'text_editor' in all_settings_status:
+                EDITORS = [
+                    ('Visual Studio Code', 'code', '--wait'),
+                    ('Cursor', 'cursor', '--wait'),
+                    ('VS Code Insiders', 'code-insiders', '--wait'),
+                    ('Notepad++', 'notepad++', None),
+                    ('Neovim', 'nvim', None),
+                    ('Vim', 'vim', None),
+                    ('Nano', 'nano', None),
+                    ('Emacs', 'emacs', None),
+                ]
+
+                available = [
+                    (name, exe, wait_flag)
+                    for name, exe, wait_flag in EDITORS
+                    if which(exe)
+                ]
+                if available:
+                    default_text_editor = available[0][1]
+                    print('Found text editors:')
+                    for text_editor in available:
+                        print_colored_text(f'  {text_editor[0]} [{text_editor[1]}]')
+                else:
+                    default_text_editor = None
+
+                settings['text_editor'] = input(f'1. Text editor {f'[{default_text_editor}]' if default_text_editor else ''} ') or default_text_editor
+
+            if 'wait_flag' in all_settings_status:
+                for text_editor in available:
+                    if settings['text_editor'] == text_editor[1]:
+                        settings['wait_flag'] = text_editor[2]
+                        break
+                else:
+                    settings['wait_flag'] = input('2. Wait flag: ')
+
+            if 'model' in all_settings_status:
+                response = ollama.list()
+                models = [model.model for model in response.models]
+
+                if models:
+                    default_model = 'mistral:latest' if 'mistral:latest' in models else models[0]
+                    print('Found ollama AI models:')
+                    for model in models:
+                        print_colored_text(f'  {model}')
+                else:
+                    default_model = None
+                
+                settings['model'] = input(f'3. Model {f'[{default_model}]' if default_model else ''} ') or default_model
+
+            user_settings.update(settings)
+
+            with open(settings_file_path, 'w') as f:
+                dump(user_settings, f, indent=4)
+            
+            print_colored_text('Note that automatic error reporting is enabled by default', [255, 255, 0])
+            print_colored_text('Settings saved at: ', [0, 255, 0], end='')
+            print_colored_text(settings_file_path, [255, 105, 180])
+
+        elif type(all_settings_status) == ValidationError:
+            print_colored_text('There are problems with the user settings:', [255, 0, 0])
+            for error in all_settings_status.errors():
+                print_colored_text(f'{error['loc'][0]}:', end='\n  ')
+        
+                print(f'Problem type: ', end='')
+                print_colored_text(error['type'], [255, 0, 0], end='\n  ')
+        
+                print('Message: ', end='')
+                print_colored_text(error['msg'], [0, 255, 0])
+            print(f'Settings: ', end='')
+            print_colored_text(settings_file_path, [255, 105, 180])
+            print_colored_text('Defaulted to default setting for this session', [255, 255, 0])
+    
     if args.paths:
         def create_entry(name: str, path: Path | str) -> tuple[str, int]:
             path = Path(path)

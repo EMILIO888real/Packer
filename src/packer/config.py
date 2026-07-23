@@ -50,16 +50,15 @@ from pydantic import BaseModel, ValidationError
 from getpass import getpass
 from cryptography.fernet import InvalidToken
 from plyer import notification
-from sys import exit
 
 import json
 import pygame
-import ollama
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys, input_via_text_editor
-from packer.paths import assets_dir, config_dir, log_path, error_report_path, projects_file_path
+from packer.paths import assets_dir, log_path, error_report_path, projects_file_path
 from packer.exceptions import Global_exception_handler
 from packer.utils import is_file_encrypted, read_encrypted_file
+from packer.paths import settings_file_path
 
 
 with open(f'{assets_dir}/version.json') as f:
@@ -155,8 +154,8 @@ class Settings(BaseModel):
         notification_volume (float): Volume level for notification sounds (default: 1.0, range 0.0 to 1.0).
     '''
 
-    text_editor: str
-    wait_flag: str | None
+    text_editor: str = 'code'
+    wait_flag: str | None = '--wait'
     verbose: bool = True
     skip_git_status: bool = False
     changes_summary_prompt: list[dict[str, str]] = [
@@ -187,7 +186,7 @@ class Settings(BaseModel):
     )},
         {'role': 'user', 'content': '$bullet_summary'},
     ]
-    model: str
+    model: str = 'mistral'
     getpass_echo_char: str | None = None
     copy_github_release_clipboard: bool = True
     open_gitHub_release: bool = True
@@ -217,83 +216,26 @@ class Settings(BaseModel):
     stream_background_color: list[int] | None = [44, 44, 44]
 
 
-EDITORS = [
-    ('Visual Studio Code', 'code', '--wait'),
-    ('Cursor', 'cursor', '--wait'),
-    ('VS Code Insiders', 'code-insiders', '--wait'),
-    ('Notepad++', 'notepad++', None),
-    ('Neovim', 'nvim', None),
-    ('Vim', 'vim', None),
-    ('Nano', 'nano', None),
-    ('Emacs', 'emacs', None),
-]
+if not Path(settings_file_path).exists():
+    with open(settings_file_path, 'w') as f:
+        f.write('{}')
 
-settings_path = f'{config_dir}/settings.json'
+with open(settings_file_path) as f:
+    user_settings: dict = json.load(f)
 
-if not Path(settings_path).exists():
-    print('Let\'s set up some basic settings [2-3]\n')
-    settings = {}
+# Check for mandatory settings in a soft setting way
+missing = []
+for key in ['text_editor', 'wait_flag', 'model']:
+    if key not in user_settings:
+        missing.append(key)
 
-    available = [
-        (name, exe, wait_flag)
-        for name, exe, wait_flag in EDITORS
-        if which(exe)
-    ]
-    if available:
-        default_text_editor = available[0][1]
-        print('Found text editors:')
-        for text_editor in available:
-            print_colored_text(f'  {text_editor[0]} [{text_editor[1]}]')
-    else:
-        default_text_editor = None
-
-    settings['text_editor'] = input(f'1. Text editor {f'[{default_text_editor}]' if default_text_editor else ''} ') or default_text_editor
-
-    for text_editor in available:
-        if settings['text_editor'] == text_editor[1]:
-            settings['wait_flag'] = text_editor[2]
-            break
-    else:
-        settings['wait_flag'] = input('2. Wait flag: ')
-
-    response = ollama.list()
-    models = [model.model for model in response.models]
-
-    if models:
-        default_model = 'mistral:latest' if 'mistral:latest' in models else models[0]
-        print('Found ollama AI models:')
-        for model in models:
-            print_colored_text(f'  {model}')
-    else:
-        default_model = None
-    
-    settings['model'] = input(f'3. Model {f'[{default_model}]' if default_model else ''} ') or default_model
-
-    with open(settings_path, 'w') as f:
-        json.dump(settings, f, indent=4)
-    
-    print_colored_text('Note that automatic error reporting is enabled by default', [255, 255])
-    print_colored_text('Settings saved at: ', [0, 255, 0], end='')
-    print_colored_text(settings_path, [255, 105, 180])
-
-with open(settings_path) as f:
-    user_settings = json.load(f)
+all_settings_status = missing
 
 try:
     all_settings: Settings = Settings(**normalize_settings_keys(user_settings))
 except ValidationError as e:
-    print_colored_text('There are problems with the user settings:', [255, 0, 0])
-    for error in e.errors():
-        print_colored_text(f'{error['loc'][0]}:', end='\n  ')
-
-        print(f'Problem type: ', end='')
-        print_colored_text(error['type'], [255, 0, 0], end='\n  ')
-
-        print('Message: ', end='')
-        print_colored_text(error['msg'], [0, 255, 0])
-    print(f'Settings: ', end='')
-    print_colored_text(settings_path, [255, 105, 180])
-    exit(1)
+    all_settings_status = e
+    all_settings = Settings()
 
 
 # All setup for settings
