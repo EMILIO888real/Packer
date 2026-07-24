@@ -23,6 +23,8 @@
 - Moved all terminal like interface logic for prompting or outputting missing settings in the cli.py module instead of config.py, so that the info can be injected into any interface, only downside of this approach is the forced default settings in case of any problem to them like missing values or validation problems, might change in the future. 
 - The forced settings to be enforced in a softer way instead of the setting pydantic object outright having no default value for the 3 settings, it does, but config.py looks if the user has provided these settings if not add them as a status that any interface can use to display and prompt for the missing settings. 
 - Reworked the logic around settings to validate and check and use fallbacks or defaults to complete defaults settings in config.py in case of any problems. 
+- Moved the Gofile user token and folder ID input and storage logic to be conditionally executed based on the presence of the Gofile user token. 
+- Only prompts for the GoFile code if the user token was provided. 
 
 ### Fixed
 

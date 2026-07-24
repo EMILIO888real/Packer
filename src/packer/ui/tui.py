@@ -53,13 +53,15 @@ def main() -> tuple[str, Project]:
 
         gofile_user_token = _getpass('1. Gofile user token: ') or None
 
-        gofile_folder_id = _getpass('2. Gofile folder id (leave empty to create a folder): ') or None
-        if not gofile_folder_id:
-            folder_name = input('name of the folder: (leave empty to skip): ') or None
-            if folder_name:
-                response = create_gofile_folder(folder_name, gofile_user_token)
-                user_setup_data[6] = response['data']['code']
-                gofile_folder_id = response['data']['id']
+        if gofile_user_token:
+            gofile_folder_id = _getpass('2. Gofile folder id (leave empty to create a folder): ') or None
+            if not gofile_folder_id:
+                folder_name = input('name of the folder: (leave empty to skip): ') or None
+                if folder_name:
+                    response = create_gofile_folder(folder_name, gofile_user_token)
+                    user_setup_data[6] = response['data']['code']
+                    gofile_folder_id = response['data']['id']
+            gofile_data = {'gofile user token': gofile_user_token, 'gofile folder id': gofile_folder_id}
 
         print('Starting setup...')
         github_repo_url = setup(*user_setup_data)
@@ -70,8 +72,7 @@ def main() -> tuple[str, Project]:
         new_projects_configurations = {
             project_directory: {
                 'github repo token': _getpass('5. Github repo token: '),
-                'gofile user token': gofile_user_token,
-                'gofile folder id': gofile_folder_id,
+                **gofile_data,
                 'github repo url': github_repo_url
                 }
             }
