@@ -1,34 +1,32 @@
-## [%new_version] - %date
+## [0.22.0] - 2026-07-25
 
 ### Added
-- A new method call `self.buffer_queue.join()` at the end the `run` method to ensure waiting for the output to finish before returning and possibly exiting. 
-- Setup for user settings if the file is missing in `config.py`, by prompting for the 3 required settings with also searching for available and offering Packer defaults as an option as well. 
-- Proper Invalid settings output, instead of triggering an exception now Packer displays the problematic setting with the type of problem and a message attached in a nice colorful clean output. 
-- Colors to a lot of the output. 
-- Introduced a new settings `stream_background_color` in the global settings for configuring streamed commands output background color. 
-- The ability to skip `interactive debugger` in the exception handler with a keyboard interrupt (ctrl+c), *no need to answer in that case*. 
-- Dynamically fetch licenses from GitHub for autocomplete in the CLI using the rest API. 
-- `actions.py` a new module for storing actions the user can choose to do in any of the provided interfaces, like CLI, TUI and in the future a GUI and a proper TUI with textual or some other fancy TUI library. 
-- A function `_filter_empty_changelog_sections` to remove empty sections from changelog. 
+- [6f00753] A new method call `self.buffer_queue.join()` at the end the `run` method to ensure waiting for the output to finish before returning and possibly exiting. 
+- [ea25344] Setup for user settings if the file is missing in `config.py`, by prompting for the 3 required settings with also searching for available and offering Packer defaults as an option as well. 
+- [ea25344] Proper Invalid settings output, instead of triggering an exception now Packer displays the problematic setting with the type of problem and a message attached in a nice colorful clean output. 
+- [1e358db] Colors to a lot of the output. 
+- [cd8f578] Introduced a new settings `stream_background_color` in the global settings for configuring streamed commands output background color. 
+- [cd8f578] The ability to skip `interactive debugger` in the exception handler with a keyboard interrupt (ctrl+c), *no need to answer in that case*. 
+- [4b531b8] Dynamically fetch licenses from GitHub for autocomplete in the CLI using the rest API. 
+- [daf18ee] `actions.py` a new module for storing actions the user can choose to do in any of the provided interfaces, like CLI, TUI and in the future a GUI and a proper TUI with textual or some other fancy TUI library. 
+- [113ec8a] A function `_filter_empty_changelog_sections` to remove empty sections from changelog.
 
 ### Changed
-- `text editor`, `wait flag` and `model` user settings to be mandatory set, since the user might not be using or installing Packer defaults. 
-- Default value handling for the text editor and AI model to display the first found option, for text editors this is enhanced since it looks for a few presets. 
-- Settings saving to have nice indentation and mention automatic error reporting with a path to the settings file. 
-- All background color printing functionality in `etf.py` to be less rigid, more modular and simpler to use. 
-- Terminal clearing logic to instead of only check at the constructor the terminal size to determine the amount of lines to clear, but instead each time it prints them making it possible to adjust the terminal size while the stream is going without any visual artifacts. 
-- Removed the `old_version` parameter from `Packer` constructor, since `Packer` can just get it himself dymanicly during boot up. 
-- Completely changed `main.py` to be much leaner and not so mixed up with the terminal interfaces or any interfaces for that matter, instead it just runs 2 functions `tui` and `cli`, the 2 interfaces and in the future the gui interface as well, possibly by main, possibly by cli via a flag. 
-- `CLI` and `TUI` to use the only action stored in `actions.py` for now `run` which just runs the main `Packer` class on whatever project chosen that is saved in packer configs. 
-- `TUI` now also includes the prompt for a new version prompt which allows the TUI instead of returning values, but run actions himself. 
-- Moved all terminal like interface logic for prompting or outputting missing settings in the cli.py module instead of config.py, so that the info can be injected into any interface, only downside of this approach is the forced default settings in case of any problem to them like missing values or validation problems, might change in the future. 
-- The forced settings to be enforced in a softer way instead of the setting pydantic object outright having no default value for the 3 settings, it does, but config.py looks if the user has provided these settings if not add them as a status that any interface can use to display and prompt for the missing settings. 
-- Reworked the logic around settings to validate and check and use fallbacks or defaults to complete defaults settings in config.py in case of any problems. 
-- Moved the Gofile user token and folder ID input and storage logic to be conditionally executed based on the presence of the Gofile user token. 
-- Only prompts for the GoFile code if the user token was provided. 
-- `revert_changes` method to first wait for all output to output before running (trying to output anything). 
-
-### Fixed
+- [ea25344] `text editor`, `wait flag` and `model` user settings to be mandatory set, since the user might not be using or installing Packer defaults. 
+- [1e358db] Default value handling for the text editor and AI model to display the first found option, for text editors this is enhanced since it looks for a few presets. 
+- [1e358db] Settings saving to have nice indentation and mention automatic error reporting with a path to the settings file. 
+- [cd8f578] All background color printing functionality in `etf.py` to be less rigid, more modular and simpler to use. 
+- [cd8f578] Terminal clearing logic to instead of only check at the constructor the terminal size to determine the amount of lines to clear, but instead each time it prints them making it possible to adjust the terminal size while the stream is going without any visual artifacts. 
+- [daf18ee] Removed the `old_version` parameter from `Packer` constructor, since `Packer` can just get it himself dymanicly during boot up. 
+- [daf18ee] Completely changed `main.py` to be much leaner and not so mixed up with the terminal interfaces or any interfaces for that matter, instead it just runs 2 functions `tui` and `cli`, the 2 interfaces and in the future the gui interface as well, possibly by main, possibly by cli via a flag. 
+- [daf18ee] `CLI` and `TUI` to use the only action stored in `actions.py` for now `run` which just runs the main `Packer` class on whatever project chosen that is saved in packer configs. 
+- [daf18ee] `TUI` now also includes the prompt for a new version prompt which allows the TUI instead of returning values, but run actions himself. 
+- [a395d7f] Moved all terminal like interface logic for prompting or outputting missing settings in the cli.py module instead of config.py, so that the info can be injected into any interface, only downside of this approach is the forced default settings in case of any problem to them like missing values or validation problems, might change in the future. 
+- [a395d7f] The forced settings to be enforced in a softer way instead of the setting pydantic object outright having no default value for the 3 settings, it does, but config.py looks if the user has provided these settings if not add them as a status that any interface can use to display and prompt for the missing settings. 
+- [a395d7f] Reworked the logic around settings to validate and check and use fallbacks or defaults to complete defaults settings in config.py in case of any problems. 
+- [ed9dd7b] Moved the Gofile user token and folder ID input and storage logic to be conditionally executed based on the presence of the Gofile user token. 
+- [ed9dd7b] Only prompts for the GoFile code if the user token was provided. 
+- [113ec8a] `revert_changes` method to first wait for all output to output before running (trying to output anything).
 
 ---
 
