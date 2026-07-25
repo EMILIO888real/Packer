@@ -28,6 +28,41 @@ from packer.config import all_settings, Project, packer_version, send_notificati
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
 
 
+def _filter_empty_changelog_sections(changelog: str) -> str:
+    '''Return a changelog with empty "###" sections removed.'''
+
+    lines = changelog.splitlines()
+    filtered_lines: list[str] = []
+    current_header: str | None = None
+    current_section_lines: list[str] = []
+
+    def flush_current_section() -> None:
+        nonlocal current_header, current_section_lines
+
+        if current_header is None:
+            return
+
+        section_content = '\n'.join(current_section_lines).strip()
+        if section_content:
+            filtered_lines.extend([current_header, *current_section_lines])
+
+        current_header = None
+        current_section_lines = []
+
+    for line in lines:
+        if line.startswith('### '):
+            flush_current_section()
+            current_header = line
+            current_section_lines = []
+        elif current_header is not None:
+            current_section_lines.append(line)
+        else:
+            filtered_lines.append(line)
+
+    flush_current_section()
+    return '\n'.join(filtered_lines).strip()
+
+
 def thread_excepthook(args):
     sys.excepthook(args.exc_type, args.exc_value, args.exc_traceback)
 
@@ -213,10 +248,8 @@ class Packer():
         self.print_and_log('Getting latest changelog...')
         with open('CHANGELOG.md') as f:
             full_changelog = f.read()
-            latest_changelog = full_changelog[full_changelog.find(f'## [%new_version]') + 27:full_changelog.find(f'## [{old_version_text}]') - 7]
 
-        self.print_and_log('Updating changelog with the new version...')
-        full_changelog = full_changelog.replace('%new_version', self.version).replace('%date', str(datetime.date(datetime.now())), 1)
+        latest_changelog = full_changelog[full_changelog.find(f'## [%new_version]') + 27:full_changelog.find(f'## [{old_version_text}]') - 7]
 
 
         self.print_and_log('Getting the latest tag...')
@@ -251,17 +284,24 @@ class Packer():
                             commit_sha_location = fixed_category.find(data['text'])
                             fixed_category = f'{fixed_category[: commit_sha_location - 1]} [{data['hash']}] {fixed_category[commit_sha_location: ]}'
 
-            self.print_and_log('Constructing updated latest changelog...')
-            latest_updated_changelog = (
+            self.print_and_log('Updating the latest changelog...')
+            latest_changelog = (
                 f'### Added\n{added_category.strip()}\n\n'
                 f'### Changed\n{changed_category.strip()}\n\n'
                 f'### Fixed\n{fixed_category.strip()}'
             )
 
-            self.print_and_log('Stitching the entire changelog with latest...')
-            new_full_changelog = f'{full_changelog[:full_changelog.find(f'{datetime.date(datetime.now())}') + len(f'{datetime.date(datetime.now())}') + 2]}{latest_updated_changelog}'
-            full_changelog = f'{new_full_changelog}{full_changelog[full_changelog.find('---') - 2:]}'
-        
+        self.print_and_log('Filtering out empty sections...')
+        latest_changelog_start = full_changelog.find(f'## [%new_version]') + 27
+        latest_changelog_end = full_changelog.find(f'## [{old_version_text}]') - 7
+        latest_changelog = _filter_empty_changelog_sections(latest_changelog)
+
+        self.print_and_log('Stitching full changelog with the updated latest changelog')
+        full_changelog = f'{full_changelog[:latest_changelog_start]}{latest_changelog}{full_changelog[latest_changelog_end:]}'
+
+        self.print_and_log('Updating changelog with the new version...')
+        full_changelog = full_changelog.replace('%new_version', self.version).replace('%date', str(datetime.date(datetime.now())), 1)
+
         self.print_and_log('Writing out the updated changelog...')
         with open('CHANGELOG.md', 'w') as f:
             f.write(full_changelog)
@@ -517,7 +557,7 @@ class Packer():
                 'version_description': description,
                 'github_repo_url': self.github_repo_url,
                 'gofile_download_url': download_url,
-                'latest_changelog': latest_updated_changelog if 'latest_updated_changelog' in locals() else latest_changelog
+                'latest_changelog': latest_changelog
             }
 
             self.release_text = Template(self.release_text).substitute(release_notes_template_data)
@@ -697,6 +737,7 @@ class Packer():
     def revert_changes(self, exit: bool = True) -> None | NoReturn:
         '''Rollback the release process by removing the generated archive, deleting the uploaded Gofile copy and GitHub release when present, and resetting the Git repository to its previous state.'''
 
+        self.buffer_queue.join()
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
         if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():

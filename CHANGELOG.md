@@ -9,6 +9,7 @@
 - The ability to skip `interactive debugger` in the exception handler with a keyboard interrupt (ctrl+c), *no need to answer in that case*. 
 - Dynamically fetch licenses from GitHub for autocomplete in the CLI using the rest API. 
 - `actions.py` a new module for storing actions the user can choose to do in any of the provided interfaces, like CLI, TUI and in the future a GUI and a proper TUI with textual or some other fancy TUI library. 
+- A function `_filter_empty_changelog_sections` to remove empty sections from changelog. 
 
 ### Changed
 - `text editor`, `wait flag` and `model` user settings to be mandatory set, since the user might not be using or installing Packer defaults. 
@@ -25,6 +26,7 @@
 - Reworked the logic around settings to validate and check and use fallbacks or defaults to complete defaults settings in config.py in case of any problems. 
 - Moved the Gofile user token and folder ID input and storage logic to be conditionally executed based on the presence of the Gofile user token. 
 - Only prompts for the GoFile code if the user token was provided. 
+- `revert_changes` method to first wait for all output to output before running (trying to output anything). 
 
 ### Fixed
 
