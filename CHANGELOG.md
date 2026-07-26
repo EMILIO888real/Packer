@@ -3,6 +3,7 @@
 ### Added
 
 ### Changed
+- Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
 
 ### Fixed
 

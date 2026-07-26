@@ -35,6 +35,7 @@ def _filter_empty_changelog_sections(changelog: str) -> str:
     filtered_lines: list[str] = []
     current_header: str | None = None
     current_section_lines: list[str] = []
+    pending_blank_lines: list[str] = []
 
     def flush_current_section() -> None:
         nonlocal current_header, current_section_lines
@@ -42,9 +43,15 @@ def _filter_empty_changelog_sections(changelog: str) -> str:
         if current_header is None:
             return
 
-        section_content = '\n'.join(current_section_lines).strip()
+        section_lines = list(current_section_lines)
+        while section_lines and not section_lines[0].strip():
+            section_lines.pop(0)
+        while section_lines and not section_lines[-1].strip():
+            section_lines.pop()
+
+        section_content = '\n'.join(section_lines).strip()
         if section_content:
-            filtered_lines.extend([current_header, *current_section_lines])
+            filtered_lines.extend([current_header, *section_lines])
 
         current_header = None
         current_section_lines = []
@@ -52,12 +59,18 @@ def _filter_empty_changelog_sections(changelog: str) -> str:
     for line in lines:
         if line.startswith('### '):
             flush_current_section()
+            pending_blank_lines.clear()
             current_header = line
-            current_section_lines = []
         elif current_header is not None:
             current_section_lines.append(line)
         else:
-            filtered_lines.append(line)
+            if line.strip():
+                if pending_blank_lines:
+                    filtered_lines.extend([''])
+                    pending_blank_lines.clear()
+                filtered_lines.append(line)
+            elif filtered_lines and filtered_lines[-1].strip():
+                pending_blank_lines.append(line)
 
     flush_current_section()
     return '\n'.join(filtered_lines).strip()
