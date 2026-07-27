@@ -290,8 +290,7 @@ def main():
                     settings['wait_flag'] = input('2. Wait flag: ')
 
             if 'model' in all_settings_status:
-                response = ollama.list()
-                models = [model.model for model in response.models]
+                models = [model.model for model in sorted([model for model in ollama.list().models if 'completion' in ollama.show(model.model).capabilities], key=lambda model:model.size)]
 
                 if models:
                     default_model = 'mistral:latest' if 'mistral:latest' in models else models[0]
