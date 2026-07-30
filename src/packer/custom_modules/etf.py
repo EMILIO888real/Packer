@@ -51,35 +51,42 @@ def reset_formatting() -> None:
     """
     print('\033[0m', end='')
 
-def print_list(items: list[Any], start: Any = '* ', end: Any = '\n', index: bool = False, index_text: str = '%i. '):
+def print_list(items: list[Any], color: list[int] | None = None, index_color: list[int] | None = None, start: Any = '* ', end: Any = '\n', index: bool = False, index_text: str = '$i. '):
     '''
     Print a list of items with optional formatting.
 
     This function prints each item in a list, optionally with a prefix, suffix, and/or index numbers.
     It is designed to be flexible for various display purposes.
 
-    :param items: A list of items to be printed.
+    :param items: The list of items to print.
     :type items: list[Any]
-    :param start: A string to be printed before each item. Defaults to '* '.
+    :param color: Optional RGB color for the text (e.g., [R, G, B]). If None, default terminal color is used.
+    :type color: list[int]
+    :param index_color: Optional RGB color for the index numbers. If None, uses the same color as the items.
+    :type index_color: list[int]
+    :param start: A string to prepend to each item (default is '* ').
     :type start: Any
-    :param end: A string to be printed after each item. Defaults to '\n'.
+    :param end: A string to append after each item (default is newline).
     :type end: Any
-    :param index: If True, each item will be printed with an index number. Defaults to False.
+    :param index: If True, prints an index number before each item.
     :type index: bool
-    :param index_text: A string to be used as the index format. Defaults to '%i. '.
+    :param index_text: A string template for the index number, where '$i' will be replaced by the index (default is '$i. ').
     :type index_text: str
     '''
-
-    if index:
-        def print_index(i):
-            print(index_text.replace('%i', str(i)), end='')
-    else:
-        def print_index(i):
-            pass
+    if not index_color:
+        index_color = color
 
     for i, item in enumerate(items):
-        print_index(i)
-        print(f'{start}{item}', end=end)
+        if index:
+            text = index_text.replace('$i', str(i))
+            if index_color:
+                print_colored_text(text, index_color, end='')
+            else:
+                print(text, end='')
+        if color:
+            print_colored_text(f'{start}{item}', color, end=end)
+        else:
+            print(f'{start}{item}', end=end)
 
 def flush_input_linux() -> None:
     """Flush the input buffer on Linux.

@@ -20,7 +20,8 @@ dependencies = [
     "plyer",
     "argcomplete",
     "pygame",
-    "cryptography"
+    "cryptography",
+    "tdqm"
 ]
 
 [tool.setuptools]

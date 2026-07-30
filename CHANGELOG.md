@@ -1,10 +1,12 @@
 ## [%new_version] - %date
 
 ### Added
+- `track_model_pull` function to be able to easily track installing models in any interface in cli.py it uses the `TqdmProgressRenderer`. 
 
 ### Changed
 - Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
 - Ollama models suggestion to filter out any models that don't have completion in their capabilities metadata, like text embedded models, also to sort by size and choose mistral if possible otherwise the smallest available. 
+- The `print_list` function in `src/packer/custom_modules/etf.py` now accepts optional RGB color for text, index number color. 
 
 ### Fixed
 

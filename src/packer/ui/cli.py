@@ -23,6 +23,7 @@ from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, er
 from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings, all_settings_status
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
+from packer.utils import track_model_pull, TqdmProgressRenderer
 
 def _clear_path(path: str | Path) -> None:
     path = Path(path)
@@ -295,10 +296,14 @@ def main():
                 if models:
                     default_model = 'mistral:latest' if 'mistral:latest' in models else models[0]
                     print('Found ollama AI models:')
-                    for model in models:
-                        print_colored_text(f'  {model}')
+                    print_list(models, [138, 43, 226], start='  - ')
                 else:
-                    default_model = None
+                    print_colored_text('No installed completion models found', [255, 255, 0])
+                    if simple_prompt_retries('Install mistral [default] model'):
+                        track_model_pull('mistral:latest', TqdmProgressRenderer())
+                        default_model = 'mistral:latest'
+                    else:
+                        default_model = None
                 
                 settings['model'] = input(f'3. Model {f'[{default_model}]' if default_model else ''} ') or default_model
 

@@ -1,12 +1,17 @@
+from abc import ABC, abstractmethod
 from os import urandom
 from pathlib import Path
 from subprocess import run
 from sys import platform
+from base64 import urlsafe_b64encode
 
+from tqdm import tqdm
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-from base64 import urlsafe_b64encode
+import ollama
+
+from packer.custom_modules.etf import clear_lines, print_colored_text
 
 
 def pip_install(packages: list[str], python_exe_path: str | Path | None = None):
@@ -113,3 +118,64 @@ def read_encrypted_file(file_path: str | Path, password: bytes) -> str:
     decrypted_data = Fernet(decryption_key).decrypt(extracted_ciphertext)
 
     return decrypted_data.decode()
+
+def model_pull_progress(model_name: str):
+    for progress in ollama.pull(model_name, stream=True):
+        yield {
+            'total': progress.total,
+            'completed': progress.completed,
+            'status': progress.status,
+        }
+
+class ProgressRenderer(ABC):
+    @abstractmethod
+    def start(self, total: int) -> None:
+        pass
+
+    @abstractmethod
+    def update(self, completed: int, status: str | None) -> None:
+        pass
+
+    @abstractmethod
+    def finish(self) -> None:
+        pass
+
+class TqdmProgressRenderer(ProgressRenderer):
+    def __init__(self):
+        self.bar = None
+        self.lines = 0
+
+    def start(self, total):
+        if self.bar:
+            self.bar.close()
+        self.bar = tqdm(total=total, unit='B', unit_scale=True, unit_divisor=1024)
+        self.lines += 1
+
+    def update(self, completed, status):
+        self.bar.n = completed
+        self.bar.set_description(status)
+        self.bar.refresh()
+
+    def finish(self):
+        self.bar.close()
+        clear_lines(self.lines)
+        print_colored_text('Successfully installed!', [0, 255, 0])
+
+def track_model_pull(model_name: str, renderer: ProgressRenderer):
+    stream = model_pull_progress(model_name)
+
+    first = next(stream)
+    while not first['total']:
+        first = next(stream)
+    total = first['total']
+    renderer.start(total)
+
+    for progress in stream:
+        if progress['completed']:
+            if progress['total'] == total:
+                renderer.update(progress['completed'], progress['status'])
+            else:
+                total = progress['total']
+                renderer.start(total)
+
+    renderer.finish()
