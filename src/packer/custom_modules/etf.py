@@ -16,7 +16,7 @@ All functions use ANSI escape codes for cross-platform terminal support.
 Note: Some functions are Linux-specific.
 """
 
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
 from itertools import cycle
 from math import ceil
 from typing import Any, Optional
@@ -323,7 +323,7 @@ class Loading_animations():
             self.text = text
         self.run()
 
-def print_with_delay(text: str, colors: cycle[list[int]] = cycle([None]), delay: float = 0.03, end='\n') -> None:
+def print_with_delay(text: str, colors: Iterable[list[int]] = cycle([None]), delay: float = 0.03, end='\n') -> None:
     """Print a cinematic dialogue with a delay between each character.
 
     Displays text character one at a time after a delay with optional colors

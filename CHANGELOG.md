@@ -9,6 +9,7 @@
 - The `print_list` function in `src/packer/custom_modules/etf.py` now accepts optional RGB color for text, index number color. 
 
 ### Fixed
+- Type notation for a cycle object to use Iterable instead of runtime cycle object. 
 
 ---
 
