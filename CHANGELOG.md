@@ -10,6 +10,7 @@
 
 ### Fixed
 - Type notation for a cycle object to use Iterable instead of runtime cycle object. 
+- Build script `pyproject.toml` to correctly package the assets to also include everything inside the assets folder, not just the top directory, but everything recursively. 
 
 ---
 

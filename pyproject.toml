@@ -32,7 +32,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-packer = ["assets/*"]
+packer = ["assets/**/*"]
 
 [project.scripts]
 packer = "packer.main:main"
