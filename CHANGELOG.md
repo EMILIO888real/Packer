@@ -7,10 +7,12 @@
 - Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
 - Ollama models suggestion to filter out any models that don't have completion in their capabilities metadata, like text embedded models, also to sort by size and choose mistral if possible otherwise the smallest available. 
 - The `print_list` function in `src/packer/custom_modules/etf.py` now accepts optional RGB color for text, index number color. 
+- Packer to use pytest for internal functionality testing, for better future development of Packer. 
 
 ### Fixed
 - Type notation for a cycle object to use Iterable instead of runtime cycle object. 
 - Build script `pyproject.toml` to correctly package the assets to also include everything inside the assets folder, not just the top directory, but everything recursively. 
+- Corrected the filtering logic to be a bit more robust, tests had failed. 
 
 ---
 

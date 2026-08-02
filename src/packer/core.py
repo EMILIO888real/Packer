@@ -51,6 +51,8 @@ def _filter_empty_changelog_sections(changelog: str) -> str:
 
         section_content = '\n'.join(section_lines).strip()
         if section_content:
+            if filtered_lines and filtered_lines[-1].strip():
+                filtered_lines.append('')
             filtered_lines.extend([current_header, *section_lines])
 
         current_header = None
@@ -66,7 +68,8 @@ def _filter_empty_changelog_sections(changelog: str) -> str:
         else:
             if line.strip():
                 if pending_blank_lines:
-                    filtered_lines.extend([''])
+                    if filtered_lines and filtered_lines[-1].strip():
+                        filtered_lines.append('')
                     pending_blank_lines.clear()
                 filtered_lines.append(line)
             elif filtered_lines and filtered_lines[-1].strip():
