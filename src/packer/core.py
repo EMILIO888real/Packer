@@ -2,7 +2,7 @@ from pathlib import Path
 from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
-from shutil import get_terminal_size, rmtree, make_archive
+from shutil import get_terminal_size, rmtree, make_archive, which
 from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
@@ -224,6 +224,10 @@ class Packer():
             if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
                 self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...', [255, 0, 0], 40)
                 self._exit(1)
+
+        if self.description_prompt or self.title_prompt and not which('ollama'):
+            self.print_and_log('Couldn\'t find ollama on PATH, please add it if installed otherwise install it: https://ollama.com/download. Alternately you can also set both prompts to None. Exiting...', [255, 0, 0], 40)
+            self._exit(1)
         
         if check_todo:
             with open(f'{todo_rel_path}') as f:

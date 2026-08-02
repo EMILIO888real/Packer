@@ -2,6 +2,7 @@
 
 ### Added
 - `track_model_pull` function to be able to easily track installing models in any interface in cli.py it uses the `TqdmProgressRenderer`. 
+- A check before creating the Packer object to check if the ollama client is available on PATH. 
 
 ### Changed
 - Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
