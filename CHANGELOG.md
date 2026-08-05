@@ -9,11 +9,15 @@
 - Ollama models suggestion to filter out any models that don't have completion in their capabilities metadata, like text embedded models, also to sort by size and choose mistral if possible otherwise the smallest available. 
 - The `print_list` function in `src/packer/custom_modules/etf.py` now accepts optional RGB color for text, index number color. 
 - Packer to use pytest for internal functionality testing, for better future development of Packer. 
+- `print_and_log` internal functions to allow partial line coloring while retaining only full lines in the log, by utilizing an internal buffer `self.print_message_parts`. 
+- Documentation for internal `print_and_log` functions to have the same doctype copied over for simplicity, IDE support and clear intent. 
+- TUI run project choice to also check for an IndexError, in case the user provided an index that isn't listed, not just the name of the project. 
 
 ### Fixed
 - Type notation for a cycle object to use Iterable instead of runtime cycle object. 
 - Build script `pyproject.toml` to correctly package the assets to also include everything inside the assets folder, not just the top directory, but everything recursively. 
 - Corrected the filtering logic to be a bit more robust, tests had failed. 
+- Instances of waiting for smooth_output to finish before printing to the terminal in normal mode to utilize a general function `self.wait_smooth_output` instead of just calling the join method `self.buffer_queue.join`, which fails if smooth_output is disabled. 
 
 ---
 

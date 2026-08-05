@@ -37,7 +37,7 @@ def main() -> tuple[str, Project]:
                 project_directory = None
             else:
                 project_directory = projects[project_names[int(input_project)]] if input_project.isdigit() else projects[input_project]
-        except KeyError:
+        except (KeyError, IndexError):
             print(f'Couldn\'t find/evaluate the project: {input_project}')
             exit(1)
     else:

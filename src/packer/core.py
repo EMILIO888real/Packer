@@ -180,6 +180,7 @@ class Packer():
         self.changelog_git_hash = changelog_git_hash
         self.title_prompt_kwargs = title_prompt_kwargs
         self.description_prompt_kwargs = description_prompt_kwargs
+        self.print_message_parts = []
 
         # Actions needed to run once, (setup actions)
         self.logger = init_logger('packer', 'EMILIO')
@@ -222,11 +223,16 @@ class Packer():
         
         if not all_settings.skip_git_status:
             if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
-                self.print_and_log('Your git directory is not clean! Please commit or stash your changes before running the packer. Exiting...', [255, 0, 0], 40)
+                self.print_and_log('Your git directory is not clean!', [255, 0, 0], 40, ' ')
+                self.print_and_log('Please commit or stash your changes before running the packer.', [0, 255, 0], end=' ')
+                self.print_and_log('Exiting...', [138, 43, 226])
                 self._exit(1)
 
         if self.description_prompt or self.title_prompt and not which('ollama'):
-            self.print_and_log('Couldn\'t find ollama on PATH, please add it if installed otherwise install it: https://ollama.com/download. Alternately you can also set both prompts to None. Exiting...', [255, 0, 0], 40)
+            self.print_and_log('Couldn\'t find ollama on PATH', [255, 0, 0], 40)
+            self.print_and_log('please add it if installed otherwise install it: https://ollama.com/download.', [0, 255, 0], end=''),
+            self.print_and_log('Alternately you can also set both prompts to None.', [255, 255, 0], end='')
+            self.print_and_log('Exiting...', [138, 43, 226])
             self._exit(1)
         
         if check_todo:
@@ -344,7 +350,7 @@ class Packer():
 
                 first_chunk = next(stream).message.content.lstrip()
                 description.append(first_chunk)
-                self.buffer_queue.join()
+                self._wait_smooth_output()
                 self.stream_output_chunk(first_chunk, 'version description output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
 
                 for chunk in stream:
@@ -377,7 +383,7 @@ class Packer():
 
                 first_chunk = first_chunk = next(stream).message.content.lstrip()
                 version_title.append(first_chunk)
-                self.buffer_queue.join()
+                self._wait_smooth_output()
                 self.stream_output_chunk(first_chunk, 'version title output', GENERATING_COLOR) # First chunk to get rid of the empty whitespaces
                 for chunk in stream:
                     chunk = chunk.message.content
@@ -747,7 +753,7 @@ class Packer():
             with open(metadata_path, 'w') as f:
                 dump(metadata, f)
             
-            self.buffer_queue.join()
+            self._wait_smooth_output()
 
             
         else:
@@ -757,7 +763,7 @@ class Packer():
     def revert_changes(self, exit: bool = True) -> None | NoReturn:
         '''Rollback the release process by removing the generated archive, deleting the uploaded Gofile copy and GitHub release when present, and resetting the Git repository to its previous state.'''
 
-        self.buffer_queue.join()
+        self._wait_smooth_output()
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
         if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
@@ -803,8 +809,12 @@ class Packer():
             self._exit(1)
         
     def _exit(self, code: int = None):
-        self.buffer_queue.join()
+        self._wait_smooth_output()
         sys.exit(code)
+
+    def _wait_smooth_output(self):
+        if hasattr(self, 'buffer_queue'):
+            self.buffer_queue.join()
     
     def _upload_github_asset(self, file_path: Path, content_type: str):
         with open(file_path, 'rb') as f:
@@ -890,22 +900,41 @@ class Packer():
                 print_with_delay(
                     text["text"],
                     cycle([text["color"]]),
-                    all_settings.smooth_output_speed / (self.buffer_queue.qsize() + 1)
+                    all_settings.smooth_output_speed / (self.buffer_queue.qsize() + 1),
+                    text['end']
                 )
             finally:
                 self.buffer_queue.task_done()
 
-    def _print_and_log(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20):
-        '''Prints the text and logs it to the packer log file.'''
+    def _print_and_log(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
+        '''Prints the text and logs it to the packer log file.
+        
+        :param text: The text to print and log.
+        :type text: str
+        :param color: The color to use for printing, default is None (default terminal color).
+        :type color: Optional[Sequence[int]] | None
+        :param level: The logging level to use, default is 20 [INFO].
+        :type level: int
+        :param end: The string appended after the last value, default a newline.
+        :type end: str
+        '''
 
-        if all_settings.smooth_output:
-            self.buffer_queue.put({'text': text, 'color': color})
+        full_text = text + end
+
+        if hasattr(self, 'buffer_queue'):
+            self.buffer_queue.put({'text': text, 'color': color, 'end': end})
         else:
             if color:
-                print_colored_text(text, color)
+                print_colored_text(text, color, end=end)
             else:
-                print(text)
-        self.log_action(text, level)
+                print(text, end=end)
+
+        if '\n' in full_text:
+            text = f'{''.join(self.print_message_parts)}{text}'
+            self.print_message_parts.clear()
+            self.log_action(text, level)
+        else:
+            self.print_message_parts.append(full_text)
         
     def _send_queue_request(self, question: str, default: str | int = 'y') -> str | int:
         '''
@@ -967,25 +996,31 @@ class Packer():
         :rtype: bool
         '''
 
-        self.buffer_queue.join()
+        self._wait_smooth_output()
         answer = simple_prompt_retries(question, default)
         self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
 
-    def _log_and_output_queue(self, text, color: Optional[Sequence[int]] = [255, 255, 255], level: int = 20):
-        '''
-        Logs text to the packer log file and outputs it to the queue.
-
-        :param text: The text to be logged and output.
+    def _log_and_output_queue(self, text, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
+        '''Prints the text and logs it to the packer log file.
+        
+        :param text: The text to print and log.
         :type text: str
-        :param color: The color to use for printing.
-        :type color: Optional[Sequence[int]]
-        :param level: The logging level to use.
+        :param color: The color to use for printing, default is None (default terminal color).
+        :type color: Optional[Sequence[int]] | None
+        :param level: The logging level to use, default is 20 [INFO].
         :type level: int
+        :param end: The string appended after the last value, default a newline.
+        :type end: str
         '''
 
-        self.output_queue.put({'text': text, 'color': color, 'level': level})
-        self.log_action(text, level)
+        self.output_queue.put({'text': text, 'color': color, 'level': level, 'end': end})
+        if '\n' in end:
+            text = f'{''.join(self.print_message_parts)}{text}'
+            self.print_message_parts.clear()
+            self.log_action(text, level)
+        else:
+            self.print_message_parts.append(text + end)
 
     def log_action(self, action: str, level: int = 20):
             '''Logs the action with the provided level
@@ -1024,7 +1059,7 @@ class Packer():
         :rtype: Event
         '''
 
-        self.buffer_queue.join()
+        self._wait_smooth_output()
 
 
         # setup
