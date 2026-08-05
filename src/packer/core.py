@@ -186,7 +186,6 @@ class Packer():
         self.logger = init_logger('packer', 'EMILIO')
         self.chosen_description_path = Path(f'{data_dir}/chosen description.md')
         self.chosen_title_path = Path(f'{data_dir}/chosen version title.md')
-        self.git_repo = Repo()
         with open(release_notes_template_path) as f:
             self.release_text = f.read()
         self.assets_dir = f'./src/{self.program_name}/assets'
@@ -227,6 +226,8 @@ class Packer():
                 self.print_and_log('Please commit or stash your changes before running the packer.', [0, 255, 0], end=' ')
                 self.print_and_log('Exiting...', [138, 43, 226])
                 self._exit(1)
+
+        self.git_repo = Repo()
 
         if self.description_prompt or self.title_prompt and not which('ollama'):
             self.print_and_log('Couldn\'t find ollama on PATH', [255, 0, 0], 40)

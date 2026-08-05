@@ -12,12 +12,14 @@
 - `print_and_log` internal functions to allow partial line coloring while retaining only full lines in the log, by utilizing an internal buffer `self.print_message_parts`. 
 - Documentation for internal `print_and_log` functions to have the same doctype copied over for simplicity, IDE support and clear intent. 
 - TUI run project choice to also check for an IndexError, in case the user provided an index that isn't listed, not just the name of the project. 
+- Renamed project name from "packer" to "packer-release" in pyproject.toml for in the future you will be able to install this project from pypi using a package manager like pip, this name change only applies to pypi, project's official name is still packer. 
 
 ### Fixed
 - Type notation for a cycle object to use Iterable instead of runtime cycle object. 
 - Build script `pyproject.toml` to correctly package the assets to also include everything inside the assets folder, not just the top directory, but everything recursively. 
 - Corrected the filtering logic to be a bit more robust, tests had failed. 
 - Instances of waiting for smooth_output to finish before printing to the terminal in normal mode to utilize a general function `self.wait_smooth_output` instead of just calling the join method `self.buffer_queue.join`, which fails if smooth_output is disabled. 
+- Move Git repo initialization in Packer's constructor to happen after changing CWD if needed. 
 
 ---
 
