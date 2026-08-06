@@ -123,8 +123,8 @@ class Packer():
     :type project_path: str | Path
     :param gofile_user_token: The user token for Gofile, used to upload the archive.
     :type gofile_user_token: str, optional
-    :param folder_id: The folder id for Gofile, used to upload the archive.
-    :type folder_id: str, optional
+    :param gofile_folder_id: The folder id for Gofile, used to upload the archive.
+    :type gofile_folder_id: str, optional
     :param github_repo_token: The token for the Github repo, used to publish the release.
     :type github_repo_token: str
     :param github_repo_url: The url of the Github repo, used to publish the release and for the social media post. It should be in the format "username/repo".
@@ -153,7 +153,7 @@ class Packer():
 
     def __init__(self, version: dict, project_path: str | Path,
                  github_repo_token: str, github_repo_url: str, 
-                 gofile_user_token: str | None = None, folder_id: str | None = None,
+                 gofile_user_token: str | None = None, gofile_folder_id: str | None = None,
                  pypi_api_token: str | None = None,
                  input_queue: Queue = None, output_queue: Queue = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
@@ -169,7 +169,7 @@ class Packer():
         self.output_queue = output_queue
         self.version = version
         self.GOFILE_USER_TOKEN = gofile_user_token
-        self.FOLDER_ID = folder_id
+        self.FOLDER_ID = gofile_folder_id
         self.pypi_api_token = pypi_api_token
         self.GITHUB_REPO_TOKEN = github_repo_token
         self.model = model

@@ -23,6 +23,7 @@
 - Corrected the filtering logic to be a bit more robust, tests had failed. 
 - Instances of waiting for smooth_output to finish before printing to the terminal in normal mode to utilize a general function `self.wait_smooth_output` instead of just calling the join method `self.buffer_queue.join`, which fails if smooth_output is disabled. 
 - Move Git repo initialization in Packer's constructor to happen after changing CWD if needed. 
+- Renamed `folder_id` to `gofile_folder_id` parameter in the constructor of Packer class, to be simpler and use the same naming scheme as saved project settings keys. 
 
 ---
 
