@@ -16,6 +16,7 @@
 - Renamed project name from "packer" to "packer-release" in pyproject.toml for in the future you will be able to install this project from pypi using a package manager like pip, this name change only applies to pypi, project's official name is still packer. 
 - Some output to report when uploading begins on GitHub assets. 
 - `run` function in actions.py to be much simpler to use `model_dump` method with kwargs for the `Packer's` constructor. 
+- The output of the error if ollama isn't on PATH to have spaces to look nicer. 
 
 ### Fixed
 - Type notation for a cycle object to use Iterable instead of runtime cycle object. 
@@ -24,6 +25,7 @@
 - Instances of waiting for smooth_output to finish before printing to the terminal in normal mode to utilize a general function `self.wait_smooth_output` instead of just calling the join method `self.buffer_queue.join`, which fails if smooth_output is disabled. 
 - Move Git repo initialization in Packer's constructor to happen after changing CWD if needed. 
 - Renamed `folder_id` to `gofile_folder_id` parameter in the constructor of Packer class, to be simpler and use the same naming scheme as saved project settings keys. 
+- The check if ollama isn't on path to correctly evaluate first whether we need to check if any prompts are provided and if so check if ollama is available on PATH. 
 
 ---
 

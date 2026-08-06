@@ -232,10 +232,10 @@ class Packer():
 
         self.git_repo = Repo()
 
-        if self.description_prompt or self.title_prompt and not which('ollama'):
-            self.print_and_log('Couldn\'t find ollama on PATH', [255, 0, 0], 40)
-            self.print_and_log('please add it if installed otherwise install it: https://ollama.com/download.', [0, 255, 0], end=''),
-            self.print_and_log('Alternately you can also set both prompts to None.', [255, 255, 0], end='')
+        if (self.description_prompt or self.title_prompt) and not which('ollama'):
+            self.print_and_log('Couldn\'t find ollama on PATH', [255, 0, 0], 40, end=' ')
+            self.print_and_log('please add it if installed otherwise install it: https://ollama.com/download.', [0, 255, 0], end=' '),
+            self.print_and_log('Alternately you can also set both prompts to None.', [255, 255, 0], end=' ')
             self.print_and_log('Exiting...', [138, 43, 226])
             self._exit(1)
         
