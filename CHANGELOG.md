@@ -4,6 +4,7 @@
 - `track_model_pull` function to be able to easily track installing models in any interface in cli.py it uses the `TqdmProgressRenderer`. 
 - A check before creating the Packer object to check if the ollama client is available on PATH. 
 - `pypi` integration with `build` and `twine` to build the python package and upload it respectively. 
+- A fallback for when output data text dict is malformed in that case just print out the problem. 
 
 ### Changed
 - Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
@@ -26,6 +27,8 @@
 - Move Git repo initialization in Packer's constructor to happen after changing CWD if needed. 
 - Renamed `folder_id` to `gofile_folder_id` parameter in the constructor of Packer class, to be simpler and use the same naming scheme as saved project settings keys. 
 - The check if ollama isn't on path to correctly evaluate first whether we need to check if any prompts are provided and if so check if ollama is available on PATH. 
+- `main.spec` by adding `copy_metadata("twine")` to `datas` to correctly bundle all necessary data for twine. 
+- Output handling for GoFile errors, arguments were incorrectly passed. 
 
 ---
 

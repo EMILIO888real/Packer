@@ -510,20 +510,22 @@ class Packer():
                     try:
                         retry_gofile_count += 1
                         if retry_gofile_count > 2:
-                            self.print_and_log(f'After {retry_gofile_count} unsuccessful attempts the release has been paused', 30)
-                            self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no', 30)
+                            self.print_and_log(f'After', end=' ')
+                            self.print_and_log(retry_gofile_count, [0, 0, 255], end=' ')
+                            self.print_and_log('unsuccessful attempts the release has been paused', level=30)
+                            self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no', level=30)
                             if not self.prompt_user('Has the problem been resolved'):
                                 self.revert_changes()
 
                         response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
                         if response.get('status') != 'ok' or not response.get('data'):
-                            self.print_and_log(f'GoFile upload returned an invalid response: {response}', 40)
+                            self.print_and_log(f'GoFile upload returned an invalid response: {response}', [255, 0, 0], 40)
                             self.revert_changes()
                         retry_gofile = False
                     except exceptions.SSLError:
-                        self.print_and_log('Encountered an SSL (verification) error when uploading to GoFile', 30)
+                        self.print_and_log('Encountered an SSL (verification) error when uploading to GoFile', [255, 0, 0], 30)
                     except Exception as e:
-                        self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}', 30)
+                        self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}', [255, 0, 0], 30)
 
                     if retry_gofile:
                         self.print_and_log('retrying in 3 seconds...', 30)
@@ -928,6 +930,12 @@ class Packer():
                     all_settings.smooth_output_speed / (self.buffer_queue.qsize() + 1),
                     text['end']
                 )
+            except Exception as e:
+                print_colored_text('A problem occurred in smooth print output background thread.', [255, 0, 0])
+                print_colored_text(f'Most likely because of malformed text from the buffer. Error:', [0, 255, 0], end=' ')
+                print_colored_text(str(e))
+                self.log_action(f'A problem occurred in smooth print output background thread. | Error: {e}', 40)
+                self.revert_changes()
             finally:
                 self.buffer_queue.task_done()
 

@@ -1,6 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
 
-from PyInstaller.utils.hooks import collect_submodules
+from PyInstaller.utils.hooks import collect_submodules, copy_metadata
 
 hiddenimports = collect_submodules('packer.custom_modules')
 
@@ -9,8 +9,8 @@ a = Analysis(
     pathex=['src'],
     binaries=[],
     datas=[
-        ('src/packer/assets', 'packer/assets'),
-    ],
+    ("src/packer/assets", "packer/assets"),
+    ] + copy_metadata("twine"),
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
