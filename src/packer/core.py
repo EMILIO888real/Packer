@@ -511,7 +511,7 @@ class Packer():
                         retry_gofile_count += 1
                         if retry_gofile_count > 2:
                             self.print_and_log(f'After', end=' ')
-                            self.print_and_log(retry_gofile_count, [0, 0, 255], end=' ')
+                            self.print_and_log(str(retry_gofile_count), [0, 0, 255], end=' ')
                             self.print_and_log('unsuccessful attempts the release has been paused', level=30)
                             self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no', level=30)
                             if not self.prompt_user('Has the problem been resolved'):

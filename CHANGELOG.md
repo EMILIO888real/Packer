@@ -29,6 +29,7 @@
 - The check if ollama isn't on path to correctly evaluate first whether we need to check if any prompts are provided and if so check if ollama is available on PATH. 
 - `main.spec` by adding `copy_metadata("twine")` to `datas` to correctly bundle all necessary data for twine. 
 - Output handling for GoFile errors, arguments were incorrectly passed. 
+- Another argument passing error in GoFile error output log level was passed instead of a color. 
 
 ---
 
