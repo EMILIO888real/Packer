@@ -4,7 +4,10 @@ from pathlib import Path
 from subprocess import run
 from sys import platform
 from base64 import urlsafe_b64encode
-
+from requests import exceptions
+from twine.commands.upload import upload
+from twine.settings import Settings
+from twine.exceptions import NonInteractive
 from tqdm import tqdm
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
@@ -61,7 +64,7 @@ def is_file_encrypted(file_path: str | Path) -> bool:
     :rtype: bool
     '''
 
-    with open(file_path, "rb") as f:
+    with open(file_path, 'rb') as f:
         # Read the first 20 bytes to check the salt alignment and the 'gAAA' header
         header = f.read(20)
         
@@ -179,3 +182,41 @@ def track_model_pull(model_name: str, renderer: ProgressRenderer):
                 renderer.start(total)
 
     renderer.finish()
+
+def upload_package(output_dir: str | Path = 'dist', repository: str = 'pypi', api_token: str | None = None) -> str | None:
+    '''
+    Uploads generated distribution files to PyPI or TestPyPI.
+    
+    :param output_dir: Directory where the built distributions are located
+    :type output_dir: str | Path
+    :param repository: 'pypi' or 'testpypi'
+    :type repository: str
+    :param api_token: String starting with 'pypi-'
+    :type api_token: str
+    :return: None if upload is successful, or error message if it fails
+    :rtype: str | None
+    '''
+
+    dist_files = [str(p) for p in Path(output_dir).glob('*') if p.suffix in ('.whl', '.gz')]
+    
+    if not dist_files:
+        return 'No distribution files found to upload.'
+
+    # Set repository URL target
+    repo_url = 'https://upload.pypi.org/legacy/' if repository == 'pypi' else 'https://test.pypi.org/legacy/'
+
+    # Configure twine upload settings
+    settings = Settings(
+        repository_url=repo_url,
+        username='__token__',
+        password=api_token,  # Twine will check ~/.pypirc or environment variables if None
+        non_interactive=True,
+        verbose=True
+    )
+
+    try:
+        upload(settings, dist_files)
+    except NonInteractive as e:
+        return str(e)
+    except exceptions.HTTPError as e:
+        return e.response.text

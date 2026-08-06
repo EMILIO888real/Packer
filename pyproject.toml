@@ -23,7 +23,9 @@ dependencies = [
     "argcomplete",
     "pygame",
     "cryptography",
-    "tdqm"
+    "tdqm",
+    "build",
+    "twine"
 ]
 
 [tool.setuptools]

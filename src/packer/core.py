@@ -5,12 +5,13 @@ from re import MULTILINE, compile
 from shutil import get_terminal_size, rmtree, make_archive, which
 from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
-from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
+from subprocess import PIPE, CompletedProcess, Popen, run
 from time import sleep
 from typing import Any, NoReturn, Optional
 from collections.abc import Callable, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
+from packer.utils import upload_package
 from requests import post, exceptions
 from git import GitCommandError, Repo
 import tomlkit
@@ -120,12 +121,12 @@ class Packer():
     :type version: dict
     :param project_path: The path to the project directory.
     :type project_path: str | Path
-    :param GOFILE_USER_TOKEN: The user token for Gofile, used to upload the archive.
-    :type GOFILE_USER_TOKEN: str, optional
-    :param FOLDER_ID: The folder id for Gofile, used to upload the archive.
-    :type FOLDER_ID: str, optional
-    :param GITHUB_REPO_TOKEN: The token for the Github repo, used to publish the release.
-    :type GITHUB_REPO_TOKEN: str
+    :param gofile_user_token: The user token for Gofile, used to upload the archive.
+    :type gofile_user_token: str, optional
+    :param folder_id: The folder id for Gofile, used to upload the archive.
+    :type folder_id: str, optional
+    :param github_repo_token: The token for the Github repo, used to publish the release.
+    :type github_repo_token: str
     :param github_repo_url: The url of the Github repo, used to publish the release and for the social media post. It should be in the format "username/repo".
     :type github_repo_url: str
     :param input_queue: A queue for input operations, used for inter-thread communication.
@@ -151,8 +152,9 @@ class Packer():
     '''
 
     def __init__(self, version: dict, project_path: str | Path,
-                 GITHUB_REPO_TOKEN: str, github_repo_url: str, 
-                 GOFILE_USER_TOKEN: str | None = None, FOLDER_ID: str | None = None,
+                 github_repo_token: str, github_repo_url: str, 
+                 gofile_user_token: str | None = None, folder_id: str | None = None,
+                 pypi_api_token: str | None = None,
                  input_queue: Queue = None, output_queue: Queue = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['before_commands'].default, after_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['after_commands'].default,
@@ -166,9 +168,10 @@ class Packer():
         self.input_queue = input_queue
         self.output_queue = output_queue
         self.version = version
-        self.GOFILE_USER_TOKEN = GOFILE_USER_TOKEN
-        self.FOLDER_ID = FOLDER_ID
-        self.GITHUB_REPO_TOKEN = GITHUB_REPO_TOKEN
+        self.GOFILE_USER_TOKEN = gofile_user_token
+        self.FOLDER_ID = folder_id
+        self.pypi_api_token = pypi_api_token
+        self.GITHUB_REPO_TOKEN = github_repo_token
         self.model = model
         self.program_name = Path(project_path).name
         self.github_repo_url = github_repo_url
@@ -219,7 +222,7 @@ class Packer():
         if Path().cwd() != Path(project_path):
             self.print_and_log('Changing working directory...')
             chdir(project_path)
-        
+
         if not all_settings.skip_git_status:
             if run(['git', 'status', '--porcelain'], capture_output=True).stdout.decode() != '':
                 self.print_and_log('Your git directory is not clean!', [255, 0, 0], 40, ' ')
@@ -477,14 +480,17 @@ class Packer():
         self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
-            if self.compile_command != None:
+            if self.compile_command:
                 self.print_and_log('Compiling the program using Nuitka...')
                 waiting_for_compile_command = threading.Event()
                 compile_command_done = self._Popen(self.compile_command, waiting_for_compile_command)
 
-                self.print_and_log('Creating archive of the compiled program...')
-                make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
-
+            self.print_and_log(f'Building a python package ({2 if self.pypi_api_token else 1} files)')
+            waiting_for_building = threading.Event()
+            building_cmd = [sys.executable, '-m', 'build', '--outdir', f'{self.cache_dir}/dist']
+            if not self.pypi_api_token:
+                building_cmd.insert(3, '--wheel')
+            building_done = self._Popen(building_cmd, waiting_for_building)
             
             if self.run_pyinstaller:
                 self.print_and_log('Bundling the program using PyInstaller...')
@@ -494,7 +500,8 @@ class Packer():
                             'PyInstaller', 'main.spec',
                             '--distpath', f'{self.cache_dir}/dist',
                             '--workpath', f'{self.cache_dir}/build'], waiting_for_pyinstaller_bundling)
-            
+
+
             if self.GOFILE_USER_TOKEN and self.FOLDER_ID:
                 self.print_and_log('Uploading archive to Gofile...')
                 retry_gofile = True
@@ -634,6 +641,7 @@ class Packer():
                 waiting_for_pyinstaller_bundling.set()
                 pyinstaller_done.wait()
 
+                self.print_and_log('Uploading bundled program to GitHub release assets...')
                 self._upload_github_asset(Path(f'{self.cache_dir}/dist/{self.program_name}'), 'application/octet')
 
             if self.compile_command != None:
@@ -641,12 +649,28 @@ class Packer():
                 waiting_for_compile_command.set()
                 compile_command_done.wait()
 
+                self.print_and_log('Creating archive of the compiled program...')
+                make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
+
+                self.print_and_log('Uploading compiled program to GitHub release assets...')
                 self._upload_github_asset(Path(f'{self.program_name} [nuitka].zip'), 'application/zip')
+
+            self.print_and_log('Waiting for build to finish building python package...')
+            waiting_for_building.set()
+            building_done.wait()
+
+            self.print_and_log('Uploading python package built wheel file to GitHub release assets...')
+            self._upload_github_asset(f'{self.cache_dir}/dist/{Path(f'{self.cache_dir}/dist').glob('whl')}', 'application/octet')
+
+            if self.pypi_api_token:
+                result = upload_package(f'{cache_dir}/dist', api_token=self.pypi_api_token)
+                if result:
+                    self.print_and_log(f'Failed to upload built files to pypi. | Error: {result}', [255, 0, 0], 40)
+                    self.revert_changes()
 
 
             self.print_and_log('Cleaning up cache...')
-            if self.run_pyinstaller:
-                rmtree(f'{self.cache_dir}/dist')
+            rmtree(f'{self.cache_dir}/dist')
             
             if all_settings.auto_clear_cache and get_folder_size(Path(self.cache_dir)) > all_settings.cache_size_threshold:
                 self.print_and_log(f'Deleting cache folder, over threshold [{format_size(all_settings.cache_size_threshold)}]...')
@@ -1071,7 +1095,7 @@ class Packer():
 
 
         def thread_function(done: threading.Event):
-            process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
+            process = Popen(cmd, stdout=PIPE, stderr=PIPE, text=True)
 
             for text in process.stdout:
                 text = text.rstrip('\n')
@@ -1080,7 +1104,10 @@ class Packer():
                     output_text(text)
                     clear_lines(lines_used(text, get_terminal_size().columns), clear_formatting=True)
 
-            process.wait()
+            return_code = process.wait()
+            if return_code != 0:
+                self.print_and_log(f'{cmd} failed with exit code: {return_code} | stderr: {process.stderr}', [255, 0, 0], 40)
+                self.revert_changes()
             done.set()
 
         threading.Thread(target=thread_function, args=[done], daemon=True).start()

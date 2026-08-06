@@ -9,16 +9,7 @@ from packer.core import Packer
 def run(new_version: dict, project_directory: Path, project_configuration: Project):
 
     try:
-        packer = Packer(new_version, project_directory,
-                        project_configuration.github_repo_token,
-                        project_configuration.github_repo_url,
-                        project_configuration.gofile_user_token, project_configuration.gofile_folder_id,
-                        None, None,
-                        project_configuration.compile_command, project_configuration.before_commands, project_configuration.after_commands, 
-                        project_configuration.model, project_configuration.description_prompt, project_configuration.title_prompt,
-                        project_configuration.description_prompt_kwargs, project_configuration.title_prompt_kwargs,
-                        project_configuration.release_notes_template_path, project_configuration.changelog_git_hash,
-                        project_configuration.check_todo, project_configuration.todo_rel_path, project_configuration.list_start_identifier, project_configuration.list_end_identifier)
+        packer = Packer(new_version, project_directory, **project_configuration.model_dump())
 
         def packer_exception_handler(exc_type, exc_value, exc_traceback):
             packer.revert_changes(False)

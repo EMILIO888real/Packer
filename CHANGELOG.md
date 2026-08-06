@@ -3,6 +3,7 @@
 ### Added
 - `track_model_pull` function to be able to easily track installing models in any interface in cli.py it uses the `TqdmProgressRenderer`. 
 - A check before creating the Packer object to check if the ollama client is available on PATH. 
+- `pypi` integration with `build` and `twine` to build the python package and upload it respectively. 
 
 ### Changed
 - Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
@@ -13,6 +14,8 @@
 - Documentation for internal `print_and_log` functions to have the same doctype copied over for simplicity, IDE support and clear intent. 
 - TUI run project choice to also check for an IndexError, in case the user provided an index that isn't listed, not just the name of the project. 
 - Renamed project name from "packer" to "packer-release" in pyproject.toml for in the future you will be able to install this project from pypi using a package manager like pip, this name change only applies to pypi, project's official name is still packer. 
+- Some output to report when uploading begins on GitHub assets. 
+- `run` function in actions.py to be much simpler to use `model_dump` method with kwargs for the `Packer's` constructor. 
 
 ### Fixed
 - Type notation for a cycle object to use Iterable instead of runtime cycle object. 

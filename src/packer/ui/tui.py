@@ -77,6 +77,9 @@ def main() -> tuple[str, Project]:
                 }
             }
 
+        print('lastly at pypi.org get an API token')
+        new_projects_configurations[project_directory]['pypi api token'] = _getpass('6. pypi API token [None] ') or None
+
 
         if simple_prompt_retries(f'Would you like to edit optional settings', 'n'):
             def prompt_optional_setting(setting: str, text: str = None, key: Callable = lambda x:x) -> None:

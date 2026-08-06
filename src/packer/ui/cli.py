@@ -372,7 +372,7 @@ def main():
         pprint(all_settings.model_dump())
 
     if args.projects:
-        SENSITIVE_CONTENT = ('gofile user token', 'gofile folder id', 'github repo token')
+        SENSITIVE_CONTENT = ('gofile user token', 'gofile folder id', 'github repo token', 'pypi api token')
         for project, project_settings in projects_configurations.get_w_tui().items():
             print(f'Project: {Path(project).name}')
             for setting_key, settings_value in project_settings.items():
