@@ -35,6 +35,7 @@
 - Addition of a `wait` parameter in `revert_changes`, `_exit` methods, and `_wait_smooth_output` function to control whether they wait for smooth output before exiting or not, in case of failure in the output the software might wait forever. 
 - Built python package wheel upload to GitHub release assets by correctly formulating a full path. 
 - To wait until all output has finished outputting before returning the revert_changes method in case output follows straight after. 
+- Minor syntax mistakes regarding python package built wheel upload to GitHub release assets. 
 
 ---
 

@@ -642,9 +642,9 @@ class Packer():
             
             self.print_and_log('Uploading python package built wheel file to GitHub release assets...')
             for item in listdir(f'{self.cache_dir}/dist'):
-                if Path(item.suffix) == '.whl':
+                if Path(item).suffix == '.whl':
                     break
-            self._upload_github_asset(f'{self.cache_dir}/dist/{item}', 'application/octet')
+            self._upload_github_asset(Path(f'{self.cache_dir}/dist/{item}'), 'application/octet')
 
 
             self.print_and_log('Uploading the compiled programs to the GitHub release...')
