@@ -636,6 +636,17 @@ class Packer():
             self.print_and_log('Fetching the git tag...')
             self.git_repo.remotes.origin.fetch(tags=True)
 
+            self.print_and_log('Waiting for build to finish building python package...')
+            waiting_for_building.set()
+            building_done.wait()
+            
+            self.print_and_log('Uploading python package built wheel file to GitHub release assets...')
+            for item in listdir(f'{self.cache_dir}/dist'):
+                if Path(item.suffix) == '.whl':
+                    break
+            self._upload_github_asset(f'{self.cache_dir}/dist/{item}', 'application/octet')
+
+
             self.print_and_log('Uploading the compiled programs to the GitHub release...')
 
             if self.run_pyinstaller:
@@ -657,19 +668,9 @@ class Packer():
                 self.print_and_log('Uploading compiled program to GitHub release assets...')
                 self._upload_github_asset(Path(f'{self.program_name} [nuitka].zip'), 'application/zip')
 
-            self.print_and_log('Waiting for build to finish building python package...')
-            waiting_for_building.set()
-            building_done.wait()
-
-            self.print_and_log('Uploading python package built wheel file to GitHub release assets...')
-            for item in listdir(f'{cache_dir}/packer/dist'):
-                item = Path(item)
-                if item.suffix == '.whl':
-                    break
-            self._upload_github_asset(item, 'application/octet')
 
             if self.pypi_api_token:
-                result = upload_package(f'{cache_dir}/dist', api_token=self.pypi_api_token)
+                result = upload_package(f'{self.cache_dir}/dist', api_token=self.pypi_api_token)
                 if result:
                     self.print_and_log(f'Failed to upload built files to pypi. | Error: {result}', [255, 0, 0], 40)
                     self.revert_changes()
@@ -837,6 +838,9 @@ class Packer():
 
             self.print_and_log('Deleting local git tag...')
             self.git_repo.delete_tag(self.version)
+
+        if wait:
+            self._wait_smooth_output()
         if exit:
             self._exit(1, wait)
         
@@ -1098,9 +1102,6 @@ class Packer():
         :rtype: Event
         '''
 
-        self._wait_smooth_output()
-
-
         # setup
         def print_with_background(text):
             print_bg_colored_text(text, all_settings.stream_background_color)
@@ -1115,6 +1116,7 @@ class Packer():
                 text = text.rstrip('\n')
                 self.log_action(text)
                 if waiting.is_set():
+                    self._wait_smooth_output()
                     output_text(text)
                     clear_lines(lines_used(text, get_terminal_size().columns), clear_formatting=True)
 

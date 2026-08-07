@@ -18,6 +18,7 @@
 - Some output to report when uploading begins on GitHub assets. 
 - `run` function in actions.py to be much simpler to use `model_dump` method with kwargs for the `Packer's` constructor. 
 - The output of the error if ollama isn't on PATH to have spaces to look nicer. 
+- Python package wheel build waiting and uploading to GitHub release assets to happen before pyinstaller and nuitka. 
 
 ### Fixed
 - Type notation for a cycle object to use Iterable instead of runtime cycle object. 
@@ -32,6 +33,8 @@
 - Another argument passing error in GoFile error output log level was passed instead of a color. 
 - Build python package wheel upload to pypi to find the correct file. 
 - Addition of a `wait` parameter in `revert_changes`, `_exit` methods, and `_wait_smooth_output` function to control whether they wait for smooth output before exiting or not, in case of failure in the output the software might wait forever. 
+- Built python package wheel upload to GitHub release assets by correctly formulating a full path. 
+- To wait until all output has finished outputting before returning the revert_changes method in case output follows straight after. 
 
 ---
 
