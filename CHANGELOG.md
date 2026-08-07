@@ -30,6 +30,8 @@
 - `main.spec` by adding `copy_metadata("twine")` to `datas` to correctly bundle all necessary data for twine. 
 - Output handling for GoFile errors, arguments were incorrectly passed. 
 - Another argument passing error in GoFile error output log level was passed instead of a color. 
+- Build python package wheel upload to pypi to find the correct file. 
+- Addition of a `wait` parameter in `revert_changes`, `_exit` methods, and `_wait_smooth_output` function to control whether they wait for smooth output before exiting or not, in case of failure in the output the software might wait forever. 
 
 ---
 

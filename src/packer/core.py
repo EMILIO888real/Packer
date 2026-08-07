@@ -662,7 +662,11 @@ class Packer():
             building_done.wait()
 
             self.print_and_log('Uploading python package built wheel file to GitHub release assets...')
-            self._upload_github_asset(f'{self.cache_dir}/dist/{Path(f'{self.cache_dir}/dist').glob('whl')}', 'application/octet')
+            for item in listdir(f'{cache_dir}/packer/dist'):
+                item = Path(item)
+                if item.suffix == '.whl':
+                    break
+            self._upload_github_asset(item, 'application/octet')
 
             if self.pypi_api_token:
                 result = upload_package(f'{cache_dir}/dist', api_token=self.pypi_api_token)
@@ -787,10 +791,11 @@ class Packer():
             self.print_and_log('Canceled going further!')
             self.revert_changes()
     
-    def revert_changes(self, exit: bool = True) -> None | NoReturn:
+    def revert_changes(self, exit: bool = True, wait: bool = True) -> None | NoReturn:
         '''Rollback the release process by removing the generated archive, deleting the uploaded Gofile copy and GitHub release when present, and resetting the Git repository to its previous state.'''
 
-        self._wait_smooth_output()
+        if wait:
+            self._wait_smooth_output()
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
         if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
@@ -833,10 +838,11 @@ class Packer():
             self.print_and_log('Deleting local git tag...')
             self.git_repo.delete_tag(self.version)
         if exit:
-            self._exit(1)
+            self._exit(1, wait)
         
-    def _exit(self, code: int = None):
-        self._wait_smooth_output()
+    def _exit(self, code: int = None, wait: bool = True):
+        if wait:
+            self._wait_smooth_output()
         sys.exit(code)
 
     def _wait_smooth_output(self):
@@ -935,7 +941,7 @@ class Packer():
                 print_colored_text(f'Most likely because of malformed text from the buffer. Error:', [0, 255, 0], end=' ')
                 print_colored_text(str(e))
                 self.log_action(f'A problem occurred in smooth print output background thread. | Error: {e}', 40)
-                self.revert_changes()
+                self.revert_changes(wait=False)
             finally:
                 self.buffer_queue.task_done()
 
