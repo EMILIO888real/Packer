@@ -1,41 +1,41 @@
-## [%new_version] - %date
+## [0.23.0] - 2026-08-07
 
 ### Added
-- `track_model_pull` function to be able to easily track installing models in any interface in cli.py it uses the `TqdmProgressRenderer`. 
-- A check before creating the Packer object to check if the ollama client is available on PATH. 
-- `pypi` integration with `build` and `twine` to build the python package and upload it respectively. 
-- A fallback for when output data text dict is malformed in that case just print out the problem. 
+- [9495cd6] `track_model_pull` function to be able to easily track installing models in any interface in cli.py it uses the `TqdmProgressRenderer`. 
+- [416eb92] A check before creating the Packer object to check if the ollama client is available on PATH. 
+- [9bc0e18] `pypi` integration with `build` and `twine` to build the python package and upload it respectively. 
+- [63f0ffc] A fallback for when output data text dict is malformed in that case just print out the problem.
 
 ### Changed
-- Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
-- Ollama models suggestion to filter out any models that don't have completion in their capabilities metadata, like text embedded models, also to sort by size and choose mistral if possible otherwise the smallest available. 
-- The `print_list` function in `src/packer/custom_modules/etf.py` now accepts optional RGB color for text, index number color. 
-- Packer to use pytest for internal functionality testing, for better future development of Packer. 
-- `print_and_log` internal functions to allow partial line coloring while retaining only full lines in the log, by utilizing an internal buffer `self.print_message_parts`. 
-- Documentation for internal `print_and_log` functions to have the same doctype copied over for simplicity, IDE support and clear intent. 
-- TUI run project choice to also check for an IndexError, in case the user provided an index that isn't listed, not just the name of the project. 
-- Renamed project name from "packer" to "packer-release" in pyproject.toml for in the future you will be able to install this project from pypi using a package manager like pip, this name change only applies to pypi, project's official name is still packer. 
-- Some output to report when uploading begins on GitHub assets. 
-- `run` function in actions.py to be much simpler to use `model_dump` method with kwargs for the `Packer's` constructor. 
-- The output of the error if ollama isn't on PATH to have spaces to look nicer. 
-- Python package wheel build waiting and uploading to GitHub release assets to happen before pyinstaller and nuitka. 
+- [a2590f0] Hardened blank line filtering by adding a list variable `pending_blank_lines` to manage extra blank lines between sections in the changelog. 
+- [dc206c5] Ollama models suggestion to filter out any models that don't have completion in their capabilities metadata, like text embedded models, also to sort by size and choose mistral if possible otherwise the smallest available. 
+- [9495cd6] The `print_list` function in `src/packer/custom_modules/etf.py` now accepts optional RGB color for text, index number color. 
+- [639f317] Packer to use pytest for internal functionality testing, for better future development of Packer. 
+- [d8c09e8] `print_and_log` internal functions to allow partial line coloring while retaining only full lines in the log, by utilizing an internal buffer `self.print_message_parts`. 
+- [d8c09e8] Documentation for internal `print_and_log` functions to have the same doctype copied over for simplicity, IDE support and clear intent. 
+- [d8c09e8] TUI run project choice to also check for an IndexError, in case the user provided an index that isn't listed, not just the name of the project. 
+- [6589965] Renamed project name from "packer" to "packer-release" in pyproject.toml for in the future you will be able to install this project from pypi using a package manager like pip, this name change only applies to pypi, project's official name is still packer. 
+- [9bc0e18] Some output to report when uploading begins on GitHub assets. 
+- [9bc0e18] `run` function in actions.py to be much simpler to use `model_dump` method with kwargs for the `Packer's` constructor. 
+- [b593dbb] The output of the error if ollama isn't on PATH to have spaces to look nicer. 
+- [00cb5a9] Python package wheel build waiting and uploading to GitHub release assets to happen before pyinstaller and nuitka.
 
 ### Fixed
-- Type notation for a cycle object to use Iterable instead of runtime cycle object. 
-- Build script `pyproject.toml` to correctly package the assets to also include everything inside the assets folder, not just the top directory, but everything recursively. 
-- Corrected the filtering logic to be a bit more robust, tests had failed. 
-- Instances of waiting for smooth_output to finish before printing to the terminal in normal mode to utilize a general function `self.wait_smooth_output` instead of just calling the join method `self.buffer_queue.join`, which fails if smooth_output is disabled. 
-- Move Git repo initialization in Packer's constructor to happen after changing CWD if needed. 
-- Renamed `folder_id` to `gofile_folder_id` parameter in the constructor of Packer class, to be simpler and use the same naming scheme as saved project settings keys. 
-- The check if ollama isn't on path to correctly evaluate first whether we need to check if any prompts are provided and if so check if ollama is available on PATH. 
-- `main.spec` by adding `copy_metadata("twine")` to `datas` to correctly bundle all necessary data for twine. 
-- Output handling for GoFile errors, arguments were incorrectly passed. 
-- Another argument passing error in GoFile error output log level was passed instead of a color. 
-- Build python package wheel upload to pypi to find the correct file. 
-- Addition of a `wait` parameter in `revert_changes`, `_exit` methods, and `_wait_smooth_output` function to control whether they wait for smooth output before exiting or not, in case of failure in the output the software might wait forever. 
-- Built python package wheel upload to GitHub release assets by correctly formulating a full path. 
-- To wait until all output has finished outputting before returning the revert_changes method in case output follows straight after. 
-- Minor syntax mistakes regarding python package built wheel upload to GitHub release assets. 
+- [3626a68] Type notation for a cycle object to use Iterable instead of runtime cycle object. 
+- [f104a51] Build script `pyproject.toml` to correctly package the assets to also include everything inside the assets folder, not just the top directory, but everything recursively. 
+- [639f317] Corrected the filtering logic to be a bit more robust, tests had failed. 
+- [d8c09e8] Instances of waiting for smooth_output to finish before printing to the terminal in normal mode to utilize a general function `self.wait_smooth_output` instead of just calling the join method `self.buffer_queue.join`, which fails if smooth_output is disabled. 
+- [6589965] Move Git repo initialization in Packer's constructor to happen after changing CWD if needed. 
+- [05c45ce] Renamed `folder_id` to `gofile_folder_id` parameter in the constructor of Packer class, to be simpler and use the same naming scheme as saved project settings keys. 
+- [b593dbb] The check if ollama isn't on path to correctly evaluate first whether we need to check if any prompts are provided and if so check if ollama is available on PATH. 
+- [63f0ffc] `main.spec` by adding `copy_metadata("twine")` to `datas` to correctly bundle all necessary data for twine. 
+- [63f0ffc] Output handling for GoFile errors, arguments were incorrectly passed. 
+- [e3cbea1] Another argument passing error in GoFile error output log level was passed instead of a color. 
+- [804d9a6] Build python package wheel upload to pypi to find the correct file. 
+- [804d9a6] Addition of a `wait` parameter in `revert_changes`, `_exit` methods, and `_wait_smooth_output` function to control whether they wait for smooth output before exiting or not, in case of failure in the output the software might wait forever. 
+- [00cb5a9] Built python package wheel upload to GitHub release assets by correctly formulating a full path. 
+- [00cb5a9] To wait until all output has finished outputting before returning the revert_changes method in case output follows straight after. 
+- [b145d87] Minor syntax mistakes regarding python package built wheel upload to GitHub release assets.
 
 ---
 
