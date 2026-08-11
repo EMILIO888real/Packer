@@ -416,18 +416,20 @@ class Packer():
 
         self.print_and_log('Updating pyproject.toml...')
         with open('pyproject.toml', 'r', encoding='utf-8') as f:
-            config = tomlkit.load(f)
+            pyproject_config = tomlkit.load(f)
 
         # (Note: In a pyproject.toml, 'version' is usually inside the [tool.poetry] or [project] table)
-        if 'project' in config:
-            config['project']['version'] = self.version
-        elif 'tool' in config and 'poetry' in config['tool']:
-            config['tool']['poetry']['version'] = self.version
+        if 'project' in pyproject_config:
+            pyproject_config['project']['version'] = self.version
+        elif 'tool' in pyproject_config and 'poetry' in pyproject_config['tool']:
+            pyproject_config['tool']['poetry']['version'] = self.version
         else:
-            config['version'] = self.version # Fallback if it's just a top-level global key
+            pyproject_config['version'] = self.version # Fallback if it's just a top-level global key
+
+        pypi_program_name = pyproject_config['project']['name']
 
         with open('pyproject.toml', 'w', encoding='utf-8') as f:
-            tomlkit.dump(config, f)
+            tomlkit.dump(pyproject_config, f)
 
 
         if Path(f'{self.cache_dir}/{self.program_name}-{old_version_text}.zip').exists():
@@ -604,7 +606,8 @@ class Packer():
                 'version_description': description,
                 'github_repo_url': self.github_repo_url,
                 'gofile_download_url': download_url,
-                'latest_changelog': latest_changelog
+                'latest_changelog': latest_changelog,
+                'pypi_program_name': pypi_program_name
             }
 
             self.release_text = Template(self.release_text).substitute(release_notes_template_data)

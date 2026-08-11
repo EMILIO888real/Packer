@@ -8,7 +8,7 @@ Use the assets attached to this release page or PyPI to install this exact versi
 
 ### 1. Via PyPI
 ```bash
-pip install packer-release==${new_version}
+pip install ${pypi_program_name}==${new_version}
 ```
 
 ### 2. Via Attached Wheel File
@@ -24,7 +24,7 @@ pip install ./${program_name}-${new_version}-py3-none-any.whl
 Download the source archive from [$gofile_download_url]($gofile_download_url) and install it locally with pip:
 
 ```bash
-pip install /path/to/packer-${new_version}.zip
+pip install /path/to/${program_name}-${new_version}.zip
 ```
 
 ### 4. Standalone Executable (No Python Required)

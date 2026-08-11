@@ -2,6 +2,7 @@
 
 ### Added
 - Requirements section in the README. 
+- `$pypi_program_name` as another key available for you release template, also used in the default. 
 
 ### Changed
 - Installation section in README. 
