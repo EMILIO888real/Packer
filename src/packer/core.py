@@ -23,7 +23,7 @@ from webbrowser import open_new_tab
 from itertools import cycle
 import queue
 
-from packer.custom_modules.et import format_size, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
+from packer.custom_modules.et import format_size, format_version_text, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
 from packer.custom_modules.etf import bool_answer, clear_lines, lines_used, simple_prompt_retries, print_bg_colored_text, print_colored_text, print_with_delay
 from packer.config import all_settings, Project, packer_version, send_notification
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
@@ -121,14 +121,16 @@ class Packer():
     :type version: dict
     :param project_path: The path to the project directory.
     :type project_path: str | Path
-    :param gofile_user_token: The user token for Gofile, used to upload the archive.
-    :type gofile_user_token: str, optional
-    :param gofile_folder_id: The folder id for Gofile, used to upload the archive.
-    :type gofile_folder_id: str, optional
     :param github_repo_token: The token for the Github repo, used to publish the release.
     :type github_repo_token: str
     :param github_repo_url: The url of the Github repo, used to publish the release and for the social media post. It should be in the format "username/repo".
     :type github_repo_url: str
+    :param gofile_user_token: The user token for Gofile, used to upload the archive.
+    :type gofile_user_token: str, optional
+    :param gofile_folder_id: The folder id for Gofile, used to upload the archive.
+    :type gofile_folder_id: str, optional
+    :param pypi_api_token: The API token for PyPI, used to upload the built package.
+    :type pypi_api_token: str, optional
     :param input_queue: A queue for input operations, used for inter-thread communication.
     :type input_queue: Queue, optional
     :param output_queue: A queue for output operations, used for inter-thread communication.
@@ -149,6 +151,14 @@ class Packer():
     :type release_notes_template_path: str, optional
     :param changelog_git_hash: Whether to include the git hash in the changelog.
     :type changelog_git_hash: bool, optional
+    :param check_todo: Whether to check for TODOs in the specified file before proceeding with the build.
+    :type check_todo: bool, optional
+    :param todo_rel_path: The relative path to the file to check for TODOs.
+    :type todo_rel_path: str, optional
+    :param list_start_identifier: The identifier for the start of the TODO list in the specified file.
+    :type list_start_identifier: str, optional
+    :param list_end_identifier: The identifier for the end of the TODO list in the specified file.
+    :type list_end_identifier: str, optional
     '''
 
     def __init__(self, version: dict, project_path: str | Path,
@@ -269,7 +279,8 @@ class Packer():
         self.print_and_log('Updating version...')
         with open(f'{self.assets_dir}/version.json', 'w') as f:
             dump(self.version, f, indent=4)
-        self.version = f'{self.version['major']}.{self.version['minor']}.{self.version['patch']}' # Not using a text variable to rewrite this one 
+        self.version = format_version_text(self.version) # Not using a text variable to rewrite this one 
+        self.program_archive_path = Path(f'{self.cache_dir}/{self.program_name}-{self.version}.zip')
 
         old_version_text = f'{self.old_version['major']}.{self.old_version['minor']}.{self.old_version['patch']}' # Not possible above solution due to needing both
         self.print_and_log(f'Chosen version: {self.version}')
@@ -419,9 +430,9 @@ class Packer():
             tomlkit.dump(config, f)
 
 
-        if Path(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip').exists():
+        if Path(f'{self.cache_dir}/{self.program_name}-{old_version_text}.zip').exists():
             self.print_and_log('Removing old archive...')
-            remove(f'{self.cache_dir}/{self.program_name} {old_version_text}.zip')
+            remove(f'{self.cache_dir}/{self.program_name}-{old_version_text}.zip')
 
 
         self.print_and_log('Getting exclusions from .gitignore...')
@@ -436,7 +447,7 @@ class Packer():
 
 
         self.print_and_log('Creating an archive of the current git repository...')
-        with open(f'{self.cache_dir}/{self.program_name} {self.version}.zip', 'wb') as fp:
+        with open(self.program_archive_path, 'wb') as fp:
             self.git_repo.archive(fp, format='zip')
 
 
@@ -463,7 +474,7 @@ class Packer():
         current_project_metadata = metadata.get(str(Path().absolute()), {})
         
         project_size = get_folder_size(Path(), exclusions)
-        version_size = Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').stat().st_size
+        version_size = self.program_archive_path.stat().st_size
 
         if current_project_metadata:
             project_latest_size: int = current_project_metadata.get('project size')
@@ -477,7 +488,7 @@ class Packer():
         self.print_and_log(f'New version\'s size: {format_size(version_size)}')
 
 
-        self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name} {self.version}.zip')
+        self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name}-{self.version}.zip')
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
             if self.compile_command:
@@ -517,7 +528,7 @@ class Packer():
                             if not self.prompt_user('Has the problem been resolved'):
                                 self.revert_changes()
 
-                        response = upload_gofile_file(Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip'), self.GOFILE_USER_TOKEN, self.FOLDER_ID)
+                        response = upload_gofile_file(self.program_archive_path, self.GOFILE_USER_TOKEN, self.FOLDER_ID)
                         if response.get('status') != 'ok' or not response.get('data'):
                             self.print_and_log(f'GoFile upload returned an invalid response: {response}', [255, 0, 0], 40)
                             self.revert_changes()
@@ -663,10 +674,10 @@ class Packer():
                 compile_command_done.wait()
 
                 self.print_and_log('Creating archive of the compiled program...')
-                make_archive(f'{self.cache_dir}/{self.program_name} [nuitka]', 'zip', f'{self.cache_dir}/main.dist')
+                make_archive(f'{self.cache_dir}/{self.program_name}-[nuitka]', 'zip', f'{self.cache_dir}/main.dist')
 
                 self.print_and_log('Uploading compiled program to GitHub release assets...')
-                self._upload_github_asset(Path(f'{self.program_name} [nuitka].zip'), 'application/zip')
+                self._upload_github_asset(Path(f'{self.program_name}-[nuitka].zip'), 'application/zip')
 
 
             if self.pypi_api_token:
@@ -703,7 +714,7 @@ class Packer():
 
             if self.compile_command != None:
                 rmtree(f'{self.cache_dir}/main.dist')
-                remove(f'{self.cache_dir}{self.program_name} [nuitka].zip')
+                remove(f'{self.cache_dir}{self.program_name}-[nuitka].zip')
 
             self.print_and_log('Writing social media post text to a file...')
             with open(f'{data_dir}/social media post.md', 'w') as f:
@@ -799,9 +810,9 @@ class Packer():
             self._wait_smooth_output()
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
-        if Path(f'{self.cache_dir}/{self.program_name} {self.version}.zip').exists():
+        if self.program_archive_path.exists():
             self.print_and_log('Removing archive...', [255, 255, 0])
-            remove(f'{self.cache_dir}/{self.program_name} {self.version}.zip')
+            remove(self.program_archive_path)
 
         if hasattr(self, 'file_id'):
             self.print_and_log('Deleting uploaded copy...', [255, 255, 0])

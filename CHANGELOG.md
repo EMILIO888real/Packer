@@ -1,8 +1,24 @@
 ## [%new_version] - %date
 
 ### Added
+- Requirements section in the README. 
 
 ### Changed
+- Installation section in README. 
+- Usage section in README. 
+- Other various sections like features, Honorable mentions in the README. 
+- Updated CLI documentation to the latest implementation. 
+- Updated project settings documentation to the latest implementation. 
+- Removed the typical release template in PROJECT.md, instead the user can check out the default template. 
+- Updated Packer settings documentation to the latest implementation. 
+- Updated Doctype for Settings object and the module itself config.py to the latest implementation. 
+- The name of the archive created by Packer of your software from "$program_name x.y.z.zip" to "$program_name-x.y.z.zip" and saved it as a variable. 
+- The default release template's installation section to be much simpler and include PyPI as a another method. 
+- Version bump token or the prompt for which version to bump up to from "M, m, p" to "x, y, z". 
+- Doctype of the Packer class to the latest implementation. 
+- Removed tips section in the default release template RELEASE.md. 
+- Updated ROADMAP.md to state that I will try to write it when Packer comes closer to releasing. 
+- Added mention of the 3 main interfaces that will be available in Packer later, GUI (pygame), TUI (textual), CLI (primary). 
 
 ### Fixed
 

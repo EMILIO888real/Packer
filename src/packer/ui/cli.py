@@ -34,7 +34,7 @@ def get_project_names(**kwargs):
     return [Path(project).name for project in projects_configurations.get_w_tui().keys()]
 
 def get_new_version(**kwargs):
-    return ['M', 'm', 'p']
+    return ['x', 'y', 'z']
 
 def get_text_editors(**kwargs):
     return ['code', 'nvim', 'vim', 'nano', 'subl3', 'atom', 'emacs', 'idea', 'webstorm', 'notepad', 'pycharm']
@@ -149,7 +149,7 @@ def main():
                 current_version = load(f)
 
             try:
-                chosen_version = resolve_version(current_version, args.run_version if args.run_version else stripped_input('New version(M, m, P): '))
+                chosen_version = resolve_version(current_version, args.run_version if args.run_version else stripped_input('New version(x, y, z): '))
             except ValueError as e:
                 print(f'Invalid version input: {e}')
                 exit(1)

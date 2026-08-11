@@ -123,7 +123,7 @@ def main() -> tuple[str, Project]:
         current_version = load(f)
 
     try:
-        next_version = resolve_version(current_version, stripped_input('New version(M, m, P): '))
+        next_version = resolve_version(current_version, stripped_input('New version(x, y, z): '))
     except ValueError as exc:
         print(f'Invalid version input: {exc}')
         exit(1)

@@ -20,11 +20,11 @@ The following options are stored for each project in `projects.json`.
 
 | Setting                       | Type                              | Default             | Description                                                                                                         |
 | ----------------------------- | --------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| `gofile_user_token`           | `str`                             | —                   | GoFile API token used to upload release archives.                                                                   |
-| `gofile_folder_id`            | `str`                             | —                   | ID of the GoFile folder where release archives are uploaded.                                                        |
+| `gofile_user_token`           | `str`                             | `None`                   | GoFile API token used to upload release archives.                                                                   |
+| `gofile_folder_id`            | `str`                             | `None`                   | ID of the GoFile folder where release archives are uploaded.                                                        |
 | `github_repo_token`           | `str`                             | —                   | GitHub personal access token used for repository operations.                                                        |
 | `github_repo_url`             | `str`                             | —                   | GitHub repository URL in the form `username/repository`.                                                            |
-| `program_name`                | `str`                             | —                   | Name of the project used throughout generated releases and documentation.                                           |
+| `pypi_api_token`              | `str`                             | `None`                   | API token used for publishing releases to PyPI.                                                                     |
 | `before_commands`             | `Sequence[Sequence[str]] or None` | `None`              | Commands executed before the release process begins. Each command is represented as a sequence of arguments.        |
 | `after_commands`              | `Sequence[Sequence[str]] or None` | `None`              | Commands executed after the release process completes. Each command is represented as a sequence of arguments.      |
 | `compile_command`             | `Sequence[str] or None`           | `None`              | Command used to build or compile the project before packaging.                                                      |
@@ -44,9 +44,6 @@ The following options are stored for each project in `projects.json`.
 
 `release_notes_template_path` points to the Markdown template used when generating GitHub releases.
 
-The default template is:
-[`RELEASE.md`](../src/packer/assets/RELEASE.md).
-
 Supported template variables:
 
 | Variable | Description |
@@ -58,60 +55,5 @@ Supported template variables:
 | `$gofile_download_url` | GoFile archive download URL. |
 | `$latest_changelog` | Changelog entries for the current release. |
 
-See the default release template:
+See the default release template (used by Packer):
 [`src/packer/assets/RELEASE.md`](../src/packer/assets/RELEASE.md)
-
-A typical release template consists of the following sections:
-
-### Header
-
-Displays the project name and release version.
-
-```text
-$program_name Update [$new_version]
-```
-
-### Description
-
-Contains the AI-generated summary of the release.
-
-```text
-$version_description
-```
-
-### Installation
-
-Provides installation instructions using either:
-
-* GitHub (repository clone)
-* GoFile (downloadable release archive)
-
-This section typically includes:
-
-* Repository clone command
-* GoFile download link
-* Reference to the project's README for post-installation setup
-
-### Changes
-
-Displays the changelog entries for the current release.
-
-```text
-$latest_changelog
-```
-
-Most templates also include a link to the complete changelog in the GitHub repository.
-
-### Tips
-
-An optional section explaining the differences between the available distribution methods, for example:
-
-* GitHub contains the complete project history and supports updates via `git pull`.
-* GoFile provides only the latest packaged release and is intended for users who only need the newest version.
-
-## Notes
-
-* These settings are stored per project in `projects.json`.
-* Global settings that affect all projects are documented in `docs/SETTINGS.md`.
-* Prompt templates are passed directly to the configured AI model and can be customized to change the generated output.
-* Changes to `projects.json` are loaded when Packer starts.

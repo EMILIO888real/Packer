@@ -10,13 +10,9 @@ For detailed documentation on project and user settings, see:
 - User Settings: https://github.com/EMILIO888real/Packer/blob/master/docs/SETTINGS.md
 
 Example usage:
-```
-    from packer.config import all_settings, projects_configurations, Project
-    from packer.utils import normalize_settings_keys
-    
-    all_settings.text_editor # Access a global setting
-    packer_config = projects_configurations['packer'] # Access the dict containing the settings to that project, in this case the packer project.
-    project = Project(**packer_config) # or you can also first call the normalize_settings_keys function to replace ' ' with '_', to create snake case words.
+    from packer.config import all_settings, user_settings, default_settings, projects_configurations
+    project_config = projects_configurations.get_w_tui()['path/to/project']
+    print(all_settings.text_editor)  # Access global user setting
 
 Attributes:
     all_settings: A Settings object containing all merged configuration for the selected project.
@@ -25,9 +21,13 @@ Attributes:
     default_config: A dictionary containing the default configuration structure.
     projects_configurations: Optional dictionary of project-specific configurations from projects.json.
     packer_version: The current version of the packer package.
+    _getpass: A function to securely prompt for passwords with echo_char option.
+    _input_via_text_editor: A function to prompt for input using a text editor.
+    find_user_project: A function to find a project by name in the projects.json file.
 '''
 
-__all__ = 'user_settings, default_settings, default_config, all_settings, load, packer_version'
+__all__ = ['all_settings', 'user_settings', 'default_settings', 'default_config', 'projects_configurations', 'packer_version',
+           '_getpass', '_input_via_text_editor', 'find_user_project', 'send_notification']
 
 from os import environ
 from warnings import filterwarnings
@@ -81,6 +81,7 @@ class Project(BaseModel):
         gofile_folder_id (str): Target folder ID on GoFile for uploads.
         github_repo_token (str): GitHub personal access token for repository operations.
         github_repo_url (str): URL of the GitHub repository.
+        pypi_api_token (str): API token for publishing to PyPI.
         before_commands (tuple | None): Commands to execute before the build process.
         after_commands (tuple | None): Commands to execute after the build process.
         compile_command (Sequence[str] | None): Command sequence to compile/build the project.
@@ -141,7 +142,6 @@ class Settings(BaseModel):
         wait_flag (str | None): Flag to pass to the text editor (default: '--wait').
         verbose (bool): Enable verbose output logging (default: True).
         skip_git_status (bool): Skip git status checks before operations (default: False).
-        model (str): LLM model to use for summaries (default: 'mistral').
         changes_summary_prompt (list[dict]): Prompt template for summarizing git diffs at a high level.
         high_level_summary_prompt (list[dict]): Prompt template for creating a single summary sentence
                                                   from a bullet-point list of changes.
@@ -153,6 +153,14 @@ class Settings(BaseModel):
         desktop_notifications (bool): Whether to show desktop notifications for important events (default: True).
         notification_sound_path (str | Path): Path to the sound file for notifications (default: '1', which maps to a default sound).
         notification_volume (float): Volume level for notification sounds (default: 1.0, range 0.0 to 1.0).
+        smooth_output (bool): Enable smooth streaming output animation (default: True).
+        smooth_output_speed (float): Speed of smooth output animation in seconds per character (default: 0.005).
+        logs_size_threshold (int): Maximum size of logs directory in bytes before auto-clear (default: 104857000, 100 MiB).
+        cache_size_threshold (int): Maximum size of cache directory in bytes before auto-clear (default: 1073741824, 1 GiB).
+        auto_clear_cache (bool): Automatically clear cache when threshold is exceeded (default: False).
+        auto_clear_logs (bool): Automatically clear logs when threshold is exceeded (default: True).
+        suggestions_prompt (list[dict]): Prompt template for generating release note style suggestions from git diffs.
+        stream_background_color (list[int] | None): RGB background color for streamed output (default: [44, 44, 44]).
     '''
 
     text_editor: str = 'code'

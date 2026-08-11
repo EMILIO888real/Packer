@@ -1,71 +1,142 @@
 # Packer
 
-A Python automation tool that streamlines Python release workflows: creating optimized archives, uploading releases to GoFile, updating Git repositories, and publishing GitHub releases with AI-generated notes.
+A Python automation tool that streamlines Python release workflows: creating archives, uploading them to GoFile, updating Git repositories, publishing GitHub releases with AI-generated notes, and building, uploading wheels to PyPI.
 
 ## Contents
 
+- [Requirements](#requirements)
 - [Installation](#installation)
-- [Binary Downloads](#binary-downloads)
 - [Usage](#usage)
 - [Demos](#demos)
 - [Configuration](#configuration)
 	- [Settings](#settings)
 	- [Config](#config)
-	- [Extra customization](#extra-customization)
 - [Extra notes](#extra-notes)
 - [Warning](#warning)
 - [Features](#features)
 - [Feedback and Suggestions](#feedback-and-suggestions)
-- [Honorable mentions](#honorable-mentions)
 - [Changelog](#changelog)
 - [In future updates](#in-future-updates)
 
+## Requirements
+
+- python >=3.10 (unless you use one of the executables)
+- git, For lots of things
+- GitHub account, For creating a GitHub release
+- GoFile account [optional] For uploading to your profile tied folder.
+- ollama [optional] For AI generated version description, name and git diff summarization in the change module.
+- PyPI account [optional] For uploading to PyPI
+
 ## Installation
 
-Available via:
+Available via multiple methods — choose whichever fits your workflow:
 
-* **GitHub Releases:** [GitHub Releases](https://github.com/EMILIO888real/Packer/releases/)
-* **Third-party website (GoFile):** [Archive](https://gofile.io/d/OktQl5)
+- [From GitHub Releases](#from-github-releases)
+- [From PyPI](#from-pypi)
+- [From source (GitHub clone)](#from-source-github-clone)
+- [From a source archive (GoFile)](#from-a-source-archive-gofile)
 
-You can also install from source in a virtual environment:
+### From GitHub Releases
+
+Prebuilt artifacts are published on the [Releases page](https://github.com/EMILIO888real/Packer/releases/):
+
+- **PyInstaller executables:** standalone binaries — `packer` for Linux systems and `packer.exe` for Windows.
+- **Wheel file:** a Python `.whl` built with the `build` package for easy installation on any platform.
+- **Source archives:** `tar.gz` / `zip` source distributions for local builds.
+
+Example install for a downloaded wheel:
 
 ```bash
+pip install packer-x.y.z-py3-none-any.whl
+```
+
+### From PyPI
+
+A release is also published to PyPI under the name `packer-release`:
+
+```bash
+pip install packer-release
+```
+
+### From source (GitHub clone)
+
+Install from source in a virtual environment after cloning the repository:
+
+```bash
+git clone https://github.com/EMILIO888real/Packer.git
+cd Packer
 python -m venv .venv
 source .venv/bin/activate
 pip install .
 ```
 
-### Binary Downloads
+> **Note**: There are 2 branches **master** (somewhat stable, default) and **development** (latest changes, updates every 1-3 days)
 
-When downloading, please choose the correct build for your operating system:
+Or let `pip` clone and build directly from the GitHub repository (no manual clone required):
 
-| File Name | Platform | Description |
-| --- | --- | --- |
-| `packer` | Linux/macOS | Executable for Unix-based systems. |
-| `packer.exe` | Windows | Executable for Windows systems. |
+```bash
+pip install git+https://github.com/EMILIO888real/Packer.git
+```
 
-### To install:
+### From a source archive (GoFile)
 
-* **GitHub:** Download the appropriate binary or archive for your system from the [Releases page](https://github.com/EMILIO888real/Packer/releases/).
-* **Third-party website (GoFile):** Head to the website [Archive](https://gofile.io/d/OktQl5) and download the specific archive for the desired version.
+If you prefer to install from a downloaded source archive, download the archive from the [GoFile archive](https://gofile.io/d/bsT5ix) and install it with `pip`:
+
+```bash
+pip install /path/to/packer-x.y.z.tar.gz
+```
 
 After installing, continue following instructions in this README.
 
 ## Usage
 
-After installing the project, you can run it from the command line using the package entry points.
+After installing the project, you can run it from the command line using the command `packer`.
 
 ### Basic example
 
-```bash
-python -m packer.main
-```
-
-If the package is installed in your environment, you can also run:
-
+TUI
 ```bash
 packer
 ```
+
+GUI
+```bash
+packer -g
+```
+
+CLI
+```
+packer run -p packer -v m
+```
+
+Packer is also usable as a library: you can import parts of it into your own Python projects and call its functions or classes programmatically. Example:
+
+```python
+from packer import Packer # <- this works because the object is public. full path: packer.core.Packer
+# or import specific helpers
+from packer.actions import run # <- Isn't public, so full import path is needed.
+from packer.config import Project
+
+instance = Packer(**kwargs)
+
+try:
+	instance.run()
+except KeyboardInterrupt:
+	print('User canceled, reverting changes...')
+	instance.revert_changes()
+
+run(Project(**kwargs))
+```
+
+Explore more about how to use it as a library by checking out the top `__init__.py` for available public python objects and doctype for those objects on use case.
+
+>**Note:** You can't import Packer if you installed one of the executables
+
+### Interfaces
+
+- **CLI:** Primary command-line interface; run `packer` with any command or flag.
+- **GUI (pygame):** A graphical UI is available via a pygame-based frontend for interactive use; run `packer --gui`
+- **TUI (Textual):** A terminal UI (TUI) built with Textual is included for rich, keyboard-driven workflows; just run `packer`
 
 ## Demos
 
@@ -83,10 +154,6 @@ See [docs/SETTINGS.md](docs/SETTINGS.md#L1) for global Packer settings and [docs
 
 Packer expects a project layout with `src/` code and an `assets/` folder containing at least `version.json` and `integrity.json`. A `CHANGELOG.md` at the project root is required for release-note generation.
 
-### Extra customization
-
-See [docs/PROJECT.md](docs/PROJECT.md#L1) for notes about adding custom assets and creating profiles.
-
 ## Extra notes
 
 - Packer integrates with GoFile for archive hosting and GitHub for release publishing.
@@ -99,22 +166,18 @@ See [docs/PROJECT.md](docs/PROJECT.md#L1) for notes about adding custom assets a
 
 ## Features
 
-- Archive Creation: Packages your program with customizable exclusion rules.
+- Archive Creation: Packages your program with customizable exclusion rules. Uses `.gitignore`
 - Cloud Upload: Uploads archives to GoFile with optional folder management.
 - Git Integration: Handles repository updates and tagging.
 - GitHub Releases: Publishes releases with AI-generated titles and descriptions.
 - Optional Compilation: Supports Nuitka for compiled distributions.
 - Error Handling: Automatic rollback to previous version if a step fails.
 - AI-Powered: Uses Ollama (when available) to generate release notes.
+- PyPI integration: builds python wheels and uploads them to PyPI.
 
 ## Feedback and Suggestions
 
 Please open issues or pull requests on the project's GitHub repository, or email [emilspro888@gmail.com] to suggest improvements or report bugs.
-
-## Honorable mentions
-
-- Ollama — used for AI-generated release notes (optional).
-- GoFile — used as archive hosting provider.
 
 ## Changelog
 

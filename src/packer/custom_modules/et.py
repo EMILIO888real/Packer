@@ -587,12 +587,12 @@ def simple_merge_settings(user_settings: dict[str, Any] | None, default_settings
 def resolve_version(current_version: dict[str, int], version_input: str) -> dict[str, int]:
     '''Resolve a version bump token or explicit version string.
 
-    Resolves a version bump token (M/m/P) or explicit version string (e.g., '1.2.3')
+    Resolves a version bump token (x/y/z) or explicit version string (e.g., '1.2.3')
     into a version dictionary.
 
     :param current_version: Current version as dict with keys 'major', 'minor', 'patch'.
     :type current_version: dict[str, int]
-    :param version_input: Version bump token ('M'/'m'/'P') or explicit version string.
+    :param version_input: Version bump token ('x'/'y'/'z') or explicit version string.
     :type version_input: str
     :return: Resolved version as dictionary with keys 'major', 'minor', 'patch'.
     :rtype: dict[str, int]
@@ -605,22 +605,22 @@ def resolve_version(current_version: dict[str, int], version_input: str) -> dict
         try:
             major, minor, patch = (int(part) for part in raw_value.split('.'))
         except ValueError as exc:
-            raise ValueError('Use either M, m, p or a full version like 0.10.1.') from exc
+            raise ValueError('Use either x, y, z or a full version like 0.10.1.') from exc
 
         return {'major': major, 'minor': minor, 'patch': patch}
 
     match raw_value:
-        case 'M':
+        case 'x':
             version['major'] = version['major'] + 1
             version['minor'] = 0
             version['patch'] = 0
-        case 'm':
+        case 'y':
             version['minor'] = version['minor'] + 1
             version['patch'] = 0
-        case 'P':
+        case 'z':
             version['patch'] = version['patch'] + 1
         case _:
-            raise ValueError('Use either M, m, P or a full version like 0.10.1.')
+            raise ValueError('Use either x, y, z or a full version like 0.10.1.')
         
     return version
 

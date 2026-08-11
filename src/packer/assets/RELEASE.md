@@ -4,47 +4,41 @@ $version_description
 
 ## Installation
 
-Available via:
+Use the assets attached to this release page or PyPI to install this exact version.
 
-* **GitHub:** [GitHub Releases](https://github.com/${github_repo_url}/releases/tag/${new_version})
-* **Third-party website (GoFile):** [Archive]($gofile_download_url) (click the download button).
+### 1. Via PyPI
+```bash
+pip install packer-release==${new_version}
+```
 
-### Binary Downloads
+### 2. Via Attached Wheel File
 
-When downloading, please choose the correct build for your operating system:
+Download `${program_name}-${new_version}-py3-none-any.whl` from the **Assets** section below, then run:
 
-| File Name | Platform | Description |
-| --- | --- | --- |
-| `$program_name` | Linux/macOS | Executable for Unix-based systems. |
-| `$program_name.exe` | Windows | Executable for Windows systems. |
+```bash
+pip install ./${program_name}-${new_version}-py3-none-any.whl
+```
 
-### To install:
+### 3. From GoFile Source Archive
 
-* **GitHub:**
-Download the appropriate binary for your system from the [Releases page](https://github.com/${github_repo_url}/releases/tag/${new_version}).
-* **Third-party website (GoFile):**
-Head to the website [Archive]($gofile_download_url) and download the specific arhive with the appropriate version.
+Download the source archive from [$gofile_download_url]($gofile_download_url) and install it locally with pip:
 
-After installing, continue following instructions via the README.
+```bash
+pip install /path/to/packer-${new_version}.zip
+```
+
+### 4. Standalone Executable (No Python Required)
+
+Download the binary for your platform from the **Assets** section below:
+
+* **Linux:** `${program_name}` *(run `chmod +x ${program_name}` to make it executable)*
+* **Windows:** `${program_name}.exe`
 
 ## Changes in $new_version
 
 $latest_changelog
 
 [Full changelog](https://github.com/${github_repo_url}/blob/master/CHANGELOG.md)
-
-## Tips
-
-If you prefer to build from source via **GitHub**, you can clone the repository using:
-
-```bash
-git clone https://github.com/${github_repo_url} --depth 1
-
-```
-
-Using `--depth 1` creates a "shallow clone," which only downloads the latest commit, saving you significant time and storage space compared to a full repository clone.
-
-While downloading the pre-compiled binaries (like `$program_name` or `$program_name.exe`) is usually the fastest way to get started, cloning the repository allows you to easily pull future updates with `git pull` as they are released.
 
 ## Verification
 
@@ -56,15 +50,12 @@ To ensure the integrity of the downloaded files, you can verify their SHA256 che
 Open PowerShell and run the following command:
 ```powershell
 Get-FileHash .\$program_name.exe -Algorithm SHA256
-
 ```
 
-
-* **Linux/macOS (Terminal):**
+* **Linux (Terminal):**
 Open your terminal and run:
 ```bash
 sha256sum $program_name
-
 ```
 
 Compare the resulting hash with the one provided in the GitHub release assets list to ensure it matches.

@@ -7,7 +7,7 @@ If the automatic `revert_changes()` method fails, you can manually roll back the
 ## 1. Remove the generated archive
 
 ```bash
-rm -f <cache_dir>/<program_name> <version>.zip
+rm "<cache_dir>/<program_name>-<version>.zip"
 ```
 
 To find the cache directory, run:
