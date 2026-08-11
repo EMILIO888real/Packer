@@ -20,7 +20,7 @@ from packer.custom_modules.et import resolve_version, normalize_settings_keys, g
 from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir, metadata_path
-from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings, all_settings_status
+from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings, all_settings_status, ollama_available
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
 from packer.utils import track_model_pull, TqdmProgressRenderer
@@ -291,21 +291,33 @@ def main():
                     settings['wait_flag'] = input('2. Wait flag: ')
 
             if 'model' in all_settings_status:
-                models = [model.model for model in sorted([model for model in ollama.list().models if 'completion' in ollama.show(model.model).capabilities], key=lambda model:model.size)]
+                if ollama_available:
+                    models = [model.model for model in sorted([model for model in ollama.list().models if 'completion' in ollama.show(model.model).capabilities], key=lambda model:model.size)]
 
-                if models:
-                    default_model = 'mistral:latest' if 'mistral:latest' in models else models[0]
-                    print('Found ollama AI models:')
-                    print_list(models, [138, 43, 226], start='  - ')
-                else:
-                    print_colored_text('No installed completion models found', [255, 255, 0])
-                    if simple_prompt_retries('Install mistral [default] model'):
-                        track_model_pull('mistral:latest', TqdmProgressRenderer())
-                        default_model = 'mistral:latest'
+                    if models:
+                        default_model = 'mistral:latest' if 'mistral:latest' in models else models[0]
+                        print('Found ollama AI models:')
+                        print_list(models, [138, 43, 226], start='  - ')
                     else:
-                        default_model = None
-                
-                settings['model'] = input(f'3. Model {f'[{default_model}]' if default_model else ''} ') or default_model
+                        print_colored_text('No installed completion models found', [255, 255, 0])
+                        if simple_prompt_retries('Install mistral [default] model'):
+                            track_model_pull('mistral:latest', TqdmProgressRenderer())
+                            default_model = 'mistral:latest'
+                        else:
+                            default_model = None
+
+                    settings['model'] = input(f'3. Model {f'[{default_model}]' if default_model else ''} ') or default_model
+                else:
+                    print_colored_text('Ollama ins\'t available on PATH', [255, 0, 0])
+                    if simple_prompt_retries('Will u use AI features in Packer'):
+                        print_colored_text('Then please install the ollama clint and start the program again', [134, 202, 146])
+                        sys.exit()
+                    else:
+                        print_colored_text('Setting all AI prompts to None (disabling all AI features, excluding individual project configs) ...', [190, 144, 114])
+                        settings['model'] = 'mistral'
+                        settings['changes_summary_prompt'] = None
+                        settings['high_level_summary_prompt'] = None
+                        settings['suggestions_prompt'] = None
 
             user_settings.update(settings)
 

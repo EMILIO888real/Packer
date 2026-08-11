@@ -251,35 +251,6 @@ except ValidationError as e:
 all_settings.text_editor = which(all_settings.text_editor)
 
 
-def _getpass(prompt: str) -> str:
-    '''
-    Prompt the user for a password with echo_char option using whatever is specified in settings.
-
-    :param prompt: The prompt to display to the user.
-    :type prompt: str
-    :return: The password entered by the user.
-    :rtype: str
-    '''
-    return getpass(prompt, echo_char=all_settings.getpass_echo_char)
-
-def _input_via_text_editor(text: str, file_path: str = None, text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag) -> str:
-    '''
-    Prompt the user for input using a text editor, as specified in the global settings.
-
-    :param text: The initial text to display in the editor.
-    :type text: str
-    :param file_path: Optional path to a temporary file to use for the editor session.
-    :type file_path: str | None
-    :param text_editor: The text editor to use (default is the one specified in global settings).
-    :type text_editor: str
-    :param wait_flag: Optional flag to pass to the text editor to make it wait for the user to finish editing (default is the one specified in global settings).
-    :type wait_flag: str | None
-    :return: The text entered by the user in the editor.
-    :rtype: str
-    '''
-
-    return input_via_text_editor(text, file_path, text_editor, wait_flag)
-
 # All other miscellaneous setup
 
 pygame.mixer.init()
@@ -293,6 +264,20 @@ notification_sound.set_volume(all_settings.notification_volume)
 exception_handler = Global_exception_handler(packer_version, log_path, error_report_path,
                                              'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
 exception_handler.update()
+
+
+ollama_available = bool(which('ollama'))
+
+def _getpass(prompt: str) -> str:
+    '''
+    Prompt the user for a password with echo_char option using whatever is specified in settings.
+
+    :param prompt: The prompt to display to the user.
+    :type prompt: str
+    :return: The password entered by the user.
+    :rtype: str
+    '''
+    return getpass(prompt, echo_char=all_settings.getpass_echo_char)
 
 class _Projects_configurations_manager():
     def __init__(self):
@@ -366,3 +351,21 @@ def send_notification(title: str, message: str, timeout: int = 5):
     )
 
     notification_sound.play()
+
+def _input_via_text_editor(text: str, file_path: str = None, text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag) -> str:
+    '''
+    Prompt the user for input using a text editor, as specified in the global settings.
+
+    :param text: The initial text to display in the editor.
+    :type text: str
+    :param file_path: Optional path to a temporary file to use for the editor session.
+    :type file_path: str | None
+    :param text_editor: The text editor to use (default is the one specified in global settings).
+    :type text_editor: str
+    :param wait_flag: Optional flag to pass to the text editor to make it wait for the user to finish editing (default is the one specified in global settings).
+    :type wait_flag: str | None
+    :return: The text entered by the user in the editor.
+    :rtype: str
+    '''
+
+    return input_via_text_editor(text, file_path, text_editor, wait_flag)

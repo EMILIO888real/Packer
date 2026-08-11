@@ -25,7 +25,7 @@ import queue
 
 from packer.custom_modules.et import format_size, format_version_text, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
 from packer.custom_modules.etf import bool_answer, clear_lines, lines_used, simple_prompt_retries, print_bg_colored_text, print_colored_text, print_with_delay
-from packer.config import all_settings, Project, packer_version, send_notification
+from packer.config import all_settings, Project, packer_version, send_notification, ollama_available
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
 
 
@@ -242,7 +242,7 @@ class Packer():
 
         self.git_repo = Repo()
 
-        if (self.description_prompt or self.title_prompt) and not which('ollama'):
+        if (self.description_prompt or self.title_prompt) and not ollama_available:
             self.print_and_log('Couldn\'t find ollama on PATH', [255, 0, 0], 40, end=' ')
             self.print_and_log('please add it if installed otherwise install it: https://ollama.com/download.', [0, 255, 0], end=' '),
             self.print_and_log('Alternately you can also set both prompts to None.', [255, 255, 0], end=' ')

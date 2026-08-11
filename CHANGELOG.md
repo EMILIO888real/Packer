@@ -3,6 +3,8 @@
 ### Added
 - Requirements section in the README. 
 - `$pypi_program_name` as another key available for you release template, also used in the default. 
+- An `ollama_available` variable to check if Ollama is available on PATH. 
+- An option to disable all general AI features in packer in global settings in case the user doesn't want to use any of them. 
 
 ### Changed
 - Installation section in README. 
@@ -20,6 +22,7 @@
 - Removed tips section in the default release template RELEASE.md. 
 - Updated ROADMAP.md to state that I will try to write it when Packer comes closer to releasing. 
 - Added mention of the 3 main interfaces that will be available in Packer later, GUI (pygame), TUI (textual), CLI (primary). 
+- Rearrange config.py a little around, so it's a little easier to use. 
 
 ### Fixed
 
