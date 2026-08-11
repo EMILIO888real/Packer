@@ -684,9 +684,9 @@ class Packer():
 
 
             if self.pypi_api_token:
-                result = upload_package(f'{self.cache_dir}/dist', api_token=self.pypi_api_token)
-                if result:
-                    self.print_and_log(f'Failed to upload built files to pypi. | Error: {result}', [255, 0, 0], 40)
+                error_message = upload_package(f'{self.cache_dir}/dist', api_token=self.pypi_api_token)
+                if error_message:
+                    self.print_and_log(f'Failed to upload built files to pypi. | Error: {error_message}', [255, 0, 0], 40)
                     self.revert_changes()
 
 

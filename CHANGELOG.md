@@ -5,6 +5,7 @@
 - `$pypi_program_name` as another key available for you release template, also used in the default. 
 - An `ollama_available` variable to check if Ollama is available on PATH. 
 - An option to disable all general AI features in packer in global settings in case the user doesn't want to use any of them. 
+- Trusted publishing for Packer releases for PyPI through GitHub actions with publish.yaml, which now handles building and uploading to PyPI safely, old method is still available and Packer still builds the wheel file for the GitHub release. 
 
 ### Changed
 - Installation section in README. 
