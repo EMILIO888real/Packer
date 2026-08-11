@@ -57,4 +57,4 @@ Supported template variables:
 | `$pypi_program_name` | Project name on PyPI. |
 
 See the default release template (used by Packer):
-[`src/packer/assets/RELEASE.md`](../src/packer/assets/RELEASE.md)
+[`src/packer/assets/RELEASE.md`](https://github.com/EMILIO888real/Packer/blob/master/src/packer/assets/RELEASE.md)

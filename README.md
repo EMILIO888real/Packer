@@ -148,7 +148,7 @@ Explore more about how to use it as a library by checking out the top `__init__.
 
 ### Settings
 
-See [docs/SETTINGS.md](docs/SETTINGS.md#L1) for global Packer settings and [docs/PROJECT.md](docs/PROJECT.md#L1) for project-specific settings. For CLI options, see [docs/CLI.md](docs/CLI.md#L1).
+See [docs/SETTINGS.md](https://github.com/EMILIO888real/Packer/blob/master/docs/SETTINGS.md#L1) for global Packer settings and [docs/PROJECT.md](https://github.com/EMILIO888real/Packer/blob/master/docs/PROJECT.md#L1) for project-specific settings. For CLI options, see [docs/CLI.md](https://github.com/EMILIO888real/Packer/blob/master/docs/CLI.md#L1).
 
 ### Config
 
@@ -161,7 +161,7 @@ Packer expects a project layout with `src/` code and an `assets/` folder contain
 
 ## Warning
 
-- Possible problems might arise in that case, please back up your project before running for the first time and even if packer messed up, it won't destroy or corrupt your project so GL fixing it! Here is also a guide for manually reverting a release in case it fails catastrophically: [docs/MANUAL_REVERT.md](docs/MANUAL_REVERT.md#L1).
+- Possible problems might arise in that case, please back up your project before running for the first time and even if packer messed up, it won't destroy or corrupt your project so GL fixing it! Here is also a guide for manually reverting a release in case it fails catastrophically: [docs/MANUAL_REVERT.md](https://github.com/EMILIO888real/Packer/blob/master/docs/MANUAL_REVERT.md#L1).
 - Note that automatic error reporting is enabled by default. *You can disable it in the settings*
 
 ## Features
@@ -181,8 +181,8 @@ Please open issues or pull requests on the project's GitHub repository, or email
 
 ## Changelog
 
-See the full history in [CHANGELOG.md](./CHANGELOG.md#L1).
+See the full history in [CHANGELOG.md](https://github.com/EMILIO888real/Packer/blob/master/CHANGELOG.md#L1).
 
 ## In future updates
 
-See planned features and roadmap in [docs/ROADMAP.md](docs/ROADMAP.md#L1).
+See planned features and roadmap in [docs/ROADMAP.md](https://github.com/EMILIO888real/Packer/blob/master/docs/ROADMAP.md#L1).
