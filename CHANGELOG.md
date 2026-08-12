@@ -30,6 +30,7 @@
 - Replaced the config section with a much more useful setup section, that explains Packer's new project setup. 
 
 ### Fixed
+- Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 
 
 ---
 

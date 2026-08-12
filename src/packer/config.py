@@ -100,7 +100,7 @@ class Project(BaseModel):
     gofile_folder_id: str | None = None 
     github_repo_token: str
     github_repo_url: str
-    pypi_api_token: str
+    pypi_api_token: str | None = None
 
     before_commands: tuple[tuple[str, ...] | Callable, ...] | None = None
     after_commands: tuple[tuple[str, ...], ...] | Callable | None = None
