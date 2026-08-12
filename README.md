@@ -154,11 +154,6 @@ See [docs/SETTINGS.md](https://github.com/EMILIO888real/Packer/blob/master/docs/
 
 Packer expects a project layout with `src/` code and an `assets/` folder containing at least `version.json` and `integrity.json`. A `CHANGELOG.md` at the project root is required for release-note generation.
 
-## Extra notes
-
-- Packer integrates with GoFile for archive hosting and GitHub for release publishing.
-- Optional compilation via Nuitka is supported for producing compiled releases.
-
 ## Warning
 
 - Possible problems might arise in that case, please back up your project before running for the first time and even if packer messed up, it won't destroy or corrupt your project so GL fixing it! Here is also a guide for manually reverting a release in case it fails catastrophically: [docs/MANUAL_REVERT.md](https://github.com/EMILIO888real/Packer/blob/master/docs/MANUAL_REVERT.md#L1).

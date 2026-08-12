@@ -26,6 +26,7 @@
 - Added mention of the 3 main interfaces that will be available in Packer later, GUI (pygame), TUI (textual), CLI (primary). 
 - Rearrange config.py a little around, so it's a little easier to use. 
 - All file links in all of the documentation, mostly just README to link to GitHub hosted file location instead of local files, so that other platforms like PyPI can correctly link them. 
+- Removed extra notes section in the README about Packer's integration with GoFile, GitHub, and Nuitka. 
 
 ### Fixed
 
