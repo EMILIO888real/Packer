@@ -150,9 +150,45 @@ Explore more about how to use it as a library by checking out the top `__init__.
 
 See [docs/SETTINGS.md](https://github.com/EMILIO888real/Packer/blob/master/docs/SETTINGS.md#L1) for global Packer settings and [docs/PROJECT.md](https://github.com/EMILIO888real/Packer/blob/master/docs/PROJECT.md#L1) for project-specific settings. For CLI options, see [docs/CLI.md](https://github.com/EMILIO888real/Packer/blob/master/docs/CLI.md#L1).
 
-### Config
+### Setup
 
-Packer expects a project layout with `src/` code and an `assets/` folder containing at least `version.json` and `integrity.json`. A `CHANGELOG.md` at the project root is required for release-note generation.
+When you create a new project profile, Packer will guide you through a short setup flow. It is not just a folder creation step; it also creates a saved project entry so later releases can be run without re-entering all credentials.
+
+Typical profile setup asks for:
+
+- Program name: must be a valid Python-style identifier (letters, numbers, underscores, no spaces, no leading numbers)
+- Project directory: where the project should live; defaults to a folder under your Documents directory using the program name
+- GitHub access: either a GitHub personal access token or a repository URL in `username/repo` form
+- Author name: used for project metadata
+- Optional extras: GoFile code, license type, whether to use GitHub PAT authentication, and whether to include PyInstaller build support
+
+After the initial project scaffold is created, Packer will also prompt for the sensitive release credentials it needs to actually publish or update your project:
+
+- GoFile user token and optional folder ID
+- GitHub repo token
+- PyPI API token
+- Optional project settings such as compile command, before/after commands, and the Ollama model name for AI-generated release text
+
+The profile is saved to your local config directory (typically under your OS user config folder, such as `~/.config/packer/projects.json`) unless you choose to encrypt it. If you encrypt the file, you will be asked to create a password.
+
+A minimal project should look like this:
+
+```text
+my-project/
+├── src/
+│   └── my_project/
+├── assets/
+│   ├── version.json
+│   ├── integrity.json
+│   └── RELEASE.md   # optional template used at runtime; not a normal project file you should keep in source control
+├── CHANGELOG.md
+├── README.md
+└── pyproject.toml
+```
+
+> Note: `RELEASE.md` is not a regular project artifact that should be committed to your repo. It is a template with placeholders that Packer fills in at runtime when preparing GitHub release notes. The important project files are usually the source tree, `assets/version.json`, `assets/integrity.json`, and your changelog.
+
+> Tip: if the project is already a git repo and you want to release a version, make sure the repository is clean enough for Packer to detect the changelog and build steps correctly.
 
 ## Warning
 

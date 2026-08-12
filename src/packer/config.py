@@ -32,8 +32,6 @@ __all__ = ['all_settings', 'user_settings', 'default_settings', 'default_config'
 from os import environ
 from warnings import filterwarnings
 
-from packer.custom_modules.etf import print_colored_text
-
 filterwarnings(
     "ignore",
     message=r".*Your system is avx2 capable but pygame was not built with support for it.*",
