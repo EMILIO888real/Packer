@@ -481,10 +481,10 @@ class Packer():
         if current_project_metadata:
             project_latest_size: int = current_project_metadata.get('project size')
             if project_latest_size:
-                self.print_and_log(f'Project size change: {format_size(project_latest_size - project_size)}')
+                self.print_and_log(f'Project size change: {format_size(project_size - project_latest_size)}')
             last_versions_size: int = current_project_metadata.get('version size')
             if last_versions_size:
-                self.print_and_log(f'New versions size change: {format_size(last_versions_size - version_size)}')
+                self.print_and_log(f'New versions size change: {format_size(version_size - last_versions_size)}')
 
         self.print_and_log(f'Full project size with exclusions: {format_size(project_size)}')
         self.print_and_log(f'New version\'s size: {format_size(version_size)}')

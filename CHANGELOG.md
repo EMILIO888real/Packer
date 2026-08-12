@@ -32,6 +32,7 @@
 
 ### Fixed
 - Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 
+- Project size comparison has been reversed in `print_and_log` function calls for both project and new versions sizes. 
 
 ---
 
