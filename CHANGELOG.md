@@ -28,6 +28,7 @@
 - All file links in all of the documentation, mostly just README to link to GitHub hosted file location instead of local files, so that other platforms like PyPI can correctly link them. 
 - Removed extra notes section in the README about Packer's integration with GoFile, GitHub, and Nuitka. 
 - Replaced the config section with a much more useful setup section, that explains Packer's new project setup. 
+- Introduced an environment variable `pypi-production` in the "publish" workflow, which will pause the workflow execution requiring approval before continuing. 
 
 ### Fixed
 - Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 

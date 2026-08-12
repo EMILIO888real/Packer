@@ -8,6 +8,7 @@ jobs:
   publish:
     name: Build and Publish to PyPI
     runs-on: ubuntu-latest
+    environment: pypi-production  # <--- Pauses here for approval
     permissions:
       id-token: write     # Required for PyPI OIDC Trusted Publishing
       contents: read
