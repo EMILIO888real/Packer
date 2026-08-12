@@ -7,6 +7,7 @@
 - An option to disable all general AI features in packer in global settings in case the user doesn't want to use any of them. 
 - Trusted publishing for Packer releases for PyPI through GitHub actions with publish.yaml, which now handles building and uploading to PyPI safely, old method is still available and Packer still builds the wheel file for the GitHub release. 
 - A basic Security policy via Security.md in the project root. 
+- Removal of 'build' directory unless excluded in exclusions. 
 
 ### Changed
 - Installation section in README. 
