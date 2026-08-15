@@ -77,8 +77,14 @@ def main() -> tuple[str, Project]:
                 }
             }
 
-        print('lastly at pypi.org get an API token')
-        new_projects_configurations[project_directory]['pypi api token'] = _getpass('6. pypi API token [None] ') or None
+        if simple_prompt_retries('Will u be using trusted publishing (OIDC)'):
+            default_workflow_filename = Project.model_fields['workflow_filename'].default
+            default_environment_name = Project.model_fields['environment_name'].default
+            new_projects_configurations[project_directory]['workflow filename'] = stripped_input(f'6. workflow filename [{default_workflow_filename}] ') or default_workflow_filename
+            new_projects_configurations[project_directory]['environment name'] = stripped_input(f'7. environment name [{default_environment_name}] ') or default_environment_name
+        else:
+            print('lastly at pypi.org get an API token')
+            new_projects_configurations[project_directory]['pypi api token'] = _getpass('6. pypi API token [None] ') or None
 
 
         if simple_prompt_retries(f'Would you like to edit optional settings', 'n'):
@@ -122,10 +128,14 @@ def main() -> tuple[str, Project]:
     with open(f'{project_directory}/src/{Path(project_directory).name}/assets/version.json') as f:
         current_version = load(f)
 
-    try:
-        next_version = resolve_version(current_version, stripped_input('New version(x, y, z): '))
-    except ValueError as exc:
-        print(f'Invalid version input: {exc}')
-        exit(1)
+    if current_version['post'] > 0:
+        next_version = current_version
+    else:
+        try:
+            next_version = resolve_version(current_version, stripped_input('New version(x, y, z): '))
+        except ValueError as exc:
+            print(f'Invalid version input: {exc}')
+            exit(1)
+        
 
     actions.run(next_version, project_directory, Project(**normalize_settings_keys(projects_configurations.get_w_tui()[project_directory])))

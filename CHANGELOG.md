@@ -8,6 +8,10 @@
 - Trusted publishing for Packer releases for PyPI through GitHub actions with publish.yaml, which now handles building and uploading to PyPI safely, old method is still available and Packer still builds the wheel file for the GitHub release. 
 - A basic Security policy via Security.md in the project root. 
 - Removal of 'build' directory unless excluded in exclusions. 
+- `git_commit` a helper method to `Packer` to easily make commits by trying signed first and if that fails then unsigned. 
+- Confirm/cancel prompt for PyPI upload when using GitHub for trusted publishing instead of `Packer`. 
+- A step: `Yank the uploaded PyPI release` to `MANUAL_REVERT`, just like in the `revert_changes` method of `Packer`. 
+- `post` index to version numbers. 
 
 ### Changed
 - Installation section in README. 
@@ -30,6 +34,11 @@
 - Removed extra notes section in the README about Packer's integration with GoFile, GitHub, and Nuitka. 
 - Replaced the config section with a much more useful setup section, that explains Packer's new project setup. 
 - Introduced an environment variable `pypi-production` in the "publish" workflow, which will pause the workflow execution requiring approval before continuing. 
+- `wait_smooth_output` `Packer` method call for `_Popen` method to be called before setting the wait flag for commands, so they can freely output instead of calling the method inside the _Popen method. 
+- Moved all kinds of cleaning and post release tasks to happen after prompting the user to revert if necessary, instead of right before it. 
+- `format_version_text` to handle `post` version index if present and add it if not present. 
+- `resolve_version` function to correctly bump version with post index in the mix, adds it if missing, not the previous function `format_version_text`, it skips post if it's 0. 
+- UI implementation of bumping the version to only prompt for a version bump if no post version is present. 
 
 ### Fixed
 - Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 

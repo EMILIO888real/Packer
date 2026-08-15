@@ -261,7 +261,7 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
 
     print_and_log('Creating version.json file...')
     with open(f'{root_dir}/assets/version.json', 'w') as f:
-        f.write('{"major": 0, "minor": 0, "patch": 0}')
+        f.write('{"major": 0, "minor": 0, "patch": 0, "post": 0}')
 
     print_and_log('Creating an integrity file...')
     with open(f'{root_dir}/assets/integrity.json', 'w') as f:

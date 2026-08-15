@@ -148,11 +148,14 @@ def main():
             with open(f'{project_path}/src/{project_path.name}/assets/version.json') as f:
                 current_version = load(f)
 
-            try:
-                chosen_version = resolve_version(current_version, args.run_version if args.run_version else stripped_input('New version(x, y, z): '))
-            except ValueError as e:
-                print(f'Invalid version input: {e}')
-                exit(1)
+            if current_version['post'] > 0:
+                chosen_version = current_version
+            else:
+                try:
+                    chosen_version = resolve_version(current_version, args.run_version if args.run_version else stripped_input('New version(x, y, z): '))
+                except ValueError as e:
+                    print(f'Invalid version input: {e}')
+                    exit(1)
 
             actions.run(chosen_version, project_path, Project(**normalize_settings_keys(projects_configurations.get_w_tui()[str(project_path)])))
 

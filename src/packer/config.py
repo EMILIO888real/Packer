@@ -122,6 +122,8 @@ class Project(BaseModel):
     todo_rel_path: str = 'dev/TODO.md'
     list_start_identifier: str = 'before next release'
     list_end_identifier: str = '#'
+    environment_name: str = 'pypi-production'
+    workflow_filename: str = 'publish.yaml'
 
 
 class Settings(BaseModel):

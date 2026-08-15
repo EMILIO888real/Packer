@@ -2,7 +2,7 @@ from pathlib import Path
 from datetime import datetime
 from multiprocessing import Queue
 from re import MULTILINE, compile
-from shutil import get_terminal_size, rmtree, make_archive, which
+from shutil import get_terminal_size, rmtree, make_archive
 from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
 from subprocess import PIPE, CompletedProcess, Popen, run
@@ -11,8 +11,8 @@ from typing import Any, NoReturn, Optional
 from collections.abc import Callable, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
-from packer.utils import upload_package
-from requests import post, exceptions
+from packer.utils import find_environments, process_deployed_environments, upload_package
+from requests import HTTPError, post, exceptions
 from git import GitCommandError, Repo
 import tomlkit
 import threading
@@ -22,6 +22,7 @@ from pyperclip import copy
 from webbrowser import open_new_tab
 from itertools import cycle
 import queue
+from tenacity import retry,stop_after_attempt, wait_exponential, retry_if_exception_type
 
 from packer.custom_modules.et import format_size, format_version_text, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
 from packer.custom_modules.etf import bool_answer, clear_lines, lines_used, simple_prompt_retries, print_bg_colored_text, print_colored_text, print_with_delay
@@ -172,7 +173,8 @@ class Packer():
                  description_prompt_kwargs: dict[Any, Any] = Project.model_fields['description_prompt_kwargs'].default, title_prompt_kwargs: dict[Any, Any] = Project.model_fields['title_prompt_kwargs'].default,
                  release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default,
                  check_todo: bool = Project.model_fields['check_todo'].default, todo_rel_path: str = Project.model_fields['todo_rel_path'].default,
-                 list_start_identifier: str = Project.model_fields['list_start_identifier'].default, list_end_identifier: str = Project.model_fields['list_end_identifier'].default
+                 list_start_identifier: str = Project.model_fields['list_start_identifier'].default, list_end_identifier: str = Project.model_fields['list_end_identifier'].default,
+                 environment_name: str = Project.model_fields['environment_name'].default, workflow_filename: str = Project.model_fields['workflow_filename'].default
                 ):
         # parameter initialization
         self.input_queue = input_queue
@@ -194,6 +196,8 @@ class Packer():
         self.title_prompt_kwargs = title_prompt_kwargs
         self.description_prompt_kwargs = description_prompt_kwargs
         self.print_message_parts = []
+        self.environment_name = environment_name
+        self.workflow_filename = workflow_filename
 
         # Actions needed to run once, (setup actions)
         self.logger = init_logger('packer', 'EMILIO')
@@ -426,7 +430,7 @@ class Packer():
         else:
             pyproject_config['version'] = self.version # Fallback if it's just a top-level global key
 
-        pypi_program_name = pyproject_config['project']['name']
+        self.pypi_program_name = pyproject_config['project']['name']
 
         with open('pyproject.toml', 'w', encoding='utf-8') as f:
             tomlkit.dump(pyproject_config, f)
@@ -576,20 +580,7 @@ class Packer():
             commit_body = f'{description}'
             commit_metadata = f'Gofile url: {download_url}\nPublished by packer v{packer_version}!'
 
-            commit_message = f'{commit_subject}\n\n{commit_body}\n\n{commit_metadata}'
-
-            try:
-                self.git_repo.git.commit('-S', '-m', commit_message)
-                self.committed = True
-            except GitCommandError:
-                try:
-                        self.print_and_log('Fallback to unsigned commit...', 30)
-                        self.git_repo.git.commit('-m', commit_message)
-                        self.committed = True
-                except GitCommandError as e:
-                    self.committed = False
-                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0], 40)
-                    self.revert_changes()
+            self.committed = self.git_commit(f'{commit_subject}\n\n{commit_body}\n\n{commit_metadata}')
 
 
             sha = self.git_repo.head.commit.hexsha
@@ -614,7 +605,7 @@ class Packer():
                 'github_repo_url': self.github_repo_url,
                 'gofile_download_url': download_url,
                 'latest_changelog': latest_changelog,
-                'pypi_program_name': pypi_program_name
+                'pypi_program_name': self.pypi_program_name
             }
 
             self.release_text = Template(self.release_text).substitute(release_notes_template_data)
@@ -658,6 +649,7 @@ class Packer():
             self.git_repo.remotes.origin.fetch(tags=True)
 
             self.print_and_log('Waiting for build to finish building python package...')
+            self._wait_smooth_output()
             waiting_for_building.set()
             building_done.wait()
             
@@ -668,10 +660,11 @@ class Packer():
             self._upload_github_asset(Path(f'{self.cache_dir}/dist/{item}'), 'application/octet')
 
 
-            self.print_and_log('Uploading the compiled programs to the GitHub release...')
+            self.print_and_log('Uploading the built versions versions to the GitHub release...')
 
             if self.run_pyinstaller:
                 self.print_and_log('Waiting for PyInstaller to finish...')
+                self._wait_smooth_output()
                 waiting_for_pyinstaller_bundling.set()
                 pyinstaller_done.wait()
 
@@ -680,6 +673,7 @@ class Packer():
 
             if self.compile_command != None:
                 self.print_and_log('Waiting for Nuitka to finish...')
+                self._wait_smooth_output()
                 waiting_for_compile_command.set()
                 compile_command_done.wait()
 
@@ -693,42 +687,11 @@ class Packer():
             if self.pypi_api_token:
                 error_message = upload_package(f'{self.cache_dir}/dist', api_token=self.pypi_api_token)
                 if error_message:
-                    self.print_and_log(f'Failed to upload built files to pypi. | Error: {error_message}', [255, 0, 0], 40)
+                    self.print_and_log(f'Failed to upload built files to PyPI. | Error: {error_message}', [255, 0, 0], 40)
                     self.revert_changes()
+                else:
+                    self.published_to_pypi = True
 
-
-            self.print_and_log('Cleaning up cache...')
-            rmtree(f'{self.cache_dir}/dist')
-            
-            if all_settings.auto_clear_cache and get_folder_size(Path(self.cache_dir)) > all_settings.cache_size_threshold:
-                self.print_and_log(f'Deleting cache folder, over threshold [{format_size(all_settings.cache_size_threshold)}]...')
-                rmtree(self.cache_dir)
-            
-            if all_settings.auto_clear_logs and get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
-                self.print_and_log(f'Cleaning logs folder, over threshold: [{format_size(all_settings.logs_size_threshold)}]...')
-
-                def _get_timestamp(file: str) -> datetime:
-                    if 'error report' in file:
-                        file = file.rstrip('.json').lstrip('error report ')
-                    else:
-                        file = file.rstrip('.log')
-                    
-                    return datetime.strptime(file, '%Y-%m-%d')
-
-                files = sorted(listdir(log_dir), key=_get_timestamp)
-
-                while get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
-                    file = files.pop(0)
-                    remove(f'{log_dir}/{file}')
-                    self.print_and_log(f'Removed {file}')
-
-            if self.compile_command != None:
-                rmtree(f'{self.cache_dir}/main.dist')
-                remove(f'{self.cache_dir}{self.program_name}-[nuitka].zip')
-
-            self.print_and_log('Writing social media post text to a file...')
-            with open(f'{data_dir}/social media post.md', 'w') as f:
-                f.write(self.release_text)
 
             if self.git_repo.active_branch.name == 'development':
                 self.print_and_log('Switching to master branch...')
@@ -753,29 +716,37 @@ class Packer():
                 self.print_and_log('Switching to existing development branch...')
                 self.git_repo.heads['development'].checkout()
 
+            if not self.pypi_api_token:
+                publish_to_pypi = self.prompt_user('publish to PyPI')
+                self.print_and_log('getting workflow and run id...')
+                workflow = self.repo.get_workflow(self.workflow_filename)
+                run_id = next(iter(workflow.get_runs())).id
 
-            self.print_and_log('Adding changelog template for next version...')
-            with open('CHANGELOG.md', 'w') as f:
-                f.write(f'## [%new_version] - %date\n\n### Added\n\n### Changed\n\n### Fixed\n\n---\n\n{full_changelog}')
+                self.print_and_log('getting environment id and processing it...')
 
-            self.print_and_log('Committing next version preparation and updating origin...')
-            self.git_repo.index.add(['CHANGELOG.md'])
-            next_versions_commit_message = 'Prepared next version development branch'
-            try:
-                self.git_repo.git.commit('-S', '-m', next_versions_commit_message)
-                self.prep_committed = True
-            except GitCommandError:
-                try:
-                    self.print_and_log('Fallback to unsigned commit...', 30)
-                    self.git_repo.git.commit('-m', next_versions_commit_message)
-                    self.prep_committed = True
-                except GitCommandError as e:
-                    self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0], 40)
-            self.git_repo.remotes.origin.push()
+                @retry(
+                    stop=stop_after_attempt(3),
+                    wait=wait_exponential(multiplier=1, min=2, max=10),
+                    retry=retry_if_exception_type(HTTPError)
+                )
+                def _find_environments():
+                    return find_environments(self.GITHUB_REPO_TOKEN, self.github_repo_url, run_id, self.environment_name)
+                environment_id = _find_environments()
 
-            self.print_and_log('Cleaning up temporary files...')
-            remove(self.chosen_description_path)
-            remove(self.chosen_title_path)
+                @retry(
+                    stop=stop_after_attempt(3),
+                    wait=wait_exponential(multiplier=1, min=2, max=10),
+                    retry=retry_if_exception_type(HTTPError)
+                )
+                def _process_environments():
+                    return process_deployed_environments(self.GITHUB_REPO_TOKEN, self.github_repo_url, run_id, environment_id, 'approved' if publish_to_pypi else 'rejected')
+                _process_environments()
+
+
+                if publish_to_pypi:
+                    self.published_to_pypi = True
+                else:
+                    self.revert_changes()
 
 
             self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
@@ -795,11 +766,61 @@ class Packer():
 
             if self.prompt_user('Do you want to revert', 'n'):
                 self.revert_changes()
+
+
+            self.print_and_log('Running post release clean up tasks...')
+            
+            self.print_and_log('Cleaning up cache...')
+            rmtree(f'{self.cache_dir}/dist')
+        
+            if all_settings.auto_clear_cache and get_folder_size(Path(self.cache_dir)) > all_settings.cache_size_threshold:
+                self.print_and_log(f'Deleting cache folder, over threshold [{format_size(all_settings.cache_size_threshold)}]...')
+                rmtree(self.cache_dir)
+        
+            if all_settings.auto_clear_logs and get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
+                self.print_and_log(f'Cleaning logs folder, over threshold: [{format_size(all_settings.logs_size_threshold)}]...')
+        
+                def _get_timestamp(file: str) -> datetime:
+                    if 'error report' in file:
+                        file = file.rstrip('.json').lstrip('error report ')
+                    else:
+                        file = file.rstrip('.log')
+        
+                    return datetime.strptime(file, '%Y-%m-%d')
+        
+                files = sorted(listdir(log_dir), key=_get_timestamp)
+        
+                while get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
+                    file = files.pop(0)
+                    remove(f'{log_dir}/{file}')
+                    self.print_and_log(f'Removed {file}')
+        
+            if self.compile_command != None:
+                rmtree(f'{self.cache_dir}/main.dist')
+                remove(f'{self.cache_dir}{self.program_name}-[nuitka].zip')
+        
+            self.print_and_log('Writing social media post text to a file...')
+            with open(f'{data_dir}/social media post.md', 'w') as f:
+                f.write(self.release_text)
+
+
+            self.print_and_log('Adding changelog template for next version...')
+            with open('CHANGELOG.md', 'w') as f:
+                f.write(f'## [%new_version] - %date\n\n### Added\n\n### Changed\n\n### Fixed\n\n---\n\n{full_changelog}')
+        
+            self.print_and_log('Committing next version preparation and updating origin...')
+            self.git_repo.index.add(['CHANGELOG.md'])
+            self.prep_committed = self.git_commit('Prepared next version development branch')
+            self.git_repo.remotes.origin.push()
+        
+            self.print_and_log('Cleaning up temporary files...')
+            remove(self.chosen_description_path)
+            remove(self.chosen_title_path)
+
             
             self.print_and_log('Updating metadata.json...')
             current_project_metadata['project size'] = project_size
             current_project_metadata['version size'] = version_size
-
 
             metadata[str(Path().absolute())] = current_project_metadata
             
@@ -807,8 +828,6 @@ class Packer():
                 dump(metadata, f)
             
             self._wait_smooth_output()
-
-            
         else:
             self.print_and_log('Canceled going further!')
             self.revert_changes()
@@ -860,10 +879,63 @@ class Packer():
             self.print_and_log('Deleting local git tag...')
             self.git_repo.delete_tag(self.version)
 
+        if hasattr(self, 'published_to_pypi') and self.published_to_pypi:
+            self.print_and_log(f'I can\'t automatically yank the uploaded PyPI distribution.', [255, 255, 0], 30)
+            self.print_and_log('Please head on over to:', end='')
+            self.print_and_log(f'https://pypi.org/manage/project/{self.pypi_program_name}/releases/', [255, 105, 180], end=' ')
+            self.print_and_log('and do it yourself through their web UI.')
+
+            self.print_and_log('Updating pyproject.toml version...')
+            with open('pyproject.toml', 'r', encoding='utf-8') as f:
+                pyproject_config = tomlkit.load(f)
+
+            if self.version.count('.') == 2:
+                new_version = f'{self.version}.post1'
+            else:
+                for i, char in enumerate(self.version, self.version.find('-') + 1):
+                    if char.isdigit():
+                        new_version = f'{self.version[:i]}{int(self.version[i]) + 1}{self.version[i + 1:]}'
+            if 'project' in pyproject_config:
+                pyproject_config['project']['version'] = new_version
+            elif 'tool' in pyproject_config and 'poetry' in pyproject_config['tool']:
+                pyproject_config['tool']['poetry']['version'] = new_version
+            else:
+                pyproject_config['version'] = new_version
+            
+            with open('pyproject.toml', 'w', encoding='utf-8') as f:
+                tomlkit.dump(pyproject_config, f)
+
+            self.print_and_log(f'Committing the version bump to {new_version} after failed release...')
+            self.git_repo.index.add(['pyproject.toml'])
+            self.git_commit('Bumped version after failed release')
+
         if wait:
             self._wait_smooth_output()
         if exit:
             self._exit(1, wait)
+
+    def git_commit(self, commit_message: str) -> bool:
+        '''
+        Commits the staged changes in the git repository with the provided commit message. It first attempts to create a signed commit, and if that fails, it falls back to an unsigned commit.
+
+        :param commit_message: The message to use for the commit.
+        :type commit_message: str
+        :return: True if the commit was successful, False otherwise.
+        :rtype: bool
+        '''
+
+        try:
+            self.git_repo.git.commit('-S', '-m', commit_message)
+            return True
+        except GitCommandError:
+            try:
+                    self.print_and_log('Fallback to unsigned commit...', 30)
+                    self.git_repo.git.commit('-m', commit_message)
+                    return True
+            except GitCommandError as e:
+                self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0], 40)
+                self.revert_changes()
+                return False
         
     def _exit(self, code: int = None, wait: bool = True):
         if wait:
@@ -1137,7 +1209,6 @@ class Packer():
                 text = text.rstrip('\n')
                 self.log_action(text)
                 if waiting.is_set():
-                    self._wait_smooth_output()
                     output_text(text)
                     clear_lines(lines_used(text, get_terminal_size().columns), clear_formatting=True)
 

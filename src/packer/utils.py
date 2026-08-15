@@ -4,7 +4,8 @@ from pathlib import Path
 from subprocess import run
 from sys import platform
 from base64 import urlsafe_b64encode
-from requests import exceptions
+from typing import Literal
+import requests
 from twine.commands.upload import upload
 from twine.settings import Settings
 from twine.exceptions import NonInteractive
@@ -218,5 +219,75 @@ def upload_package(output_dir: str | Path = 'dist', repository: str = 'pypi', ap
         upload(settings, dist_files)
     except NonInteractive as e:
         return str(e)
-    except exceptions.HTTPError as e:
+    except requests.exceptions.HTTPError as e:
         return e.response.text
+
+
+def find_environments(github_repo_token: str, github_repo_url: str, run_id: int, environment_name: str = 'pypi-production') -> int:
+    '''
+    sends a request to the GitHub API to retrieve the list of pending deployments for a specific workflow run.
+    
+    :param github_repo_token: The GitHub token used to authenticate with the GitHub API
+    :type github_repo_token: str
+    :param github_repo_url: The GitHub repository URL in the format "owner/repo"
+    :type github_repo_url: str
+    :param run_id: The ID of the workflow run to retrieve pending deployments for
+    :type run_id: int
+    :param environment_name: The name of the environment to retrieve the ID for (default is "pypi-production")
+    :type environment_name: str
+
+    :return: The ID of the environment with the name "pypi-production"
+    :rtype: int
+
+    :raises requests.exceptions.HTTPError: If the request to the GitHub API fails
+    '''
+
+    response = requests.get(
+        f'https://api.github.com/repos/{github_repo_url}'
+        f'/actions/runs/{run_id}/pending_deployments',
+        headers={
+            'Authorization': f'Bearer {github_repo_token}',
+            'Accept': 'application/vnd.github+json',
+        },
+    )
+    response.raise_for_status()
+
+    deployments = requests.json()
+
+    environment = next(
+        deployment
+        for deployment in deployments
+        if deployment['environment']['name'] == environment_name
+    )
+
+    return environment['environment']['id']
+
+def process_deployed_environments(github_repo_token: str, github_repo_url: str, run_id: int, environment_id: int, state: Literal['approved', 'rejected'] = 'approved', comment: str = 'Approved through Packer'):
+    '''
+    sends a request to the GitHub API to approve or reject a specific workflow run for a specific environment.
+    
+    :param github_repo_token: The GitHub token used to authenticate with the GitHub API
+    :type github_repo_token: str
+    :param github_repo_url: The GitHub repository URL in the format "owner/repo"
+    :type github_repo_url: str
+    :param run_id: The ID of the workflow run to approve or reject
+    :type run_id: int
+    :param environment_id: The ID of the environment to approve or reject the workflow run for
+    :type environment_id: int
+
+    :raises requests.exceptions.HTTPError: If the request to the GitHub API fails
+    '''
+
+    requests.post(
+        f'https://api.github.com/repos/{github_repo_url: str}'
+        f'/actions/runs/{run_id}/pending_deployments',
+        headers={
+            'Authorization': f'Bearer {github_repo_token}',
+            'Accept': 'application/vnd.github+json',
+        },
+        json={
+            'environment_ids': [environment_id],
+            'state': state,
+            'comment': comment,
+        },
+    ).raise_for_status()

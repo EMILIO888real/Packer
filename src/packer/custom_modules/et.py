@@ -431,15 +431,16 @@ def init_logger(program: str, author: str, log_format: str = '[%(levelname)s] %(
 def format_version_text(version: dict) -> str:
     '''Format a version dictionary into a human-readable string.
 
-    Formats a version dictionary into a human-readable string format.
-
-    :param version: Dictionary with keys 'major', 'minor', and 'patch'.
+    :param version: Dictionary with keys 'major', 'minor', 'patch', and 'post'.
     :type version: dict
-    :return: Formatted string in the format "major.minor.patch".
+    :return: Formatted string in the format "major.minor.patch-post".
     :rtype: str
     '''
 
-    return f'{version["major"]}.{version["minor"]}.{version["patch"]}'
+    if version['post'] > 0:
+        return f'{version['major']}.{version['minor']}.{version['patch']}-{version['post']}'
+    else:
+        return f'{version['major']}.{version['minor']}.{version['patch']}'
 
 def create_gofile_folder(folder_name: str, GOFILE_USER_TOKEN: str) -> dict:
     '''Create a folder in the GoFile account root directory.
@@ -585,43 +586,64 @@ def simple_merge_settings(user_settings: dict[str, Any] | None, default_settings
     return merge_settings(normalize_settings_keys(user_settings), default_settings)
 
 def resolve_version(current_version: dict[str, int], version_input: str) -> dict[str, int]:
-    '''Resolve a version bump token or explicit version string.
+    '''Resolve a version bump token or explicit version string, optionally with a post index.
 
-    Resolves a version bump token (x/y/z) or explicit version string (e.g., '1.2.3')
-    into a version dictionary.
+    Resolves a version bump token (x/y/z) or explicit version string (e.g., '1.2.3'
+    or '1.2.3-post1' / '1.2.3-1') into a version dictionary. The returned dictionary
+    will always include the keys 'major', 'minor', 'patch' and 'post' (post defaults to 0).
 
     :param current_version: Current version as dict with keys 'major', 'minor', 'patch'.
     :type current_version: dict[str, int]
     :param version_input: Version bump token ('x'/'y'/'z') or explicit version string.
     :type version_input: str
-    :return: Resolved version as dictionary with keys 'major', 'minor', 'patch'.
+    :return: Resolved version as dictionary with keys 'major', 'minor', 'patch', 'post'.
     :rtype: dict[str, int]
     '''
 
     version = current_version.copy()
     raw_value = version_input.strip()
 
+    # Handle optional post-release suffixes like '-1' or '-post1'
+    post_index = 0
+    if '-' in raw_value:
+        base, suffix = raw_value.split('-', 1)
+        raw_value = base
+        if suffix.startswith('post'):
+            num = suffix[len('post'):]
+        else:
+            num = suffix
+        try:
+            post_index = int(num)
+        except ValueError as exc:
+            raise ValueError('Use either x, y, z or a full version like 0.10.1 or 0.10.1-post1.') from exc
+
     if raw_value.count('.') == 2:
         try:
             major, minor, patch = (int(part) for part in raw_value.split('.'))
         except ValueError as exc:
-            raise ValueError('Use either x, y, z or a full version like 0.10.1.') from exc
+            raise ValueError('Use either x, y, z or a full version like 0.10.1 or 0.10.1-post1.') from exc
 
-        return {'major': major, 'minor': minor, 'patch': patch}
+        return {'major': major, 'minor': minor, 'patch': patch, 'post': post_index}
 
     match raw_value:
         case 'x':
             version['major'] = version['major'] + 1
             version['minor'] = 0
             version['patch'] = 0
+            version['post'] = 0
         case 'y':
             version['minor'] = version['minor'] + 1
             version['patch'] = 0
+            version['post'] = 0
         case 'z':
             version['patch'] = version['patch'] + 1
+            version['post'] = 0
         case _:
-            raise ValueError('Use either x, y, z or a full version like 0.10.1.')
+            raise ValueError('Use either x, y, z or a full version like 0.10.1 or 0.10.1-post1.')
         
+    # Ensure post key is present in the returned dict
+    if 'post' not in version:
+        version['post'] = 0
     return version
 
 def get_folder_size(folder_path: Path, exclusions: tuple[str] = ()) -> int:
