@@ -43,6 +43,7 @@
 ### Fixed
 - Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 
 - Project size comparison has been reversed in `print_and_log` function calls for both project and new versions sizes. 
+- Extraction of latest changelog by replacing end point with `full_changelog.find(f'---')` instead of `full_changelog.find(f'## [{old_version_text}]') - 7`, to not rely on `old_version_text`. 
 
 ---
 

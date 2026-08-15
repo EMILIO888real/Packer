@@ -294,7 +294,7 @@ class Packer():
         with open('CHANGELOG.md') as f:
             full_changelog = f.read()
 
-        latest_changelog = full_changelog[full_changelog.find(f'## [%new_version]') + 27:full_changelog.find(f'## [{old_version_text}]') - 7]
+        latest_changelog = full_changelog[full_changelog.find(f'## [%new_version]') + 27:full_changelog.find(f'---')].strip()
 
 
         self.print_and_log('Getting the latest tag...')
@@ -338,7 +338,7 @@ class Packer():
 
         self.print_and_log('Filtering out empty sections...')
         latest_changelog_start = full_changelog.find(f'## [%new_version]') + 27
-        latest_changelog_end = full_changelog.find(f'## [{old_version_text}]') - 7
+        latest_changelog_end = full_changelog.find(f'---')
         latest_changelog = _filter_empty_changelog_sections(latest_changelog)
 
         self.print_and_log('Stitching full changelog with the updated latest changelog')
