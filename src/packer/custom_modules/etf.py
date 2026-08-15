@@ -888,24 +888,23 @@ def lines_used(text: str, width: int) -> int:
     """
     return sum(max(1, ceil(len(line) / width)) for line in text.splitlines() or [text])
 
-def print_bg_colored_text(text: str, color: list[int]) -> None:
+def print_bg_colored_text(text: str, color: list[int], end: str = '\n', flush: bool = False) -> None:
     """Print text with a colored background.
 
     Prints text with the specified background color and clears appropriately.
 
     :param text: The text to print.
     :type text: str
-    :param red: The red component of the background RGB color (0-255).
-    :type red: int
-    :param green: The green component of the background RGB color (0-255).
-    :type green: int
-    :param blue: The blue component of the background RGB color (0-255).
-    :type blue: int
-    :param terminal_width: The width of the terminal in characters for line wrapping calculation.
-    :type terminal_width: int
+    :param color: The RGB color for the background (list of 3 integers).
+    :type color: list[int]
+    :param end: The string to print at the end (default is newline).
+    :type end: str
+    :param flush: Whether to flush the output buffer (default is False).
+    :type flush: bool
     """
+
     set_background_color(color)
-    print(text)
+    print(text, end=end, flush=flush)
 
 def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str | int = 'y', shorten: set[str] = ('yes', 'no')) -> int | None:
     """Prompt the user with a question and return the selected answer.

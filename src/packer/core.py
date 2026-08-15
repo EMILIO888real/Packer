@@ -1192,7 +1192,7 @@ class Packer():
 
         # setup
         def print_with_background(text):
-            print_bg_colored_text(text, all_settings.stream_background_color)
+            print_bg_colored_text(text, all_settings.stream_background_color, flush=True)
         output_text = print_with_background if all_settings.stream_background_color else print
         done = threading.Event()
 
@@ -1204,7 +1204,7 @@ class Packer():
                 text = text.rstrip('\n')
                 self.log_action(text)
                 if waiting.is_set():
-                    output_text(text)
+                    output_text(text, force=True)
                     clear_lines(lines_used(text, get_terminal_size().columns), clear_formatting=True)
 
             return_code = process.wait()

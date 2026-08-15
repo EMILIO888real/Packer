@@ -1,10 +1,12 @@
 ## [%new_version] - %date
 
 ### Added
+- `flush` and `end` parameters to `print_bg_colored_text`, they are just passed straight to `print` function. 
 
 ### Changed
 
 ### Fixed
+- `_Popen` streamed output to actually output by flushing the input buffer. 
 
 ---
 
