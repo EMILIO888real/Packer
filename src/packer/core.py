@@ -510,13 +510,6 @@ class Packer():
             if not self.pypi_api_token:
                 building_cmd.insert(3, '--wheel')
             building_done = self._Popen(building_cmd, waiting_for_building)
-
-            for pattern in exclusions:
-                if Path('build').match(pattern):
-                    break
-            else:
-                self.print_and_log('Removing build directory...')
-                rmtree('build')
             
             if self.run_pyinstaller:
                 self.print_and_log('Bundling the program using PyInstaller...')
@@ -828,6 +821,13 @@ class Packer():
             
             with open(metadata_path, 'w') as f:
                 dump(metadata, f)
+
+            for pattern in exclusions:
+                if Path('build').match(pattern):
+                    break
+            else:
+                self.print_and_log('Removing build directory created by python package building...')
+                rmtree('build')
             
             self._wait_smooth_output()
         else:
