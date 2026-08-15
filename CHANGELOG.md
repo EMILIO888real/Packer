@@ -13,6 +13,7 @@
 - A step: `Yank the uploaded PyPI release` to `MANUAL_REVERT`, just like in the `revert_changes` method of `Packer`. 
 - `post` index to version numbers. 
 - Support for keeping the current version when no new version input is provided (empty string) in the `resolve_version` function and its callers in `cli.py`, `tui.py`, and `et.py`. 
+- A method call `_process_environments` to the `revert_changes` method to also reject the pending task on GitHub. 
 
 ### Changed
 - Installation section in README. 
@@ -40,6 +41,7 @@
 - `format_version_text` to handle `post` version index if present and add it if not present. 
 - `resolve_version` function to correctly bump version with post index in the mix, adds it if missing, not the previous function `format_version_text`, it skips post if it's 0. 
 - UI implementation of bumping the version to only prompt for a version bump if no post version is present. 
+- `_process_environments` function to be a method of Packer and to also call automatically itself `find_environments` imported function without needing another private method for Packer. 
 
 ### Fixed
 - Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 

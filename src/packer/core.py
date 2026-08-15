@@ -7,11 +7,10 @@ from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
 from subprocess import PIPE, CompletedProcess, Popen, run
 from time import sleep
-from typing import Any, NoReturn, Optional
+from typing import Any, Literal, NoReturn, Optional
 from collections.abc import Callable, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
-from packer.utils import find_environments, process_deployed_environments, upload_package
 from requests import HTTPError, post, exceptions
 from git import GitCommandError, Repo
 import tomlkit
@@ -28,6 +27,7 @@ from packer.custom_modules.et import format_size, format_version_text, get_folde
 from packer.custom_modules.etf import bool_answer, clear_lines, lines_used, simple_prompt_retries, print_bg_colored_text, print_colored_text, print_with_delay
 from packer.config import all_settings, Project, packer_version, send_notification, ollama_available
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
+from packer.utils import find_environments, process_deployed_environments, upload_package
 
 
 def _filter_empty_changelog_sections(changelog: str) -> str:
@@ -711,32 +711,14 @@ class Packer():
                 self.print_and_log('Switching to existing development branch...')
                 self.git_repo.heads['development'].checkout()
 
-            if not self.pypi_api_token:
+            if not self.pypi_api_token and self.environment_name and self.workflow_filename:
                 publish_to_pypi = self.prompt_user('publish to PyPI')
                 self.print_and_log('getting workflow and run id...')
-                workflow = self.repo.get_workflow(self.workflow_filename)
-                run_id = next(iter(workflow.get_runs())).id
+                self.workflow = self.repo.get_workflow(self.workflow_filename)
+                self.run_id = next(iter(self.workflow.get_runs())).id
 
                 self.print_and_log('getting environment id and processing it...')
-
-                @retry(
-                    stop=stop_after_attempt(3),
-                    wait=wait_exponential(multiplier=1, min=2, max=10),
-                    retry=retry_if_exception_type(HTTPError)
-                )
-                def _find_environments():
-                    return find_environments(self.GITHUB_REPO_TOKEN, self.github_repo_url, run_id, self.environment_name)
-                environment_id = _find_environments()
-
-                @retry(
-                    stop=stop_after_attempt(3),
-                    wait=wait_exponential(multiplier=1, min=2, max=10),
-                    retry=retry_if_exception_type(HTTPError)
-                )
-                def _process_environments():
-                    return process_deployed_environments(self.GITHUB_REPO_TOKEN, self.github_repo_url, run_id, environment_id, 'approved' if publish_to_pypi else 'rejected')
-                _process_environments()
-
+                self._process_environments('approved' if publish_to_pypi else 'rejected', 'Approved through Packer by user' if publish_to_pypi else 'Rejected through Packer by user')
 
                 if publish_to_pypi:
                     self.published_to_pypi = True
@@ -910,6 +892,9 @@ class Packer():
             self.print_and_log(f'Committing the version bump to {new_version} after failed release...')
             self.git_repo.index.add(['pyproject.toml'])
             self.git_commit('Bumped version after failed release')
+        else:
+            if self.environment_name and self.workflow_filename:
+                self._process_environments('rejected', 'Rejected through Packer\'s revert changes method')
 
         if wait:
             self._wait_smooth_output()
@@ -938,6 +923,14 @@ class Packer():
                 self.print_and_log(f'Something went wrong while committing: {e}', [255, 0, 0], 40)
                 self.revert_changes()
                 return False
+
+    @retry(
+        stop=stop_after_attempt(3),
+        wait=wait_exponential(multiplier=1, min=2, max=10),
+        retry=retry_if_exception_type(HTTPError)
+    )
+    def _process_environments(self, state: Literal['approved', 'rejected'] = 'approved', comment: str = 'Approved through Packer'):
+        process_deployed_environments(self.GITHUB_REPO_TOKEN, self.github_repo_url, self.run_id, find_environments(self.GITHUB_REPO_TOKEN, self.github_repo_url, self.run_id, self.environment_name), state, comment)
         
     def _exit(self, code: int = None, wait: bool = True):
         if wait:

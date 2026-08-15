@@ -236,7 +236,7 @@ def find_environments(github_repo_token: str, github_repo_url: str, run_id: int,
     :param environment_name: The name of the environment to retrieve the ID for (default is "pypi-production")
     :type environment_name: str
 
-    :return: The ID of the environment with the name "pypi-production"
+    :return: The ID of the environment with the provided environment name
     :rtype: int
 
     :raises requests.exceptions.HTTPError: If the request to the GitHub API fails
@@ -279,7 +279,7 @@ def process_deployed_environments(github_repo_token: str, github_repo_url: str, 
     '''
 
     post(
-        f'https://api.github.com/repos/{github_repo_url: str}'
+        f'https://api.github.com/repos/{github_repo_url}'
         f'/actions/runs/{run_id}/pending_deployments',
         headers={
             'Authorization': f'Bearer {github_repo_token}',
