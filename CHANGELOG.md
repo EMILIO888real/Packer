@@ -1,55 +1,55 @@
-## [%new_version] - %date
+## [0.24.0-1] - 2026-08-15
 
 ### Added
-- Requirements section in the README. 
-- `$pypi_program_name` as another key available for you release template, also used in the default. 
-- An `ollama_available` variable to check if Ollama is available on PATH. 
-- An option to disable all general AI features in packer in global settings in case the user doesn't want to use any of them. 
-- Trusted publishing for Packer releases for PyPI through GitHub actions with publish.yaml, which now handles building and uploading to PyPI safely, old method is still available and Packer still builds the wheel file for the GitHub release. 
-- A basic Security policy via Security.md in the project root. 
-- Removal of 'build' directory unless excluded in exclusions. 
-- `git_commit` a helper method to `Packer` to easily make commits by trying signed first and if that fails then unsigned. 
-- Confirm/cancel prompt for PyPI upload when using GitHub for trusted publishing instead of `Packer`. 
-- A step: `Yank the uploaded PyPI release` to `MANUAL_REVERT`, just like in the `revert_changes` method of `Packer`. 
-- `post` index to version numbers. 
-- Support for keeping the current version when no new version input is provided (empty string) in the `resolve_version` function and its callers in `cli.py`, `tui.py`, and `et.py`. 
-- A method call `_process_environments` to the `revert_changes` method to also reject the pending task on GitHub. 
+- [3cd1f5f] Requirements section in the README. 
+- [1712c6c] `$pypi_program_name` as another key available for you release template, also used in the default. 
+- [c0f2b33] An `ollama_available` variable to check if Ollama is available on PATH. 
+- [c0f2b33] An option to disable all general AI features in packer in global settings in case the user doesn't want to use any of them. 
+- [a135d6c] Trusted publishing for Packer releases for PyPI through GitHub actions with publish.yaml, which now handles building and uploading to PyPI safely, old method is still available and Packer still builds the wheel file for the GitHub release. 
+- [118ae06] A basic Security policy via Security.md in the project root. 
+- [4186f12] Removal of 'build' directory unless excluded in exclusions. 
+- [b9e88ab] `git_commit` a helper method to `Packer` to easily make commits by trying signed first and if that fails then unsigned. 
+- [b9e88ab] Confirm/cancel prompt for PyPI upload when using GitHub for trusted publishing instead of `Packer`. 
+- [b9e88ab] A step: `Yank the uploaded PyPI release` to `MANUAL_REVERT`, just like in the `revert_changes` method of `Packer`. 
+- [b9e88ab] `post` index to version numbers. 
+- [36ffe0e] Support for keeping the current version when no new version input is provided (empty string) in the `resolve_version` function and its callers in `cli.py`, `tui.py`, and `et.py`. 
+- [efbb24c] A method call `_process_environments` to the `revert_changes` method to also reject the pending task on GitHub.
 
 ### Changed
-- Installation section in README. 
-- Usage section in README. 
-- Other various sections like features, Honorable mentions in the README. 
-- Updated CLI documentation to the latest implementation. 
-- Updated project settings documentation to the latest implementation. 
-- Removed the typical release template in PROJECT.md, instead the user can check out the default template. 
-- Updated Packer settings documentation to the latest implementation. 
-- Updated Doctype for Settings object and the module itself config.py to the latest implementation. 
-- The name of the archive created by Packer of your software from "$program_name x.y.z.zip" to "$program_name-x.y.z.zip" and saved it as a variable. 
-- The default release template's installation section to be much simpler and include PyPI as a another method. 
-- Version bump token or the prompt for which version to bump up to from "M, m, p" to "x, y, z". 
-- Doctype of the Packer class to the latest implementation. 
-- Removed tips section in the default release template RELEASE.md. 
-- Updated ROADMAP.md to state that I will try to write it when Packer comes closer to releasing. 
-- Added mention of the 3 main interfaces that will be available in Packer later, GUI (pygame), TUI (textual), CLI (primary). 
-- Rearrange config.py a little around, so it's a little easier to use. 
-- All file links in all of the documentation, mostly just README to link to GitHub hosted file location instead of local files, so that other platforms like PyPI can correctly link them. 
-- Removed extra notes section in the README about Packer's integration with GoFile, GitHub, and Nuitka. 
-- Replaced the config section with a much more useful setup section, that explains Packer's new project setup. 
-- Introduced an environment variable `pypi-production` in the "publish" workflow, which will pause the workflow execution requiring approval before continuing. 
-- `wait_smooth_output` `Packer` method call for `_Popen` method to be called before setting the wait flag for commands, so they can freely output instead of calling the method inside the _Popen method. 
-- Moved all kinds of cleaning and post release tasks to happen after prompting the user to revert if necessary, instead of right before it. 
-- `format_version_text` to handle `post` version index if present and add it if not present. 
-- `resolve_version` function to correctly bump version with post index in the mix, adds it if missing, not the previous function `format_version_text`, it skips post if it's 0. 
-- UI implementation of bumping the version to only prompt for a version bump if no post version is present. 
-- `_process_environments` function to be a method of Packer and to also call automatically itself `find_environments` imported function without needing another private method for Packer. 
+- [3cd1f5f] Installation section in README. 
+- [3cd1f5f] Usage section in README. 
+- [3cd1f5f] Other various sections like features, Honorable mentions in the README. 
+- [3cd1f5f] Updated CLI documentation to the latest implementation. 
+- [3cd1f5f] Updated project settings documentation to the latest implementation. 
+- [3cd1f5f] Removed the typical release template in PROJECT.md, instead the user can check out the default template. 
+- [3cd1f5f] Updated Packer settings documentation to the latest implementation. 
+- [3cd1f5f] Updated Doctype for Settings object and the module itself config.py to the latest implementation. 
+- [3cd1f5f] The name of the archive created by Packer of your software from "$program_name x.y.z.zip" to "$program_name-x.y.z.zip" and saved it as a variable. 
+- [3cd1f5f] The default release template's installation section to be much simpler and include PyPI as a another method. 
+- [3cd1f5f] Version bump token or the prompt for which version to bump up to from "M, m, p" to "x, y, z". 
+- [3cd1f5f] Doctype of the Packer class to the latest implementation. 
+- [3cd1f5f] Removed tips section in the default release template RELEASE.md. 
+- [3cd1f5f] Updated ROADMAP.md to state that I will try to write it when Packer comes closer to releasing. 
+- [3cd1f5f] Added mention of the 3 main interfaces that will be available in Packer later, GUI (pygame), TUI (textual), CLI (primary). 
+- [c0f2b33] Rearrange config.py a little around, so it's a little easier to use. 
+- [4f8f7a9] All file links in all of the documentation, mostly just README to link to GitHub hosted file location instead of local files, so that other platforms like PyPI can correctly link them. 
+- [85b36b9] Removed extra notes section in the README about Packer's integration with GoFile, GitHub, and Nuitka. 
+- [6c2f1dd] Replaced the config section with a much more useful setup section, that explains Packer's new project setup. 
+- [cb77721] Introduced an environment variable `pypi-production` in the "publish" workflow, which will pause the workflow execution requiring approval before continuing. 
+- [b9e88ab] `wait_smooth_output` `Packer` method call for `_Popen` method to be called before setting the wait flag for commands, so they can freely output instead of calling the method inside the _Popen method. 
+- [b9e88ab] Moved all kinds of cleaning and post release tasks to happen after prompting the user to revert if necessary, instead of right before it. 
+- [b9e88ab] `format_version_text` to handle `post` version index if present and add it if not present. 
+- [b9e88ab] `resolve_version` function to correctly bump version with post index in the mix, adds it if missing, not the previous function `format_version_text`, it skips post if it's 0. 
+- [b9e88ab] UI implementation of bumping the version to only prompt for a version bump if no post version is present. 
+- [efbb24c] `_process_environments` function to be a method of Packer and to also call automatically itself `find_environments` imported function without needing another private method for Packer.
 
 ### Fixed
-- Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 
-- Project size comparison has been reversed in `print_and_log` function calls for both project and new versions sizes. 
+- [e63f601] Made `pypi_api_token` an optional field to the Project class in `src/packer/config.py`. This change makes the field nullable by assigning a default value of `None`. 
+- [ad87fb6] Project size comparison has been reversed in `print_and_log` function calls for both project and new versions sizes. 
 - Extraction of latest changelog by replacing end point with `full_changelog.find(
-- Changelog adding git hashes logic to use a helper function `_insert_hash_into_category` with pattern matching instead of the previous fragile approach. 
-- Moved the block of code for removing the build directory from the projects directory to post clean up. 
-- Instead of calling .json method on the requests module, now it gets called on the response instead. f'---')` instead of `full_changelog.find(f'## [{old_version_text}]') - 7`, to not rely on `old_version_text`. 
+- [ee611b6] Changelog adding git hashes logic to use a helper function `_insert_hash_into_category` with pattern matching instead of the previous fragile approach. 
+- [e968d2a] Moved the block of code for removing the build directory from the projects directory to post clean up. 
+- [70d7c0c] Instead of calling .json method on the requests module, now it gets called on the response instead. f'---')` instead of `full_changelog.find(f'## [{old_version_text}]') - 7`, to not rely on `old_version_text`. 
 
 ---
 
