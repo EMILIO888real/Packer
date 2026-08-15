@@ -5,7 +5,7 @@ from subprocess import run
 from sys import platform
 from base64 import urlsafe_b64encode
 from typing import Literal
-import requests
+from requests import exceptions, get, post
 from twine.commands.upload import upload
 from twine.settings import Settings
 from twine.exceptions import NonInteractive
@@ -219,7 +219,7 @@ def upload_package(output_dir: str | Path = 'dist', repository: str = 'pypi', ap
         upload(settings, dist_files)
     except NonInteractive as e:
         return str(e)
-    except requests.exceptions.HTTPError as e:
+    except exceptions.HTTPError as e:
         return e.response.text
 
 
@@ -242,7 +242,7 @@ def find_environments(github_repo_token: str, github_repo_url: str, run_id: int,
     :raises requests.exceptions.HTTPError: If the request to the GitHub API fails
     '''
 
-    response = requests.get(
+    response = get(
         f'https://api.github.com/repos/{github_repo_url}'
         f'/actions/runs/{run_id}/pending_deployments',
         headers={
@@ -252,7 +252,7 @@ def find_environments(github_repo_token: str, github_repo_url: str, run_id: int,
     )
     response.raise_for_status()
 
-    deployments = requests.json()
+    deployments = response.json()
 
     environment = next(
         deployment
@@ -278,7 +278,7 @@ def process_deployed_environments(github_repo_token: str, github_repo_url: str, 
     :raises requests.exceptions.HTTPError: If the request to the GitHub API fails
     '''
 
-    requests.post(
+    post(
         f'https://api.github.com/repos/{github_repo_url: str}'
         f'/actions/runs/{run_id}/pending_deployments',
         headers={
