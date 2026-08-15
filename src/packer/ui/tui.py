@@ -128,14 +128,11 @@ def main() -> tuple[str, Project]:
     with open(f'{project_directory}/src/{Path(project_directory).name}/assets/version.json') as f:
         current_version = load(f)
 
-    if current_version['post'] > 0:
-        next_version = current_version
-    else:
-        try:
-            next_version = resolve_version(current_version, stripped_input('New version(x, y, z): '))
-        except ValueError as exc:
-            print(f'Invalid version input: {exc}')
-            exit(1)
+    try:
+        next_version = resolve_version(current_version, stripped_input('New version(x, y, z): '))
+    except ValueError as exc:
+        print(f'Invalid version input: {exc}')
+        exit(1)
         
 
     actions.run(next_version, project_directory, Project(**normalize_settings_keys(projects_configurations.get_w_tui()[project_directory])))

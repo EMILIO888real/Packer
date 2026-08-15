@@ -588,9 +588,10 @@ def simple_merge_settings(user_settings: dict[str, Any] | None, default_settings
 def resolve_version(current_version: dict[str, int], version_input: str) -> dict[str, int]:
     '''Resolve a version bump token or explicit version string, optionally with a post index.
 
-    Resolves a version bump token (x/y/z) or explicit version string (e.g., '1.2.3'
-    or '1.2.3-post1' / '1.2.3-1') into a version dictionary. The returned dictionary
-    will always include the keys 'major', 'minor', 'patch' and 'post' (post defaults to 0).
+    Resolves a version bump token (x/y/z), an empty string ('' to keep the current
+    version), or an explicit version string (e.g., '1.2.3' or '1.2.3-post1' /
+    '1.2.3-1') into a version dictionary. The returned dictionary will always include
+    the keys 'major', 'minor', 'patch' and 'post' (post defaults to 0).
 
     :param current_version: Current version as dict with keys 'major', 'minor', 'patch'.
     :type current_version: dict[str, int]
@@ -615,13 +616,13 @@ def resolve_version(current_version: dict[str, int], version_input: str) -> dict
         try:
             post_index = int(num)
         except ValueError as exc:
-            raise ValueError('Use either x, y, z or a full version like 0.10.1 or 0.10.1-post1.') from exc
+            raise ValueError("Use either x, y, z, an empty string ('') to keep the current version, or a full version like 0.10.1 or 0.10.1-post1.") from exc
 
     if raw_value.count('.') == 2:
         try:
             major, minor, patch = (int(part) for part in raw_value.split('.'))
         except ValueError as exc:
-            raise ValueError('Use either x, y, z or a full version like 0.10.1 or 0.10.1-post1.') from exc
+            raise ValueError("Use either x, y, z, an empty string ('') to keep the current version, or a full version like 0.10.1 or 0.10.1-post1.") from exc
 
         return {'major': major, 'minor': minor, 'patch': patch, 'post': post_index}
 
@@ -638,8 +639,10 @@ def resolve_version(current_version: dict[str, int], version_input: str) -> dict
         case 'z':
             version['patch'] = version['patch'] + 1
             version['post'] = 0
+        case '':
+            pass
         case _:
-            raise ValueError('Use either x, y, z or a full version like 0.10.1 or 0.10.1-post1.')
+            raise ValueError("Use either x, y, z, an empty string ('') to keep the current version, or a full version like 0.10.1 or 0.10.1-post1.")
         
     # Ensure post key is present in the returned dict
     if 'post' not in version:

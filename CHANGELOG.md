@@ -12,6 +12,7 @@
 - Confirm/cancel prompt for PyPI upload when using GitHub for trusted publishing instead of `Packer`. 
 - A step: `Yank the uploaded PyPI release` to `MANUAL_REVERT`, just like in the `revert_changes` method of `Packer`. 
 - `post` index to version numbers. 
+- Support for keeping the current version when no new version input is provided (empty string) in the `resolve_version` function and its callers in `cli.py`, `tui.py`, and `et.py`. 
 
 ### Changed
 - Installation section in README. 
