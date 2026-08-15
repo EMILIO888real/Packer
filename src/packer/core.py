@@ -1,7 +1,7 @@
 from pathlib import Path
 from datetime import datetime
 from multiprocessing import Queue
-from re import MULTILINE, compile
+from re import MULTILINE, compile, escape
 from shutil import get_terminal_size, rmtree, make_archive
 from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
@@ -309,9 +309,14 @@ class Packer():
             ))
 
             self.print_and_log('Identifying changelog categories...')
-            added_category = f'{full_changelog[full_changelog.find('### Added') + 10: full_changelog.find('### Changed') - 2]}'
-            changed_category = f'{full_changelog[full_changelog.find('### Changed') + 12: full_changelog.find('### Fixed') - 2]}'
-            fixed_category = f'{full_changelog[full_changelog.find('### Fixed') + 10: full_changelog.find('---') - 2]}'
+            added_category = f'{full_changelog[full_changelog.find('### Added') + 9: full_changelog.find('### Changed')].strip()}'
+            changed_category = f'{full_changelog[full_changelog.find('### Changed') + 11: full_changelog.find('### Fixed')].strip()}'
+            fixed_category = f'{full_changelog[full_changelog.find('### Fixed') + 9: full_changelog.find('---')].strip()}'
+
+            # helper to insert hash into the first matching list item "- <text>" using a regex
+            def _insert_hash_into_category(category: str, text: str, short_hash: str) -> str:
+                pattern = compile(rf'^[ \t]*-[ \t]+' + escape(text), MULTILINE)
+                return pattern.subn(f'- [{short_hash}] {text}', category, count=1)[0]
 
             self.print_and_log('Parsing and updating changelog entries...')
             for commit in new_versions_commits:
@@ -320,14 +325,11 @@ class Packer():
                 for data in data_list:
                     match data['category']:
                         case 'Added':
-                            commit_sha_location = added_category.find(data['text'])
-                            added_category = f'{added_category[: commit_sha_location - 1]} [{data['hash']}] {added_category[commit_sha_location: ]}'
+                            added_category = _insert_hash_into_category(added_category, data['text'], data['hash'])
                         case 'Changed':
-                            commit_sha_location = changed_category.find(data['text'])
-                            changed_category = f'{changed_category[: commit_sha_location - 1]} [{data['hash']}] {changed_category[commit_sha_location: ]}'
+                            changed_category = _insert_hash_into_category(changed_category, data['text'], data['hash'])
                         case 'Fixed':
-                            commit_sha_location = fixed_category.find(data['text'])
-                            fixed_category = f'{fixed_category[: commit_sha_location - 1]} [{data['hash']}] {fixed_category[commit_sha_location: ]}'
+                            fixed_category = _insert_hash_into_category(fixed_category, data['text'], data['hash'])
 
             self.print_and_log('Updating the latest changelog...')
             latest_changelog = (
