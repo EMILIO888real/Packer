@@ -4,10 +4,13 @@
 - `flush` and `end` parameters to `print_bg_colored_text`, they are just passed straight to `print` function. 
 
 ### Changed
+- Prettified by adding a ton of colors in various random output for variables for the most part. 
+- `+` character before output the net size change if it's positive. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 
 - Replaced the flimsy check for rejecting the GitHub workflow through Packer automatically via the `revert_changes` method to instead check if `Packer` has an attribute `run_id`, no need to check if it's valid just in case the id is 0, if it's present we good. 
+- Various `print_and_log` function calls to correctly pass the log level to the parameter instead of passing it to the color parameter. 
 
 ---
 

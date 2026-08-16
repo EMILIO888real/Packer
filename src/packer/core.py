@@ -269,7 +269,7 @@ class Packer():
     def run(self):
         '''Runs the packer, which creates an archive of the program, uploads it to Gofile, updates the git directory, and publishes a new release on Github. If any error is encountered it reverts all changes back to the previous version.'''
 
-        self.print_and_log('Starting packer...')
+        self.print_and_log('Starting packer...', [0, 255, 0])
 
         self.print_and_log('Updating Github origin URL with PAT...')
 
@@ -439,7 +439,7 @@ class Packer():
 
 
         if Path(f'{self.cache_dir}/{self.program_name}-{old_version_text}.zip').exists():
-            self.print_and_log('Removing old archive...')
+            self.print_and_log('Removing old archive...', [0, 255, 0])
             remove(f'{self.cache_dir}/{self.program_name}-{old_version_text}.zip')
 
 
@@ -463,18 +463,23 @@ class Packer():
             latest_tag_commit = latest_tag.commit
             current_commit = self.git_repo.head.commit
 
-            self.print_and_log(f'Comparing current HEAD ({current_commit.hexsha[:7]}) against latest tag: {latest_tag.name} ({latest_tag_commit.hexsha[:7]})')
+            self.print_and_log(f'Comparing current HEAD', end=' ')
+            self.print_and_log(f'({current_commit.hexsha[:7]})', [0, 0, 255], end=' ')
+            self.print_and_log(f'against the latest tag', end=' ')
+            self.print_and_log(latest_tag.name, [0, 0, 255], end=' ')
+            self.print_and_log(f'({latest_tag_commit.hexsha[:7]})', [0, 0, 255])
+
             diffs = latest_tag_commit.diff(current_commit)
 
             for diff in diffs:
                 if diff.new_file:
-                    self.print_and_log(f'ADDED:    {diff.b_path}')
+                    self.print_and_log(f'ADDED:    {diff.b_path}', [255, 255, 0])
                 elif diff.deleted_file:
-                    self.print_and_log(f'REMOVED:  {diff.a_path}')
+                    self.print_and_log(f'REMOVED:  {diff.a_path}', [255, 255, 0])
                 else:
                     self.print_and_log(f'MODIFIED: {diff.a_path}')
         else:
-            self.print_and_log('No git tags found. Skipping file changes to latest version...')
+            self.print_and_log('No git tags found. Skipping file changes to latest version...', [255, 255, 0], 30)
 
 
         with open(metadata_path) as f:
@@ -487,16 +492,23 @@ class Packer():
         if current_project_metadata:
             project_latest_size: int = current_project_metadata.get('project size')
             if project_latest_size:
-                self.print_and_log(f'Project size change: {format_size(project_size - project_latest_size)}')
+                project_size_change = project_size - project_latest_size
+                self.print_and_log('Project size change:', end=' +' if project_size_change > 0 else ' ')
+                self.print_and_log(format_size(project_size_change), [162, 148, 187])
             last_versions_size: int = current_project_metadata.get('version size')
             if last_versions_size:
-                self.print_and_log(f'New versions size change: {format_size(version_size - last_versions_size)}')
+                versions_size_change = version_size - last_versions_size
+                self.print_and_log(f'New versions size change:', end=' +' if versions_size_change > 0 else ' ')
+                self.print_and_log(format_size(versions_size_change), [162, 148, 187])
 
-        self.print_and_log(f'Full project size with exclusions: {format_size(project_size)}')
-        self.print_and_log(f'New version\'s size: {format_size(version_size)}')
+        self.print_and_log(f'Full project size with exclusions:', end=' ')
+        self.print_and_log(format_size(project_size), [162, 148, 187])
+        self.print_and_log(f'New version\'s size:', end=' ')
+        self.print_and_log(format_size(version_size), [162, 148, 187])
 
 
-        self.print_and_log(f'Archive saved at: {self.cache_dir}/{self.program_name}-{self.version}.zip')
+        self.print_and_log(f'Archive saved at:', end=' ')
+        self.print_and_log(str(self.program_archive_path), [255, 105, 180])
         if self.prompt_user('Is the arhive all good (no going back after this)'):
 
             if self.compile_command:
@@ -617,7 +629,7 @@ class Packer():
                     self.repo.get_commit(sha)
                     break
                 except UnknownObjectException:
-                    self.print_and_log('Waiting...')
+                    self.print_and_log('Waiting for 1 second for Github to process the push...')
                     sleep(1)
             
             self.print_and_log('Publishing a new release on GitHub...')
@@ -627,8 +639,10 @@ class Packer():
             while retry_release:
                 try:
                     if retry_release_count > 3:
-                        self.print_and_log(f'Failed to create a release on GitHub after {retry_release_count} attempts', 30)
-                        self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no', 30)
+                        self.print_and_log(f'Failed to create a release on GitHub after', [255, 0, 0], 30, ' ')
+                        self.print_and_log(str(retry_release_count), [0, 0, 255], 30, ' ')
+                        self.print_and_log('unsuccessful attempts the release has been paused', level=30)
+                        self.print_and_log('You can attempt to resolve the problem right now, once done enter yes, if you wish to quit enter no', level=30)
                         if not self.prompt_user('Has the problem been resolved'):
                             self.revert_changes()
                     self.git_release = self.repo.create_git_release(tag=self.version, name=f'v{self.version} - {version_title}',
@@ -726,7 +740,9 @@ class Packer():
                     self.revert_changes()
 
 
-            self.print_and_log(f'New version released: {self.version} Hooray! \U0001F386')
+            self.print_and_log('New version released:', [0, 255, 0], end=' ')
+            self.print_and_log(self.version, [149, 193, 148], end=' ')
+            self.print_and_log('Hooray! \U0001F386', [0, 255, 0])
             if all_settings.desktop_notifications:
                 send_notification('New version released!', f'Version {self.version} has been released successfully!')
 
@@ -735,11 +751,16 @@ class Packer():
                 open_new_tab(release_url)
             if all_settings.copy_github_release_clipboard:
                 copy(release_url)
-                self.print_and_log('Copied GitHub release URL to clipboard')
+                self.print_and_log('Copied GitHub release URL to clipboard', [0, 255, 0])
             else:
-                self.print_and_log(f'Github release: {release_url}')
-            self.print_and_log(f'Social media post text has been saved to {data_dir}/social media post.md. You can use it to announce the new version on social media platforms!')
-            self.print_and_log(f'Log file has been saved to: {str(log_path.absolute())}')
+                self.print_and_log(f'Github release URL:', end=' ')
+                self.print_and_log(release_url, [255, 105, 180])
+            self.print_and_log(f'Social media post text has been saved to', end=' ')
+            self.print_and_log(f'{data_dir}/social media post.md', [255, 105, 180], end=' ')
+            self.print_and_log('You can use it to post on social media platforms')
+            self.print_and_log(f'Log file has been saved to:', end=' ')
+            self.print_and_log(str(log_path.absolute()), [255, 105, 180], end=' ')
+            self.print_and_log('You can use it to check for any errors or warnings that occurred during the release process')
 
             if self.prompt_user('Do you want to revert', 'n'):
                 self.revert_changes()
@@ -751,11 +772,15 @@ class Packer():
             rmtree(f'{self.cache_dir}/dist')
         
             if all_settings.auto_clear_cache and get_folder_size(Path(self.cache_dir)) > all_settings.cache_size_threshold:
-                self.print_and_log(f'Deleting cache folder, over threshold [{format_size(all_settings.cache_size_threshold)}]...')
+                self.print_and_log(f'Deleting cache folder, over threshold', end=' [')
+                self.print_and_log(format_size(all_settings.cache_size_threshold), [0, 0, 255], end='')
+                self.print_and_log('] ...')
                 rmtree(self.cache_dir)
         
             if all_settings.auto_clear_logs and get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
-                self.print_and_log(f'Cleaning logs folder, over threshold: [{format_size(all_settings.logs_size_threshold)}]...')
+                self.print_and_log(f'Deleting log files, over threshold', end=' [')
+                self.print_and_log(format_size(all_settings.logs_size_threshold), [0, 0, 255], end='')
+                self.print_and_log('] ...')
         
                 def _get_timestamp(file: str) -> datetime:
                     if 'error report' in file:
@@ -770,7 +795,7 @@ class Packer():
                 while get_folder_size(Path(log_dir)) > all_settings.logs_size_threshold:
                     file = files.pop(0)
                     remove(f'{log_dir}/{file}')
-                    self.print_and_log(f'Removed {file}')
+                    self.print_and_log(f'Removed {file}', [0, 255, 0])
         
             if self.compile_command != None:
                 rmtree(f'{self.cache_dir}/main.dist')
@@ -889,7 +914,9 @@ class Packer():
             with open('pyproject.toml', 'w', encoding='utf-8') as f:
                 tomlkit.dump(pyproject_config, f)
 
-            self.print_and_log(f'Committing the version bump to {new_version} after failed release...')
+            self.print_and_log(f'Committing the version bump to', end=' ')
+            self.print_and_log(new_version, [0, 0, 255], end=' ')
+            self.print_and_log('after failed release...')
             self.git_repo.index.add(['pyproject.toml'])
             self.git_commit('Bumped version after failed release')
         else:
@@ -916,7 +943,7 @@ class Packer():
             return True
         except GitCommandError:
             try:
-                    self.print_and_log('Fallback to unsigned commit...', 30)
+                    self.print_and_log('Fallback to unsigned commit...', [255, 255, 0], 30)
                     self.git_repo.git.commit('-m', commit_message)
                     return True
             except GitCommandError as e:
@@ -973,7 +1000,9 @@ class Packer():
         :type commit_count: int
         '''
 
-        self.print_and_log(f'Reverting HEAD {commit_count} commits back...')
+        self.print_and_log(f'Reverting HEAD', end=' ')
+        self.print_and_log(f'{commit_count}', [0, 0, 255], end=' ')
+        self.print_and_log(f'commit(s) back...')
         self.git_repo.head.reset(commit=f'HEAD~{commit_count}', working_tree=True)
         self.git_repo.remotes.origin.push(force=True) # In case we pushed it to github already!
 
