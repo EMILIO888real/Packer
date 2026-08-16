@@ -177,10 +177,10 @@ A minimal project should look like this:
 my-project/
 ├── src/
 │   └── my_project/
-├── assets/
-│   ├── version.json
-│   ├── integrity.json
-│   └── RELEASE.md   # optional template used at runtime; not a normal project file you should keep in source control
+|		└── assets/
+│   		├── version.json
+│   		├── integrity.json
+│   		└── RELEASE.md   # optional template used at runtime; not a normal project file you should keep in source control
 ├── CHANGELOG.md
 ├── README.md
 └── pyproject.toml
