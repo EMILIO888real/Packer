@@ -7,6 +7,7 @@
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 
+- Replaced the flimsy check for rejecting the GitHub workflow through Packer automatically via the `revert_changes` method to instead check if `Packer` has an attribute `run_id`, no need to check if it's valid just in case the id is 0, if it's present we good. 
 
 ---
 

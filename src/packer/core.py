@@ -893,7 +893,7 @@ class Packer():
             self.git_repo.index.add(['pyproject.toml'])
             self.git_commit('Bumped version after failed release')
         else:
-            if self.environment_name and self.workflow_filename:
+            if hasattr(self, 'run_id'):
                 self._process_environments('rejected', 'Rejected through Packer\'s revert changes method')
 
         if wait:
