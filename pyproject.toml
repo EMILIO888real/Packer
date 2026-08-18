@@ -26,7 +26,8 @@ dependencies = [
     "tdqm",
     "build",
     "twine",
-    "tenacity"
+    "tenacity",
+    "pyfiglet"
 ]
 
 [tool.setuptools]

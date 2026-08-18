@@ -2,10 +2,14 @@
 
 ### Added
 - `flush` and `end` parameters to `print_bg_colored_text`, they are just passed straight to `print` function. 
+- Color pallets to config.py, for some nice color combinations that can simply be imported. 
+- A few more flags to control the newly changed `--version` flag, like `--static`, `--version-font`, `--version-color`. 
 
 ### Changed
 - Prettified by adding a ton of colors in various random output for variables for the most part. 
 - `+` character before output the net size change if it's positive. 
+- Version flag to look much nicer. 
+- `--version` flag in the `run` command to now just be `--new-version`, `-n` instead of the `--version`, since they were conflicting, which might be confusing. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 

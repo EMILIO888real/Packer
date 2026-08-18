@@ -1,29 +1,84 @@
 from argparse import ArgumentParser
 from collections.abc import Callable
+from datetime import datetime, timedelta
+from itertools import cycle
 from json import dump, load
 from os import mkdir
 from pathlib import Path
 from pprint import pprint
+from random import choice, randint
 from shutil import rmtree, which
 import sys
 from subprocess import run
-from textwrap import dedent
+from time import sleep
+from typing import Literal
 from github import Github
 import ollama
 from pydantic import ValidationError
+from pyfiglet import FigletFont, figlet_format
 from pyzipper import WZ_AES, ZIP_DEFLATED, AESZipFile
 from argcomplete import autocomplete
 from getpass import getuser
 
 from packer import actions
 from packer.custom_modules.et import resolve_version, normalize_settings_keys, get_folder_size, format_size
-from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
+from packer.custom_modules.etf import clear_lines, print_colored_text, simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
 from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir, metadata_path
-from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings, all_settings_status, ollama_available
+from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings, all_settings_status, ollama_available, color_pallets, nice_fonts
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
 from packer.utils import track_model_pull, TqdmProgressRenderer
+
+def _draw_frame(lines: list[str], colors: cycle):
+    print_colored_text(lines[0], next(colors), end='\t')
+    print('Packer version:', end=' ')
+    print_colored_text(packer_version, [0, 0, 255])
+    print_colored_text(lines[1], next(colors), end='\t')
+    print('Developed by', end=' ')
+    print_colored_text('EMILIO', [0, 0, 255])
+    print_colored_text(lines[2], next(colors), end='\t')
+    print('Project is under the', end=' ')
+    print_colored_text('MIT License', [0, 0, 255])
+    print_colored_text(f'{lines[3]}', next(colors), end='\t')
+    print_colored_text('https://github.com/EMILIO888real/Packer', [255, 105, 180])
+    for line in lines[4:]:
+        print_colored_text(line, next(colors))
+
+def _get_text_and_colors(font: str, all_colors: list[list[list[int]]] | list[list[int]]| str) -> tuple[list[str], cycle]:
+    if type(all_colors) == str:
+        colors = choice(color_pallets) if all_colors == 'nice-random' else [[randint(0, 255) for _ in range(3)] for _ in range(0, randint(5, 10))]
+    else:
+        colors = all_colors
+
+    if font in ('nice-random', 'random'):
+        text = figlet_format('Packer', choice(nice_fonts) if font == 'nice-random' else choice(FigletFont.getFonts()))
+    else:
+        text = figlet_format('Packer', font)
+
+    lines = text.splitlines()
+
+    if len(colors) == len(lines):
+        colors.pop()
+
+    return (lines, cycle(colors))
+
+def version_animation(static: bool = False, font: str | Literal['nice-random', 'random'] = 'nice-random', all_color: Literal['nice-random', 'random'] | list[list[list[int]]] = 'nice-random'):
+    try:
+        if static:
+            _draw_frame(*_get_text_and_colors(font, all_color))
+        else:
+            while True:
+                lines, colors = _get_text_and_colors(font, all_color)
+                lines_amount = len(lines)
+
+                finish_time = datetime.now() + timedelta(seconds=2)
+                while datetime.now() < finish_time:
+                    _draw_frame(lines, colors)
+                    sleep(0.1)
+                    clear_lines(lines_amount)
+    except KeyboardInterrupt:
+        pass
 
 def _clear_path(path: str | Path) -> None:
     path = Path(path)
@@ -58,6 +113,9 @@ def main():
 
     parser.add_argument('-p', '--paths', action='store_true', help='Output all storage paths')
     parser.add_argument('-v', '--version', action='store_true', help='Display the software\'s version')
+    parser.add_argument('--static', action='store_true', help='Show a single static version banner instead of an animated loop')
+    parser.add_argument('--version-font', default='nice-random', help='Font name to use for the version banner, or use \'random\'/\'nice-random\'')
+    parser.add_argument('--version-color', default='nice-random', help='Color palette to use for the version banner, or use \'random\'/\'nice-random\'')
     parser.add_argument('-s', '--saves', action='store_true', help='Displays all saved projects')
     parser.add_argument('-c', '--config', action='store_true', help='Displays the saved configuration or packer settings')
     parser.add_argument('--projects', action='store_true', help='Displays the saved configurations of projects')
@@ -71,7 +129,7 @@ def main():
 
     run_command_parser = subparsers.add_parser('run', help='Runs packer release and update process on the specified project')
     run_command_parser.add_argument('-p', '--project', help='Specify the project to release an update on').completer = get_project_names
-    run_command_parser.add_argument('-v', '--version', dest='run_version', help='Specify the new version to update to').completer = get_new_version
+    run_command_parser.add_argument('-n', '--new-version', dest='run_version', help='Specify the new version to update to').completer = get_new_version
 
     edit_command_parser = subparsers.add_parser('edit', help='Edits user related data, like configurations, projects and so on')
     edit_command_parser.add_argument('-s', '--settings', action='store_true', help='Open to edit the settings.json in the user preferred text editor')
@@ -366,13 +424,7 @@ def main():
         print(format_entry(create_entry('metadata_path', metadata_path)))
 
     if args.version:
-        print(dedent(f'''
-                      ____            _                 Packer version {packer_version}
-                     |  _ \\ __ _  ___| | _____ _ __     Developed by EMILIO
-                     | |_) / _` |/ __| |/ / _ \\ '__|    Project is under the MIT license
-                     |  __/ (_| | (__|   <  __/ |       https://github.com/EMILIO888real/Packer
-                     |_|   \\__,_|\\___|_|\\_\\___|_|   
-                     '''))
+        version_animation(static=args.static, font=args.version_font, all_color=args.version_color)
 
     if args.saves:
         if projects_configurations.get_w_tui():
