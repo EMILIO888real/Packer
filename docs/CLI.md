@@ -23,12 +23,15 @@ Many flags are optional and will prompt for input if they are not provided. Use 
 Global options
 --------------
 
-- `-p, --paths`  : Output all storage paths used by Packer.
-- `-v, --version`: Display Packer's version.
-- `-s, --saves`  : List saved project paths.
-- `-c, --config` : Print the current user configuration values.
-- `--projects`   : Print the saved project configurations.
-- `-g, --gui`    : Launch the GUI interface.
+- `-p, --paths`    : Output all storage paths used by Packer.
+- `-v, --version`  : Display Packer's version banner.
+- `--static`       : Show only a single static version banner instead of a looping animated display.
+- `--version-font` : Choose the banner font, such as `slant`, `random`, or `nice-random`.
+- `--version-color`: Choose the banner color palette, such as `random` or `nice-random`.
+- `-s, --saves`    : List saved project paths.
+- `-c, --config`   : Print the current user configuration values.
+- `--projects`     : Print the saved project configurations.
+- `-g, --gui`      : Launch the GUI interface.
 
 Commands
 --------
@@ -42,7 +45,7 @@ Commands
 
 - `run` : Run the release/update process for a saved project.
   - `-p, --project` : Project directory name.
-  - `-v, --version` : Target version string.
+  - `-n, --new-version` : Target version string.
 
 - `edit` : Open user-related files in an editor.
   - `-s, --settings` : Open `settings.json` for editing.
@@ -94,7 +97,13 @@ packer clear --cache --log
 Run an update for a saved project:
 
 ```bash
-packer run --project myproject --version 1.2.3
+packer run --project myproject --new-version 1.2.3
+```
+
+Display a static version banner with a chosen font and palette:
+
+```bash
+packer --version --static --font slant --color random
 ```
 
 Open the settings and projects files in your editor:

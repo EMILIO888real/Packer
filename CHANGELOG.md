@@ -10,6 +10,7 @@
 - `+` character before output the net size change if it's positive. 
 - Version flag to look much nicer. 
 - `--version` flag in the `run` command to now just be `--new-version`, `-n` instead of the `--version`, since they were conflicting, which might be confusing. 
+- Updated CLI documentation to include the new global options for version display, static banner, font and color selection. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 
