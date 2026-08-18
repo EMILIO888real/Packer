@@ -152,7 +152,9 @@ def main():
     setup_command_parser.add_argument('-c', '--code', action='store_true', dest='setup_gofile_code', help='GoFile URL / code (eg. OktQl5)')
 
     setup_command_parser.add_argument('-l', '--license', dest='setup_license', help='License for the new project').completer = get_license_types
+
     setup_command_parser.add_argument('--authenticate', dest='setup_authenticate', action='store_true', help='Authenticate with GitHub using a PAT (Personal Access Token) for pushing')
+    setup_command_parser.add_argument('--open-project', dest='setup_open_project', action='store_true', help='Open the project after setup')
 
     export_command_parser = subparsers.add_parser('export', help='Export all config saved by Packer in an archive')
     export_command_parser.add_argument('-p', '--path', dest='export_path', help='Path to export archive to')
@@ -241,7 +243,7 @@ def main():
                     args.setup_overwrite,
                     args.setup_gofile_code,
                     args.setup_license, 
-                    args.setup_authenticate))}''')
+                    args.setup_authenticate), args.setup_open_project)}''')
         
         case 'export':
             files = [

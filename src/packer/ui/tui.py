@@ -64,7 +64,7 @@ def main() -> tuple[str, Project]:
             gofile_data = {'gofile user token': gofile_user_token, 'gofile folder id': gofile_folder_id}
 
         print('Starting setup...')
-        github_repo_url = setup(*user_setup_data)
+        github_repo_url = setup(*user_setup_data, open_project=False)
         print('Setup complete. Continuing with configuration...')
 
 

@@ -19,7 +19,7 @@ from keyword import iskeyword
 from packer.utils import pip_install
 from packer.custom_modules.et import init_logger, tree
 from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
-from packer.config import packer_version, _getpass
+from packer.config import packer_version, _getpass, all_settings
 from packer.custom_modules.etf import print_list
 from packer.paths import download_dir, documents_dir
 
@@ -55,7 +55,7 @@ def _create_venv(created_venv) -> None:
 
 def main(project_directory: str | Path, author_name: str, program_name: str, github_pat: str = None, github_repo_url: str = None,
          overwrite_existing: bool = False, gofile_code: str | None = None, license_type: str | None = 'MIT', github_auth: bool = False,
-         use_pyinstaller: bool = True) -> str:
+         use_pyinstaller: bool = True, open_project: bool = True) -> str:
     '''Set up a new project scaffold and initialize its local Git history.
 
     The generated layout currently looks like this:
@@ -115,6 +115,8 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
     :type github_auth: bool, optional
     :param use_pyinstaller: Whether to add PyInstaller related files and build process, defaults to True.
     :type use_pyinstaller: bool, optional
+    :param open_project: Whether to open the project after setup, defaults to True.
+    :type open_project: bool, optional
     :return: The URL of the created GitHub repository, if there is one
     :rtype: str | None
     '''
@@ -701,6 +703,9 @@ def main(project_directory: str | Path, author_name: str, program_name: str, git
             print_and_log(f'You can push manually with: git push -u origin {master_branch.name}', 20, [255, 165, 0])
     
     print_and_log(f'Project setup complete!\nYou can check out the log at {logger.handlers[0].baseFilename}')
+
+    if open_project:
+        run([all_settings.text_editor, project_directory])
     
     return github_repo_url.lstrip('https://github.com/') if github_repo_url else None
 

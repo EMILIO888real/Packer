@@ -4,6 +4,7 @@
 - `flush` and `end` parameters to `print_bg_colored_text`, they are just passed straight to `print` function. 
 - Color pallets to config.py, for some nice color combinations that can simply be imported. 
 - A few more flags to control the newly changed `--version` flag, like `--static`, `--version-font`, `--version-color`. 
+- `open_project` parameter to the `setup` function, which opens the project with the text editor defined in your settings after creation. 
 
 ### Changed
 - Prettified by adding a ton of colors in various random output for variables for the most part. 
