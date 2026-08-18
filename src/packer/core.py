@@ -23,9 +23,9 @@ from itertools import cycle
 import queue
 from tenacity import retry,stop_after_attempt, wait_exponential, retry_if_exception_type
 
-from packer.custom_modules.et import format_size, format_version_text, get_folder_size, tree, delete_upload, init_logger, input_via_text_editor
+from packer.custom_modules.et import format_size, format_version_text, get_folder_size, tree, delete_upload, init_logger
 from packer.custom_modules.etf import bool_answer, clear_lines, lines_used, simple_prompt_retries, print_bg_colored_text, print_colored_text, print_with_delay
-from packer.config import all_settings, Project, packer_version, send_notification, ollama_available
+from packer.config import all_settings, Project, packer_version, send_notification, ollama_available, _input_via_text_editor
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
 from packer.utils import find_environments, process_deployed_environments, upload_package
 
@@ -385,7 +385,7 @@ class Packer():
         else:
             description = 'Write your version description in this file. (select all text [usually ctrl+a] and then start writing your description. After you have written it, save it and close the editor)'
 
-        description = input_via_text_editor(description, str(self.chosen_description_path))
+        description = _input_via_text_editor(description, str(self.chosen_description_path))
 
 
         self.print_and_log('Generating a version title...')
@@ -417,7 +417,7 @@ class Packer():
         else:
             version_title = 'Write your version title in this file. (select all text [usually ctrl+a] and then start writing your title. After you have written it, save it and close the editor)'
 
-        version_title = input_via_text_editor(version_title, str(self.chosen_title_path))
+        version_title = _input_via_text_editor(version_title, str(self.chosen_title_path))
 
 
         self.print_and_log('Updating pyproject.toml...')

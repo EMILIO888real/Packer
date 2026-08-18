@@ -20,6 +20,7 @@
 - Replaced the flimsy check for rejecting the GitHub workflow through Packer automatically via the `revert_changes` method to instead check if `Packer` has an attribute `run_id`, no need to check if it's valid just in case the id is 0, if it's present we good. 
 - Various `print_and_log` function calls to correctly pass the log level to the parameter instead of passing it to the color parameter. 
 - The assets directory place in the README example, instead of at root, but instead it's actually inside the program's folder. 
+- Changed the import of `input_via_text_editor` to `_input_via_text_editor` to import the internal one from `config.py`, to actually use the settings defined in `Packer` global settings. 
 
 ---
 
