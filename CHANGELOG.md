@@ -12,6 +12,8 @@
 - Version flag to look much nicer. 
 - `--version` flag in the `run` command to now just be `--new-version`, `-n` instead of the `--version`, since they were conflicting, which might be confusing. 
 - Updated CLI documentation to include the new global options for version display, static banner, font and color selection. 
+- The `git` interactions in `change.py` to use the `GitPython` `Repo` object, instead of running commands through `subprocess.run`. 
+- Output to be colored for warnings and errors using a custom function `print_colored_text` from `packer.custom_modules.etf`. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 

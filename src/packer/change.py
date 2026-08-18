@@ -1,10 +1,10 @@
 from string import Template
-from subprocess import run
 from pathlib import Path
-from git import Repo
+from git import GitCommandError, Repo
 from ollama import chat
 
 from packer.config import _input_via_text_editor, all_settings
+from packer.custom_modules.etf import print_colored_text
 
 def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'], overall_description: str = None,
          text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag,
@@ -66,7 +66,7 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
         before_committing_list = content[list_start + len(list_start_identifier):list_end].lstrip(':').strip()
 
         if before_committing_list:
-            print(f'{list_start_identifier} task/s found, please delete them from the list once finished!\nList:\n{before_committing_list}')
+            print_colored_text(f'{list_start_identifier} task/s found, please delete them from the list once finished!\nList:\n{before_committing_list}', [255, 0, 0])
             return
 
 
@@ -152,9 +152,19 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
     else:
         git_message = f'{messages[0][0]}: {messages[0][1]}'
 
-    run(['git', 'add', '.'])
-    run(['git', 'commit', '-m', git_message.strip()])
-    run(['git', 'push'])
+    repo.git.add(all=True)
+    try:
+        repo.git.commit('-S', '-m', git_message)
+    except GitCommandError:
+        try:
+            if verbose:
+                print_colored_text('Fallback to unsigned commit...', [255, 255, 0])
+            repo.git.commit('-m', git_message)
+        except GitCommandError as e:
+            if verbose:
+                print_colored_text(f'Something went wrong while committing: {e}', [255, 0, 0])
+
+    repo.remotes.origin.push()
 
 def tui(changes: list[str] | None = None, overall_description: str | None = None, ai_suggestions: bool = True):
     '''
@@ -175,12 +185,12 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
         try:
             print(f'AI suggestions:\n{generate_suggestions()}')
         except KeyboardInterrupt:
-            print('Skipping AI suggestions...')
+            print_colored_text('Skipping AI suggestions...', [0, 255, 0])
 
     if not changes:
         amount = int(input('Enter the amount of changes: '))
         if amount > 1:
-            print('Enter each change idvidually, both in terminal and text editor.')
+            print_colored_text('Enter each change idvidually, both in terminal and text editor.', [255, 255, 0])
 
         changes = []
         for _ in range(amount):
@@ -188,7 +198,7 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
 
     if not overall_description:
         if len(changes) > 1:
-            overall_description = input('High level description for all changes together [None]: ').strip()
+            overall_description = input('High level description for all changes together [None] ').strip()
         else:
             overall_description = None
 
