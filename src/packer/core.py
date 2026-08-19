@@ -1079,15 +1079,22 @@ class Packer():
         :type end: str
         '''
 
-        full_text = text + end
-
-        if hasattr(self, 'buffer_queue'):
-            self.buffer_queue.put({'text': text, 'color': color, 'end': end})
+        if color:
+            print_colored_text(text, color, end=end)
         else:
-            if color:
-                print_colored_text(text, color, end=end)
-            else:
-                print(text, end=end)
+            print(text, end=end)
+        self._process_partial_output(text + end, level)
+
+
+    def _process_partial_output(self, full_text: str, level: int):
+        '''
+        Processes the full text for partial output and logs it to the packer log file.
+
+        :param full_text: The full text to process for partial output.
+        :type full_text: str
+        :param level: The logging level to use
+        :type level: int
+        '''
 
         if '\n' in full_text:
             text = f'{''.join(self.print_message_parts)}{text}'
@@ -1162,11 +1169,11 @@ class Packer():
         return answer
 
     def _log_and_output_queue(self, text, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
-        '''Prints the text and logs it to the packer log file.
+        '''Puts the text in the output queue and logs it to the packer log file.
         
-        :param text: The text to print and log.
+        :param text: The text to output to the queue and log.
         :type text: str
-        :param color: The color to use for printing, default is None (default terminal color).
+        :param color: The color to use for the text, default is None (default environment color).
         :type color: Optional[Sequence[int]] | None
         :param level: The logging level to use, default is 20 [INFO].
         :type level: int
@@ -1174,13 +1181,8 @@ class Packer():
         :type end: str
         '''
 
-        self.output_queue.put({'text': text, 'color': color, 'level': level, 'end': end})
-        if '\n' in end:
-            text = f'{''.join(self.print_message_parts)}{text}'
-            self.print_message_parts.clear()
-            self.log_action(text, level)
-        else:
-            self.print_message_parts.append(text + end)
+        self.output_queue.put({'text': text, 'color': color, 'end': end})
+        self._process_partial_output(text + end, level)
 
     def log_action(self, action: str, level: int = 20):
             '''Logs the action with the provided level

@@ -5,6 +5,7 @@
 - Color pallets to config.py, for some nice color combinations that can simply be imported. 
 - A few more flags to control the newly changed `--version` flag, like `--static`, `--version-font`, `--version-color`. 
 - `open_project` parameter to the `setup` function, which opens the project with the text editor defined in your settings after creation. 
+- `_process_partial_output` helper function for `Packer` to do just that, it's called for both output functions `_print_and_log` and `_log_and_output_queue`. 
 
 ### Changed
 - Prettified by adding a ton of colors in various random output for variables for the most part. 
@@ -14,6 +15,7 @@
 - Updated CLI documentation to include the new global options for version display, static banner, font and color selection. 
 - The `git` interactions in `change.py` to use the `GitPython` `Repo` object, instead of running commands through `subprocess.run`. 
 - Output to be colored for warnings and errors using a custom function `print_colored_text` from `packer.custom_modules.etf`. 
+- `_print_and_log` to not handle output queue, since the function won't be called there is a different function responsible for that `_log_and_output_queue`. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 
@@ -21,6 +23,7 @@
 - Various `print_and_log` function calls to correctly pass the log level to the parameter instead of passing it to the color parameter. 
 - The assets directory place in the README example, instead of at root, but instead it's actually inside the program's folder. 
 - Changed the import of `input_via_text_editor` to `_input_via_text_editor` to import the internal one from `config.py`, to actually use the settings defined in `Packer` global settings. 
+- Documentation for `_log_and_output_queue` to not just be a copy of `_print_and_log`, since the function doesn't print anything. 
 
 ---
 
