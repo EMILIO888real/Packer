@@ -231,6 +231,7 @@ class Packer():
         self.print_and_log = self._print_and_log if all_settings.verbose else self._log_and_output_queue
         self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
         self.stream_output_chunk = self._stream_queue_chunk if input_queue else self._stream_print_chunk
+        self.prompt_edit_text = self.queue_prompt_edit_text if input_queue else _input_via_text_editor
 
         # Relies on some setup actions
         if Path().cwd() != Path(project_path):
@@ -385,7 +386,7 @@ class Packer():
         else:
             description = 'Write your version description in this file. (select all text [usually ctrl+a] and then start writing your description. After you have written it, save it and close the editor)'
 
-        description = _input_via_text_editor(description, str(self.chosen_description_path))
+        description = self.prompt_edit_text(description, str(self.chosen_description_path))
 
 
         self.print_and_log('Generating a version title...')
@@ -417,7 +418,7 @@ class Packer():
         else:
             version_title = 'Write your version title in this file. (select all text [usually ctrl+a] and then start writing your title. After you have written it, save it and close the editor)'
 
-        version_title = _input_via_text_editor(version_title, str(self.chosen_title_path))
+        version_title = self.prompt_edit_text(version_title, str(self.chosen_title_path))
 
 
         self.print_and_log('Updating pyproject.toml...')
@@ -951,6 +952,21 @@ class Packer():
                 self.revert_changes()
                 return False
 
+    def queue_prompt_edit_text(self, edit_text: str, file_path: Path = None) -> str:
+        '''
+        Queues the provided text for editing and waits for the edited text to be returned.
+        
+        :param edit_text: The text to be edited.
+        :type edit_text: str
+        :param file_path: Not used in this method, only used for compatibility with the _input_via_text_editor function.
+        :type file_path: Path, optional
+        :return: The edited text returned from the queue.
+        :rtype: str
+        '''
+
+        self.input_queue.put({'edit text': edit_text})
+        return self.output_queue.get()
+    
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=10),
@@ -1117,7 +1133,7 @@ class Packer():
 
         self.output.put({'question': question, 'default': default, 'expected output type': str | int})
         
-    def _get_queue_input(self, question: str, default: str | int = 'y') -> Any:
+    def _get_queue_input(self, question: str, default: str | int = 'y') -> bool | None:
         '''
         Gets input from the input queue.
 

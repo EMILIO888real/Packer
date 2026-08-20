@@ -6,6 +6,8 @@
 - A few more flags to control the newly changed `--version` flag, like `--static`, `--version-font`, `--version-color`. 
 - `open_project` parameter to the `setup` function, which opens the project with the text editor defined in your settings after creation. 
 - `_process_partial_output` helper function for `Packer` to do just that, it's called for both output functions `_print_and_log` and `_log_and_output_queue`. 
+- A new method `queue_prompt_edit_text` to handle text editing interaction within the input queue. 
+- `self.prompt_edit_text` variable which is a dynamic function that is either `self.queue_prompt_edit_text` or `_input_via_text_editor`, based on if `input_queue` is provided. 
 
 ### Changed
 - Prettified by adding a ton of colors in various random output for variables for the most part. 
@@ -16,6 +18,8 @@
 - The `git` interactions in `change.py` to use the `GitPython` `Repo` object, instead of running commands through `subprocess.run`. 
 - Output to be colored for warnings and errors using a custom function `print_colored_text` from `packer.custom_modules.etf`. 
 - `_print_and_log` to not handle output queue, since the function won't be called there is a different function responsible for that `_log_and_output_queue`. 
+- Replaced `_input_via_text_editor` with `self.prompt_edit_text` in all places for handling version description, title, and potentially other text edits. 
+- `_get_queue_input` output type from `Any` to `bool | None`, since that's what `bool_answer` function used in it returns, `None` is only for invalid answers. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 
