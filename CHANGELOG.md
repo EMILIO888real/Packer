@@ -8,6 +8,7 @@
 - `_process_partial_output` helper function for `Packer` to do just that, it's called for both output functions `_print_and_log` and `_log_and_output_queue`. 
 - A new method `queue_prompt_edit_text` to handle text editing interaction within the input queue. 
 - `self.prompt_edit_text` variable which is a dynamic function that is either `self.queue_prompt_edit_text` or `_input_via_text_editor`, based on if `input_queue` is provided. 
+- `all_settings_status` validation variable to also catch any other exceptions when reading the settings file, like file permissions, invalid JSON and anything else. 
 
 ### Changed
 - Prettified by adding a ton of colors in various random output for variables for the most part. 
@@ -20,6 +21,9 @@
 - `_print_and_log` to not handle output queue, since the function won't be called there is a different function responsible for that `_log_and_output_queue`. 
 - Replaced `_input_via_text_editor` with `self.prompt_edit_text` in all places for handling version description, title, and potentially other text edits. 
 - `_get_queue_input` output type from `Any` to `bool | None`, since that's what `bool_answer` function used in it returns, `None` is only for invalid answers. 
+- Moved some of the constants or variables containing default and available user choices to `config.py`, so that they can easily be reused in other interfaces along side `all_settings_status`. 
+- Moved terminal interfaces `all_settings_status` processing and output to happen right after parsing provided arguments in the `cli.py`, instead of after all commands. 
+- `all_settings_status` variable creation to be a bit more robust in `config.py`. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 

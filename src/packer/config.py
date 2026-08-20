@@ -48,9 +48,9 @@ from pydantic import BaseModel, ValidationError
 from getpass import getpass
 from cryptography.fernet import InvalidToken
 from plyer import notification
-
 import json
 import pygame
+import ollama
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys, input_via_text_editor
 from packer.paths import assets_dir, log_path, error_report_path, projects_file_path
@@ -229,19 +229,24 @@ if not Path(settings_file_path).exists():
     with open(settings_file_path, 'w') as f:
         f.write('{}')
 
-with open(settings_file_path) as f:
-    user_settings: dict = json.load(f)
+try:
+    with open(settings_file_path) as f:
+        user_settings: dict = normalize_settings_keys(json.load(f))
+except Exception as e:
+    user_settings = {}
+    all_settings_status = e
 
-# Check for mandatory settings in a soft setting way
-missing = []
-for key in ['text_editor', 'wait_flag', 'model']:
-    if key not in user_settings:
-        missing.append(key)
+if 'all_settings_status' not in globals():
+    # Check for mandatory settings in a soft setting way
+    missing = []
+    for key in ['text_editor', 'wait_flag', 'model']:
+        if key not in user_settings:
+            missing.append(key)
 
-all_settings_status = missing
+    all_settings_status = missing
 
 try:
-    all_settings: Settings = Settings(**normalize_settings_keys(user_settings))
+    all_settings: Settings = Settings(**user_settings)
 except ValidationError as e:
     all_settings_status = e
     all_settings = Settings()
@@ -422,3 +427,25 @@ nice_fonts = [
     'chunky', 'doom', 'epic',
     'bubble', 'straight', 'speed', 'smslant', 'roman'
 ]
+
+TEXT_EDITORS = [
+    ('Visual Studio Code', 'code', '--wait'),
+    ('Cursor', 'cursor', '--wait'),
+    ('VS Code Insiders', 'code-insiders', '--wait'),
+    ('Notepad++', 'notepad++', None),
+    ('Neovim', 'nvim', None),
+    ('Vim', 'vim', None),
+    ('Nano', 'nano', None),
+    ('Emacs', 'emacs', None),
+]
+
+available_text_editors = [
+    (name, exe, wait_flag)
+    for name, exe, wait_flag in TEXT_EDITORS
+    if which(exe)
+]
+
+default_text_editor = available_text_editors[0][1]
+
+available_models = [model.model for model in sorted([model for model in ollama.list().models if 'completion' in ollama.show(model.model).capabilities], key=lambda model:model.size)]
+default_model = ('mistral:latest' if 'mistral:latest' in available_models else available_models[0]) if available_models else None
