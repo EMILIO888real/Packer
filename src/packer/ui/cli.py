@@ -23,8 +23,13 @@ from packer import actions
 from packer.custom_modules.et import resolve_version, normalize_settings_keys, get_folder_size, format_size
 from packer.custom_modules.etf import clear_lines, print_colored_text, simple_prompt_retries, stripped_input
 from packer.custom_modules.etf import print_list
-from packer.paths import root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir, cache_dir, projects_file_path, settings_file_path, documents_dir, metadata_path
-from packer.config import Project, packer_version, projects_configurations, all_settings, find_user_project, user_settings, all_settings_status, ollama_available, color_pallets, nice_fonts, available_text_editors, default_text_editor, available_models, default_model
+from packer.paths import (root_dir, assets_dir, config_dir, log_dir, log_path, error_report_path, data_dir,
+                          cache_dir, projects_file_path, settings_file_path, documents_dir, metadata_path
+                          )
+from packer.config import (Project, packer_version, projects_configurations, all_settings, find_user_project,
+                           user_settings, all_settings_status, ollama_available, color_pallets, nice_fonts,
+                           available_text_editors, default_text_editor, available_models, default_model
+                           )
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
 from packer.utils import track_model_pull, TqdmProgressRenderer

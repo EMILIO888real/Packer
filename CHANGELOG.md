@@ -24,6 +24,7 @@
 - Moved some of the constants or variables containing default and available user choices to `config.py`, so that they can easily be reused in other interfaces along side `all_settings_status`. 
 - Moved terminal interfaces `all_settings_status` processing and output to happen right after parsing provided arguments in the `cli.py`, instead of after all commands. 
 - `all_settings_status` variable creation to be a bit more robust in `config.py`. 
+- Long single line imports into multiple lines using parentheses. 
 
 ### Fixed
 - `_Popen` streamed output to actually output by flushing the input buffer. 
