@@ -228,7 +228,7 @@ class Packer():
             self.finished_output = threading.Event()
             threading.Thread(target=self._process_print, daemon=True).start()
 
-        self.print_and_log = self._print_and_log if all_settings.verbose else self._log_and_output_queue
+        self.print_and_log = self._smooth_output if all_settings.smooth_output else self._print_and_log if all_settings.verbose else self._log_and_output_queue
         self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
         self.stream_output_chunk = self._stream_queue_chunk if input_queue else self._stream_print_chunk
         self.prompt_edit_text = self.queue_prompt_edit_text if input_queue else _input_via_text_editor
@@ -1100,6 +1100,10 @@ class Packer():
         else:
             print(text, end=end)
         self._process_partial_output(text + end, level)
+
+    def _smooth_output(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
+        self.buffer_queue.put({'text': text, 'color': color, 'end': end})
+        self._process_partial_output(text, level)
 
 
     def _process_partial_output(self, text: str, level: int):

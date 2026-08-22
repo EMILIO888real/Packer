@@ -10,6 +10,7 @@
 - `self.prompt_edit_text` variable which is a dynamic function that is either `self.queue_prompt_edit_text` or `_input_via_text_editor`, based on if `input_queue` is provided. 
 - `all_settings_status` validation variable to also catch any other exceptions when reading the settings file, like file permissions, invalid JSON and anything else. 
 - A lot of new settings for the upcoming GUI. 
+- Introduces a new method `_smooth_output` for managing output with smoother rendering when `all_settings.smooth_output` is enabled, it was supposed to already exist when I changed the architecture, my bad. 
 
 ### Changed
 - Prettified by adding a ton of colors in various random output for variables for the most part. 
