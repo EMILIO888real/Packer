@@ -1,43 +1,41 @@
-## [%new_version] - %date
+## [0.25.0] - 2026-08-22
 
 ### Added
-- `flush` and `end` parameters to `print_bg_colored_text`, they are just passed straight to `print` function. 
-- Color pallets to config.py, for some nice color combinations that can simply be imported. 
-- A few more flags to control the newly changed `--version` flag, like `--static`, `--version-font`, `--version-color`. 
-- `open_project` parameter to the `setup` function, which opens the project with the text editor defined in your settings after creation. 
-- `_process_partial_output` helper function for `Packer` to do just that, it's called for both output functions `_print_and_log` and `_log_and_output_queue`. 
-- A new method `queue_prompt_edit_text` to handle text editing interaction within the input queue. 
-- `self.prompt_edit_text` variable which is a dynamic function that is either `self.queue_prompt_edit_text` or `_input_via_text_editor`, based on if `input_queue` is provided. 
-- `all_settings_status` validation variable to also catch any other exceptions when reading the settings file, like file permissions, invalid JSON and anything else. 
-- A lot of new settings for the upcoming GUI. 
-- Introduces a new method `_smooth_output` for managing output with smoother rendering when `all_settings.smooth_output` is enabled, it was supposed to already exist when I changed the architecture, my bad. 
+- [c77e209] `flush` and `end` parameters to `print_bg_colored_text`, they are just passed straight to `print` function. 
+- [778e892] Color pallets to config.py, for some nice color combinations that can simply be imported. 
+- [778e892] A few more flags to control the newly changed `--version` flag, like `--static`, `--version-font`, `--version-color`. 
+- [68b3505] `open_project` parameter to the `setup` function, which opens the project with the text editor defined in your settings after creation. 
+- [0ad2664] `_process_partial_output` helper function for `Packer` to do just that, it's called for both output functions `_print_and_log` and `_log_and_output_queue`. 
+- [3e19037] A new method `queue_prompt_edit_text` to handle text editing interaction within the input queue. 
+- [3e19037] `self.prompt_edit_text` variable which is a dynamic function that is either `self.queue_prompt_edit_text` or `_input_via_text_editor`, based on if `input_queue` is provided. 
+- [990e057] `all_settings_status` validation variable to also catch any other exceptions when reading the settings file, like file permissions, invalid JSON and anything else. 
+- [77c7aa0] A lot of new settings for the upcoming GUI. 
+- [ef74d40] Introduces a new method `_smooth_output` for managing output with smoother rendering when `all_settings.smooth_output` is enabled, it was supposed to already exist when I changed the architecture, my bad.
 
 ### Changed
-- Prettified by adding a ton of colors in various random output for variables for the most part. 
-- `+` character before output the net size change if it's positive. 
-- Version flag to look much nicer. 
-- `--version` flag in the `run` command to now just be `--new-version`, `-n` instead of the `--version`, since they were conflicting, which might be confusing. 
-- Updated CLI documentation to include the new global options for version display, static banner, font and color selection. 
-- The `git` interactions in `change.py` to use the `GitPython` `Repo` object, instead of running commands through `subprocess.run`. 
-- Output to be colored for warnings and errors using a custom function `print_colored_text` from `packer.custom_modules.etf`. 
-- `_print_and_log` to not handle output queue, since the function won't be called there is a different function responsible for that `_log_and_output_queue`. 
-- Replaced `_input_via_text_editor` with `self.prompt_edit_text` in all places for handling version description, title, and potentially other text edits. 
-- `_get_queue_input` output type from `Any` to `bool | None`, since that's what `bool_answer` function used in it returns, `None` is only for invalid answers. 
-- Moved some of the constants or variables containing default and available user choices to `config.py`, so that they can easily be reused in other interfaces along side `all_settings_status`. 
-- Moved terminal interfaces `all_settings_status` processing and output to happen right after parsing provided arguments in the `cli.py`, instead of after all commands. 
-- `all_settings_status` variable creation to be a bit more robust in `config.py`. 
-- Long single line imports into multiple lines using parentheses. 
+- [3a1d4dd] Prettified by adding a ton of colors in various random output for variables for the most part. 
+- [3a1d4dd] `+` character before output the net size change if it's positive. 
+- [778e892] Version flag to look much nicer. 
+- [778e892] `--version` flag in the `run` command to now just be `--new-version`, `-n` instead of the `--version`, since they were conflicting, which might be confusing. 
+- [2ed0780] Updated CLI documentation to include the new global options for version display, static banner, font and color selection. 
+- [4389405] The `git` interactions in `change.py` to use the `GitPython` `Repo` object, instead of running commands through `subprocess.run`. 
+- [4389405] Output to be colored for warnings and errors using a custom function `print_colored_text` from `packer.custom_modules.etf`. 
+- [0ad2664] `_print_and_log` to not handle output queue, since the function won't be called there is a different function responsible for that `_log_and_output_queue`. 
+- [3e19037] Replaced `_input_via_text_editor` with `self.prompt_edit_text` in all places for handling version description, title, and potentially other text edits. 
+- [3e19037] `_get_queue_input` output type from `Any` to `bool | None`, since that's what `bool_answer` function used in it returns, `None` is only for invalid answers. 
+- [990e057] Moved some of the constants or variables containing default and available user choices to `config.py`, so that they can easily be reused in other interfaces along side `all_settings_status`. 
+- [990e057] Moved terminal interfaces `all_settings_status` processing and output to happen right after parsing provided arguments in the `cli.py`, instead of after all commands. 
+- [990e057] `all_settings_status` variable creation to be a bit more robust in `config.py`. 
+- [d30d74b] Long single line imports into multiple lines using parentheses.
 
 ### Fixed
-- `_Popen` streamed output to actually output by flushing the input buffer. 
-- Replaced the flimsy check for rejecting the GitHub workflow through Packer automatically via the `revert_changes` method to instead check if `Packer` has an attribute `run_id`, no need to check if it's valid just in case the id is 0, if it's present we good. 
-- Various `print_and_log` function calls to correctly pass the log level to the parameter instead of passing it to the color parameter. 
-- The assets directory place in the README example, instead of at root, but instead it's actually inside the program's folder. 
-- Changed the import of `input_via_text_editor` to `_input_via_text_editor` to import the internal one from `config.py`, to actually use the settings defined in `Packer` global settings. 
-- Documentation for `_log_and_output_queue` to not just be a copy of `_print_and_log`, since the function doesn't print anything. 
-- `_process_partial_output` function to correctly work with the new way that part of code works, had the old namespace when it was refactored into it's own function. 
-
----
+- [c77e209] `_Popen` streamed output to actually output by flushing the input buffer. 
+- [5b09b80] Replaced the flimsy check for rejecting the GitHub workflow through Packer automatically via the `revert_changes` method to instead check if `Packer` has an attribute `run_id`, no need to check if it's valid just in case the id is 0, if it's present we good. 
+- [3a1d4dd] Various `print_and_log` function calls to correctly pass the log level to the parameter instead of passing it to the color parameter. 
+- [56363f3] The assets directory place in the README example, instead of at root, but instead it's actually inside the program's folder. 
+- [8aa36a2] Changed the import of `input_via_text_editor` to `_input_via_text_editor` to import the internal one from `config.py`, to actually use the settings defined in `Packer` global settings. 
+- [0ad2664] Documentation for `_log_and_output_queue` to not just be a copy of `_print_and_log`, since the function doesn't print anything. 
+- [6df5595] `_process_partial_output` function to correctly work with the new way that part of code works, had the old namespace when it was refactored into it's own function.---
 
 ## [0.24.0-1] - 2026-08-15
 
