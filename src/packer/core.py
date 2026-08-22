@@ -1102,22 +1102,22 @@ class Packer():
         self._process_partial_output(text + end, level)
 
 
-    def _process_partial_output(self, full_text: str, level: int):
+    def _process_partial_output(self, text: str, level: int):
         '''
-        Processes the full text for partial output and logs it to the packer log file.
+        Processes the provided text for partial output and logs it to the packer log file. If the text contains a newline character, it is logged immediately. Otherwise, it is stored in a buffer for later logging.
 
-        :param full_text: The full text to process for partial output.
+        :param text: The text to process for partial output.
         :type full_text: str
         :param level: The logging level to use
         :type level: int
         '''
 
-        if '\n' in full_text:
+        if '\n' in text:
             text = f'{''.join(self.print_message_parts)}{text}'
             self.print_message_parts.clear()
             self.log_action(text, level)
         else:
-            self.print_message_parts.append(full_text)
+            self.print_message_parts.append(text)
         
     def _send_queue_request(self, question: str, default: str | int = 'y') -> str | int:
         '''

@@ -34,6 +34,7 @@
 - The assets directory place in the README example, instead of at root, but instead it's actually inside the program's folder. 
 - Changed the import of `input_via_text_editor` to `_input_via_text_editor` to import the internal one from `config.py`, to actually use the settings defined in `Packer` global settings. 
 - Documentation for `_log_and_output_queue` to not just be a copy of `_print_and_log`, since the function doesn't print anything. 
+- `_process_partial_output` function to correctly work with the new way that part of code works, had the old namespace when it was refactored into it's own function. 
 
 ---
 
