@@ -9,6 +9,7 @@
 - A new method `queue_prompt_edit_text` to handle text editing interaction within the input queue. 
 - `self.prompt_edit_text` variable which is a dynamic function that is either `self.queue_prompt_edit_text` or `_input_via_text_editor`, based on if `input_queue` is provided. 
 - `all_settings_status` validation variable to also catch any other exceptions when reading the settings file, like file permissions, invalid JSON and anything else. 
+- A lot of new settings for the upcoming GUI. 
 
 ### Changed
 - Prettified by adding a ton of colors in various random output for variables for the most part. 

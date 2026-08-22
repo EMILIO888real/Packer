@@ -223,6 +223,14 @@ class Settings(BaseModel):
         )},
         {'role': 'user', 'content': '$diff'}]
     stream_background_color: list[int] | None = [44, 44, 44]
+    window_resolution: list[int] = [800, 600]
+    window_background_color: list[int] = [44, 44, 44]
+    slow_events: bool = False
+    event_handler_speed: float = 0.016
+    window_fps: float = 240
+    button_color: list[int] = [255, 0, 0]
+    button_size: list[int | float] = [0.4, 0.08]
+    vsync: bool = True
 
 
 if not Path(settings_file_path).exists():
@@ -268,7 +276,7 @@ notification_sound.set_volume(all_settings.notification_volume)
 
 exception_handler = Global_exception_handler(packer_version, log_path, error_report_path,
                                              'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
-exception_handler.update()
+#exception_handler.update()
 
 
 ollama_available = bool(which('ollama'))
