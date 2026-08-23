@@ -5,7 +5,7 @@ from re import MULTILINE, compile, escape
 from shutil import get_terminal_size, rmtree, make_archive
 from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
-from subprocess import PIPE, CompletedProcess, Popen, run
+from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
 from typing import Any, Literal, NoReturn, Optional
 from collections.abc import Callable, Sequence
@@ -198,6 +198,8 @@ class Packer():
         self.print_message_parts = []
         self.environment_name = environment_name
         self.workflow_filename = workflow_filename
+        self._revert_lock = threading.Lock()
+        self._revert_started = False
 
         # Actions needed to run once, (setup actions)
         self.logger = init_logger('packer', 'EMILIO')
@@ -228,7 +230,7 @@ class Packer():
             self.finished_output = threading.Event()
             threading.Thread(target=self._process_print, daemon=True).start()
 
-        self.print_and_log = self._smooth_output if all_settings.smooth_output else self._print_and_log if all_settings.verbose else self._log_and_output_queue
+        self.print_and_log = (self._smooth_output if all_settings.smooth_output else self._print_and_log) if all_settings.verbose else self._log_and_output_queue
         self.prompt_user = self._queue_prompt if input_queue else self._terminal_prompt
         self.stream_output_chunk = self._stream_queue_chunk if input_queue else self._stream_print_chunk
         self.prompt_edit_text = self.queue_prompt_edit_text if input_queue else _input_via_text_editor
@@ -288,7 +290,8 @@ class Packer():
         self.program_archive_path = Path(f'{self.cache_dir}/{self.program_name}-{self.version}.zip')
 
         old_version_text = f'{self.old_version['major']}.{self.old_version['minor']}.{self.old_version['patch']}' # Not possible above solution due to needing both
-        self.print_and_log(f'Chosen version: {self.version}')
+        self.print_and_log(f'Chosen version:', end=' ')
+        self.print_and_log(self.version, [0, 0, 255])
 
 
         self.print_and_log('Getting latest changelog...')
@@ -845,6 +848,11 @@ class Packer():
     def revert_changes(self, exit: bool = True, wait: bool = True) -> None | NoReturn:
         '''Rollback the release process by removing the generated archive, deleting the uploaded Gofile copy and GitHub release when present, and resetting the Git repository to its previous state.'''
 
+        with self._revert_lock:
+            if self._revert_started:
+                return
+            self._revert_started = True
+
         if wait:
             self._wait_smooth_output()
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
@@ -1103,25 +1111,24 @@ class Packer():
 
     def _smooth_output(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
         self.buffer_queue.put({'text': text, 'color': color, 'end': end})
-        self._process_partial_output(text, level)
+        self._process_partial_output(text + end, level)
 
 
-    def _process_partial_output(self, text: str, level: int):
+    def _process_partial_output(self, full_text: str, level: int):
         '''
         Processes the provided text for partial output and logs it to the packer log file. If the text contains a newline character, it is logged immediately. Otherwise, it is stored in a buffer for later logging.
 
-        :param text: The text to process for partial output.
+        :param full_text: The text to process for partial output and logging.
         :type full_text: str
         :param level: The logging level to use
         :type level: int
         '''
 
-        if '\n' in text:
-            text = f'{''.join(self.print_message_parts)}{text}'
+        if '\n' in full_text:
+            self.log_action(f'{''.join(self.print_message_parts)}{full_text.rstrip('\n')}', level)
             self.print_message_parts.clear()
-            self.log_action(text, level)
         else:
-            self.print_message_parts.append(text)
+            self.print_message_parts.append(full_text)
         
     def _send_queue_request(self, question: str, default: str | int = 'y') -> str | int:
         '''
@@ -1188,7 +1195,7 @@ class Packer():
         self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
 
-    def _log_and_output_queue(self, text, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
+    def _log_and_output_queue(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
         '''Puts the text in the output queue and logs it to the packer log file.
         
         :param text: The text to output to the queue and log.
@@ -1242,20 +1249,20 @@ class Packer():
         '''
 
         # setup
-        def print_with_background(text):
-            print_bg_colored_text(text, all_settings.stream_background_color, flush=True)
+        def print_with_background(text: str, flush: bool = True):
+            print_bg_colored_text(text, all_settings.stream_background_color, flush=flush)
         output_text = print_with_background if all_settings.stream_background_color else print
         done = threading.Event()
 
 
         def thread_function(done: threading.Event):
-            process = Popen(cmd, stdout=PIPE, stderr=PIPE, text=True)
+            process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
 
             for text in process.stdout:
                 text = text.rstrip('\n')
                 self.log_action(text)
                 if waiting.is_set():
-                    output_text(text, force=True)
+                    output_text(text, flush=True)
                     clear_lines(lines_used(text, get_terminal_size().columns), clear_formatting=True)
 
             return_code = process.wait()

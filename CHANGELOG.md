@@ -1,3 +1,19 @@
+## [%new_version] - %date
+
+### Added
+- A new safety mechanism for the revert_changes method to only be allowed to run once with threading.Lock for a thread safe system. 
+
+### Changed
+- Cleaned up a few random parts. 
+- `stderr` to be routed to `stdout` in `_Popen`, to be logged and outputted. 
+
+### Fixed
+- `_process_partial_output` function call to actually input the entire text, including the `\n` if present. 
+- Ordering of code execution in `_process_partial_output` to first log the text before clearing the buffer. 
+- `_Popen` method to actually pass the correct parameter `flush`, instead of `force`. 
+
+---
+
 ## [0.25.0] - 2026-08-22
 
 ### Added
@@ -36,6 +52,8 @@
 - [8aa36a2] Changed the import of `input_via_text_editor` to `_input_via_text_editor` to import the internal one from `config.py`, to actually use the settings defined in `Packer` global settings. 
 - [0ad2664] Documentation for `_log_and_output_queue` to not just be a copy of `_print_and_log`, since the function doesn't print anything. 
 - [6df5595] `_process_partial_output` function to correctly work with the new way that part of code works, had the old namespace when it was refactored into it's own function.---
+
+---
 
 ## [0.24.0-1] - 2026-08-15
 
