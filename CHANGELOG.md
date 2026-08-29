@@ -1,23 +1,22 @@
-## [%new_version] - %date
+## [0.26.0] - 2026-08-29
 
 ### Added
-- A new safety mechanism for the revert_changes method to only be allowed to run once with threading.Lock for a thread safe system. 
-- A really rough, early access and kinda bad GUI. 
-- `format_time` function `et.py` to convert seconds into other units, like the file size one. 
+- [a586148] A new safety mechanism for the revert_changes method to only be allowed to run once with threading.Lock for a thread safe system. 
+- [59fd3fa] A really rough, early access and kinda bad GUI. 
+- [59fd3fa] `format_time` function `et.py` to convert seconds into other units, like the file size one.
 
 ### Changed
-- Cleaned up a few random parts. 
-- `stderr` to be routed to `stdout` in `_Popen`, to be logged and outputted. 
-- Added a `Queue` import and modified the `run()` function in `actions.py` to accept two additional optional queues for input and output. 
-- `_finish_stream` function in `core.py` to only do something if `Packer's` native terminal interface is being used. 
+- [a586148] Cleaned up a few random parts. 
+- [a586148] `stderr` to be routed to `stdout` in `_Popen`, to be logged and outputted. 
+- [59fd3fa] Added a `Queue` import and modified the `run()` function in `actions.py` to accept two additional optional queues for input and output. 
+- [59fd3fa] `_finish_stream` function in `core.py` to only do something if `Packer's` native terminal interface is being used.
 
 ### Fixed
-- `_process_partial_output` function call to actually input the entire text, including the `\n` if present. 
-- Ordering of code execution in `_process_partial_output` to first log the text before clearing the buffer. 
-- `_Popen` method to actually pass the correct parameter `flush`, instead of `force`. 
-- Change in `Packer.get()` method: Instead of using `self.input.get()`, it now uses `self.input_queue.get()`. 
-
----
+- [a586148] `_process_partial_output` function call to actually input the entire text, including the `
+` if present. 
+- [a586148] Ordering of code execution in `_process_partial_output` to first log the text before clearing the buffer. 
+- [a586148] `_Popen` method to actually pass the correct parameter `flush`, instead of `force`. 
+- [ec4c691] Change in `Packer.get()` method: Instead of using `self.input.get()`, it now uses `self.input_queue.get()`.---
 
 ## [0.25.0] - 2026-08-22
 
