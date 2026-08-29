@@ -1154,7 +1154,7 @@ class Packer():
         :rtype: Any
         '''
 
-        answer = self.input.get()
+        answer = self.input_queue.get()
         if not answer:
             answer = default
         answer = bool_answer(answer)

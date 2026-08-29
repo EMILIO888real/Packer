@@ -15,6 +15,7 @@
 - `_process_partial_output` function call to actually input the entire text, including the `\n` if present. 
 - Ordering of code execution in `_process_partial_output` to first log the text before clearing the buffer. 
 - `_Popen` method to actually pass the correct parameter `flush`, instead of `force`. 
+- Change in `Packer.get()` method: Instead of using `self.input.get()`, it now uses `self.input_queue.get()`. 
 
 ---
 
