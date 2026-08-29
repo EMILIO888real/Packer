@@ -1010,9 +1010,7 @@ class Packer():
             print(chunk, end='', flush=True)
     
     def _finish_stream(self):
-        if self.output_queue:
-            self.output_queue.put('Stream finished!')
-        else:
+        if not self.output_queue:
             print()
         
 
@@ -1142,7 +1140,7 @@ class Packer():
         :rtype: str | int
         '''
 
-        self.output.put({'question': question, 'default': default, 'expected output type': str | int})
+        self.output_queue.put({'question': question, 'default': default, 'expected output type': str | int})
         
     def _get_queue_input(self, question: str, default: str | int = 'y') -> bool | None:
         '''

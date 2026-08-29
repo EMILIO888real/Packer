@@ -32,6 +32,7 @@ from packer.config import (Project, packer_version, projects_configurations, all
                            )
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
+from packer.ui.gui import Gui
 from packer.utils import track_model_pull, TqdmProgressRenderer
 
 def _draw_frame(lines: list[str], colors: cycle):
@@ -183,8 +184,10 @@ def main():
     autocomplete(parser)
     args = parser.parse_args()
 
-    if not args.gui:
-
+    if args.gui:
+        gui = Gui()
+        gui.run()
+    else:
         if type(all_settings_status) == list and all_settings_status != []:
             print_colored_text(f'Missing some mandatory settings: {all_settings_status}', [255, 0, 0])
             print_colored_text('Defaulted to default values for missing settings for this session', [255, 255, 0])

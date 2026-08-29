@@ -224,13 +224,17 @@ class Settings(BaseModel):
         {'role': 'user', 'content': '$diff'}]
     stream_background_color: list[int] | None = [44, 44, 44]
     window_resolution: list[int] = [800, 600]
-    window_background_color: list[int] = [44, 44, 44]
-    slow_events: bool = False
-    event_handler_speed: float = 0.016
+    window_background_color: list[int] = [13, 17, 23]
+    slow_events: bool = True
+    event_handler_speed: float = 0.016 # 60 UPS
+    gui_subsystem_speed: float = 0.1 # 10 UPS
     window_fps: float = 240
-    button_color: list[int] = [255, 0, 0]
+    button_color: list[int] = [30, 30, 30]
     button_size: list[int | float] = [0.4, 0.08]
     vsync: bool = True
+    text_color: list[int, int, int] = [115, 115, 115]
+    font_name: str | None = None
+    font_size: int = 45
 
 
 if not Path(settings_file_path).exists():
@@ -303,7 +307,10 @@ class _Projects_configurations_manager():
         else:
             self.content = {}
 
-    def get(self) -> dict[str, dict[str, Any]] | str:
+    def get(self) -> dict[str, dict[str, Any]] | str | dict:
+        '''
+        can return 'encrypted' if the projects.json file is encrypted, or a dict of the projects configurations if not.
+        '''
         return self.content
     
     def get_w_tui(self) -> dict[str, dict[str, Any]]:
@@ -319,8 +326,12 @@ class _Projects_configurations_manager():
         else:
             return self.content
 
-    def decrypt(self, password: str) -> None:
-         self.content = json.loads(read_encrypted_file(projects_file_path, password.encode()))
+    def decrypt(self, password: str):
+        try:
+            self.content = json.loads(read_encrypted_file(projects_file_path, password.encode()))
+        except InvalidToken:
+            self.content = 'Incorrect password!'
+        return self.content
 
 projects_configurations = _Projects_configurations_manager()
 
@@ -336,7 +347,7 @@ def find_user_project(name: str) -> Path | None:
     '''
 
     name.lower()
-    for candidate_path in projects_configurations.get().keys():
+    for candidate_path in projects_configurations.get_w_tui().keys():
         if Path(candidate_path).name.lower() == name:
             return Path(candidate_path)
     

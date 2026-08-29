@@ -2,10 +2,14 @@
 
 ### Added
 - A new safety mechanism for the revert_changes method to only be allowed to run once with threading.Lock for a thread safe system. 
+- A really rough, early access and kinda bad GUI. 
+- `format_time` function `et.py` to convert seconds into other units, like the file size one. 
 
 ### Changed
 - Cleaned up a few random parts. 
 - `stderr` to be routed to `stdout` in `_Popen`, to be logged and outputted. 
+- Added a `Queue` import and modified the `run()` function in `actions.py` to accept two additional optional queues for input and output. 
+- `_finish_stream` function in `core.py` to only do something if `Packer's` native terminal interface is being used. 
 
 ### Fixed
 - `_process_partial_output` function call to actually input the entire text, including the `\n` if present. 

@@ -1,4 +1,5 @@
 from pathlib import Path
+from queue import Queue
 
 from packer.config import Project, all_settings, send_notification, exception_handler
 import sys
@@ -6,10 +7,10 @@ import sys
 from packer.core import Packer
 
 
-def run(new_version: dict, project_directory: Path, project_configuration: Project):
+def run(new_version: dict, project_directory: Path, project_configuration: Project, input_queue: Queue | None = None, output_queue: Queue | None = None):
 
     try:
-        packer = Packer(new_version, project_directory, **project_configuration.model_dump())
+        packer = Packer(new_version, project_directory, **project_configuration.model_dump(), input_queue=input_queue, output_queue=output_queue)
 
         def packer_exception_handler(exc_type, exc_value, exc_traceback):
             packer.revert_changes(False)

@@ -737,6 +737,37 @@ def input_via_text_editor(text: str = '', file_path: str = None, text_editor: st
         remove(tmp_path)
     return text
 
+def format_time(time: float) -> str:
+    '''
+    Format a time duration in seconds into a human-readable string with appropriate units.
+    
+    :param time: Time duration in seconds to be formatted.
+    :type time: float
+    :return: A formatted string representing the time duration with appropriate units (e.g., '1.23 ms', '4.56 s', '7.89 min').
+    :rtype: str
+    '''
+
+    if time < 1:
+        if time * 1000 < 1:
+            if time * 1000000 < 1:
+                return f'{time * 1000000000:.2f} ns'
+            return f'{time * 1000000:.2f} µs'
+        return f'{time * 1000:.2f} ms'
+    elif time < 60:
+        return f'{time:.2f} s'
+    elif time < 3600:
+        return f'{time / 60:.2f} min'
+    elif time < 86400:
+        return f'{time / 3600:.2f} h'
+    elif time < 604800:
+        return f'{time / 86400:.2f} d'
+    elif time < 2419200:
+        return f'{time / 604800:.2f} w'
+    elif time < 29030400:
+        return f'{time / 2419200:.2f} mo'
+    else:
+        return f'{time / 29030400:.2f} y'
+
 if __name__ == '__main__':
     print('This module is not meant to be run directly')
     print('Import it in your program and use the functions from there')
