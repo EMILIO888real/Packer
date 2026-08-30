@@ -3,8 +3,10 @@
 ### Added
 
 ### Changed
+- Added a `no_index` parameter to the `main()` function in `change.py`, allowing to disable automatic full git indexation of the project (default is False). 
 
 ### Fixed
+- Made git still automatically index or stage the `CHANGELOG.md` file regardless of the `--no-index` flag. 
 
 ---
 

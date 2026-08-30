@@ -157,7 +157,9 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
     else:
         git_message = f'{messages[0][0]}: {messages[0][1]}'
 
-    if not no_index:
+    if no_index:
+        repo.git.add('CHANGELOG.md')
+    else:
         repo.git.add(all=True)
     try:
         repo.git.commit('-S', '-m', git_message)
