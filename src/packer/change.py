@@ -11,7 +11,7 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
          ai_summary: bool = True,
          check_todo: bool = True, todo_rel_path: str = '/dev/TODO.md', list_start_identifier: str = 'before committing', list_end_identifier: str = '#',
          bullet_summary_prompt = all_settings.changes_summary_prompt, high_level_summary_prompt = all_settings.high_level_summary_prompt,
-         model: str = all_settings.model, verbose: bool = True):
+         model: str = all_settings.model, verbose: bool = True, no_index: bool = False):
     '''
     Opens a temporary file in the specified text editor for describing the project's modification
 
@@ -43,6 +43,8 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
     :type high_level_summary_prompt: list[dict]
     :param model: The AI model to use for generating summaries (default is all_settings.model)
     :type model: str
+    :param no_index: Whether to disable automatic full git indexation of the project (default is False)
+    :type no_index: bool
     '''
 
     def input_via_text_editor(message: str) -> str:
@@ -71,7 +73,10 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
 
 
     repo = Repo(git_directory)
-    diff_text = repo.git.diff(unified=3)
+    if no_index:
+        diff_text = repo.git.diff('--cached', unified=3)
+    else:
+        diff_text = repo.git.diff(unified=3)
 
     if ai_summary:
         # Update prompts with runtime data
@@ -152,7 +157,8 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
     else:
         git_message = f'{messages[0][0]}: {messages[0][1]}'
 
-    repo.git.add(all=True)
+    if not no_index:
+        repo.git.add(all=True)
     try:
         repo.git.commit('-S', '-m', git_message)
     except GitCommandError:
@@ -166,7 +172,7 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
 
     repo.remotes.origin.push()
 
-def tui(changes: list[str] | None = None, overall_description: str | None = None, ai_suggestions: bool = True):
+def tui(changes: list[str] | None = None, overall_description: str | None = None, ai_suggestions: bool = True, no_index: bool = False) -> tuple[list[str], str | None, bool, bool]:
     '''
     Launches a text-based user interface for creating project change logs and committing them.
 
@@ -179,11 +185,13 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
     :type overall_description: str | None
     :param ai_suggestions: Whether to generate AI suggestions for the changes (default is True)
     :type ai_suggestions: bool
+    :return: A tuple containing the list of modification types, the overall description, whether AI suggestions were generated, and whether automatic full git indexation is disabled
+    :rtype: tuple[list[str], str | None, bool, bool]
     '''
 
     if ai_suggestions:
         try:
-            print(f'AI suggestions:\n{generate_suggestions()}')
+            print(f'AI suggestions:\n{generate_suggestions(no_index=no_index)}')
         except KeyboardInterrupt:
             print_colored_text('Skipping AI suggestions...', [0, 255, 0])
 
@@ -202,9 +210,9 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
         else:
             overall_description = None
 
-    return (changes, overall_description)
+    return (changes, overall_description, ai_suggestions, no_index)
 
-def generate_suggestions(git_directory: str | Path = '.', suggestions_prompt = all_settings.suggestions_prompt, model: str = all_settings.model, verbose: bool = True):
+def generate_suggestions(git_directory: str | Path = '.', suggestions_prompt = all_settings.suggestions_prompt, model: str = all_settings.model, verbose: bool = True, no_index: bool = False) -> str:
     '''
     Generates AI suggestions for the changes based on the current git diff.
 
@@ -214,9 +222,18 @@ def generate_suggestions(git_directory: str | Path = '.', suggestions_prompt = a
     :type suggestions_prompt: list[dict]
     :param model: The AI model to use for generating suggestions (default is all_settings.model)
     :type model: str
+    :param verbose: Whether to print verbose output (default is True)
+    :type verbose: bool
+    :param no_index: Whether to disable automatic full git indexation of the project (default is False)
+    :type no_index: bool
+    :return: The generated AI suggestions as a string
+    :rtype: str
     '''
     repo = Repo(git_directory)
-    diff_text = repo.git.diff(unified=3)
+    if no_index:
+        diff_text = repo.git.diff('--cached', unified=3)
+    else:
+        diff_text = repo.git.diff(unified=3)
     
     suggestions_prompt[1]['content'] = Template(suggestions_prompt[1 if suggestions_prompt[1]['role'] == 'user' else 0]['content']).substitute({'diff': diff_text})
 

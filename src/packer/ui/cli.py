@@ -179,6 +179,7 @@ def main():
     change_command_parser.add_argument('-o', '--overall-description', dest='change_overall_description', help='Specify the overall description, only in use if there are more than 1 change')
     change_command_parser.add_argument('-m', '--ai-summary', dest='change_ai_summary', action='store_true', help='Disable AI summary')
     change_command_parser.add_argument('-s', '--ai-suggestions', dest='change_ai_suggestions', action='store_true', help='Disable AI suggestions')
+    change_command_parser.add_argument('-i', '--no-index', dest='change_no_index', action='store_true', help='Disable automatic full git indexation of the project, useful for large projects with many files')
 
 
     autocomplete(parser)
@@ -389,8 +390,8 @@ def main():
             user_chosen_project = args.change_project if args.change_project else Path().cwd().name
             project = find_user_project(user_chosen_project)
             if project:
-                output = change_tui(args.change_changes, args.change_overall_description, not args.change_ai_suggestions)
-                change(project, modification_types=output[0], overall_description=output[1], ai_summary=not args.change_ai_summary)
+                output = change_tui(args.change_changes, args.change_overall_description, not args.change_ai_suggestions, args.change_no_index)
+                change(project, modification_types=output[0], overall_description=output[1], ai_summary=output[2], no_index=output[3])
             else:
                 print(f'I couldn\'t find your project: {user_chosen_project}')
                 sys.exit(1)
