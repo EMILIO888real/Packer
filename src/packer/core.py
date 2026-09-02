@@ -1003,11 +1003,19 @@ class Packer():
         self.output_queue.put({'type': type, 'chunk': chunk, 'color': color})
 
 
-    def _stream_print_chunk(self, chunk: str, type: str, color: list[int] | None = None):
-        if color:
-            print_colored_text(chunk, color, flush=True, end='')
-        else:
-            print(chunk, end='', flush=True)
+    def _stream_print_chunk(self, chunk: str, type: str, color: list[int, int, int] | None = None):
+        '''
+        Streams a chunk of text to the output with the specified type and color.
+
+        :param chunk: The chunk of text to stream.
+        :type chunk: str
+        :param type: Not used in this method, only used for compatibility with the _stream_queue_chunk function.
+        :type type: str
+        :param color: The color to use for printing the chunk, default is None (default terminal color).
+        :type color: list[int, int, int] | None
+        '''
+
+        print_colored_text(chunk, color, flush=True, end='')
     
     def _finish_stream(self):
         if not self.output_queue:
@@ -1088,23 +1096,20 @@ class Packer():
             finally:
                 self.buffer_queue.task_done()
 
-    def _print_and_log(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
+    def _print_and_log(self, text: str, color: list[int, int, int] | None = None, level: int = 20, end: str = '\n'):
         '''Prints the text and logs it to the packer log file.
         
         :param text: The text to print and log.
         :type text: str
         :param color: The color to use for printing, default is None (default terminal color).
-        :type color: Optional[Sequence[int]] | None
+        :type color: list[int, int, int] | None
         :param level: The logging level to use, default is 20 [INFO].
         :type level: int
         :param end: The string appended after the last value, default a newline.
         :type end: str
         '''
 
-        if color:
-            print_colored_text(text, color, end=end)
-        else:
-            print(text, end=end)
+        print_colored_text(text, color, end=end)
         self._process_partial_output(text + end, level)
 
     def _smooth_output(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):

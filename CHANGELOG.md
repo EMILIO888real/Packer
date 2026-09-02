@@ -1,12 +1,20 @@
 ## [%new_version] - %date
 
 ### Added
+- CLI completion function for settings `--version-font` fonts to give nice-random font selection. 
+- Documentation for various functions that were missing, most importantly the `Global_exception_handler` is also now documented. 
 
 ### Changed
 - Added a `no_index` parameter to the `main()` function in `change.py`, allowing to disable automatic full git indexation of the project (default is False). 
+- Officially made Packer's `Global_exception_handler` only run in a terminal interface, not when Packer is imported. 
+- `print_colored_text` function in the `etf.py` module to accept `None` as an option for color, in that case the function doesn't call the `change_color` function. 
+- Updated all use cases of `print_colored_text` function to not manually check if color is None, but now just simply pass it to the `print_colored_text` function without a seperate `print` function call. 
+- `Global_exception_handler` `update` method to allow accepting `IO queues`, making it easy to plug in an interface after creating the object. 
 
 ### Fixed
 - Made git still automatically index or stage the `CHANGELOG.md` file regardless of the `--no-index` flag. 
+- Documentation on the `bool_answer` function in the `etf.py` module. 
+- `Global_exception_handler` to use provided `IO queues`. 
 
 ---
 

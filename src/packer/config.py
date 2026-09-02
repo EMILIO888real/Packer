@@ -280,7 +280,6 @@ notification_sound.set_volume(all_settings.notification_volume)
 
 exception_handler = Global_exception_handler(packer_version, log_path, error_report_path,
                                              'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
-#exception_handler.update()
 
 
 ollama_available = bool(which('ollama'))

@@ -41,11 +41,21 @@ def check_module_conflict(program_name: str) -> bool:
     except ImportError:
         return False
 
-def print_and_log(text: str, level: int = 20, color: Sequence[int] | None = None, end: str = '\n') -> None:
-    if color:
-        print_colored_text(text, color, end=end)
-    else:
-        print(text, end=end)
+def print_and_log(text: str, level: int = 20, color: list[int, int, int] | None = None, end: str = '\n') -> None:
+    '''
+    Print the text to the console with optional color and log it to the packer log file.
+
+    :param text: The text to print and log
+    :type text: str
+    :param level: The logging level to use, default is 20 [INFO]
+    :type level: int
+    :param color: The color to use for printing, default is None (default terminal color)
+    :type color: list[int, int, int] | None
+    :param end: The string appended after the last value, default a newline
+    :type end: str
+    '''
+
+    print_colored_text(text, color, end=end)
     logger.log(level, text)
 
 def _create_venv(created_venv) -> None:

@@ -571,23 +571,25 @@ def ask_user_repeatedly(question: str, default: str = 'y', valid_answers: list =
             sleep(delay)
             clear_lines(2)
 
-def print_colored_text(text: str = '', color: list[int] = [138, 43, 226], reset: bool = True, flush: bool = False, end: str = '\n') -> None:
-    """Print colored text to the terminal.
+def print_colored_text(text: str = '', color: list[int, int, int] | None = None, reset: bool = True, flush: bool = False, end: str = '\n'):
+    '''Print colored text to the terminal.
 
     Prints text in the specified RGB color with optional formatting reset.
 
     :param text: The text to print out.
     :type text: str
-    :param color: The RGB color the text will be printed in.
-    :type color: list[int]
+    :param color: The RGB color the text will be printed in, None is default terminal color.
+    :type color: list[int, int, int] | None
     :param reset: If True, resets the terminal formatting after printing.
     :type reset: bool
     :param flush: If True, flushes the output buffer.
     :type flush: bool
     :param end: The ending character(s) after the text.
     :type end: str
-    """
-    change_color(color)
+    '''
+
+    if color:
+        change_color(color)
     print(text, flush=flush, end=end)
     if reset:
         reset_formatting()
@@ -981,8 +983,7 @@ def prompt_user(question: str, answers: list[str] = ['no', 'yes'], default: str 
             return
 
 def bool_answer(answer: str | int | None) -> bool | None:
-    """Determine if a user's yes/no answer is affirmative.
-
+    """
     Determines if a user's answer to a yes/no question is affirmative.
 
     :param answer: The user's response to a yes/no question ('yes', 'no', 'y', 'n', 1, or 0).

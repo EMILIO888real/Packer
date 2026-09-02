@@ -28,7 +28,8 @@ from packer.paths import (root_dir, assets_dir, config_dir, log_dir, log_path, e
                           )
 from packer.config import (Project, packer_version, projects_configurations, all_settings, find_user_project,
                            user_settings, all_settings_status, ollama_available, color_pallets, nice_fonts,
-                           available_text_editors, default_text_editor, available_models, default_model
+                           available_text_editors, default_text_editor, available_models, default_model,
+                           exception_handler
                            )
 from packer.setup import main as setup, tui
 from packer.change import main as change, tui as change_tui
@@ -68,7 +69,7 @@ def _get_text_and_colors(font: str, all_colors: list[list[list[int]]] | list[lis
 
     return (lines, cycle(colors))
 
-def version_animation(static: bool = False, font: str | Literal['nice-random', 'random'] = 'nice-random', all_color: Literal['nice-random', 'random'] | list[list[list[int]]] = 'nice-random'):
+def version_animation(static: bool = False, font: str | Literal['nice-random', 'random'] = 'nice-random', all_color: Literal['nice-random', 'random'] | list[list[list[int, int, int]]] = 'nice-random'):
     try:
         if static:
             _draw_frame(*_get_text_and_colors(font, all_color))
@@ -89,6 +90,12 @@ def _clear_path(path: str | Path) -> None:
     path = Path(path)
     rmtree(path, ignore_errors=True)
     print(f'Cleared {path}')
+
+
+# Completion CLI functions (.completer)
+
+def get_nice_fonts(**kwargs) -> list[str]:
+    return nice_fonts
 
 def get_project_names(**kwargs):
     return [Path(project).name for project in projects_configurations.get_w_tui().keys()]
@@ -112,6 +119,7 @@ def get_author_names(**kwargs):
 def get_setup_paths(**kwargs):
     return [f'{documents_dir}/']
 
+
 def main():
 
     global default_model
@@ -122,7 +130,7 @@ def main():
     parser.add_argument('-p', '--paths', action='store_true', help='Output all storage paths')
     parser.add_argument('-v', '--version', action='store_true', help='Display the software\'s version')
     parser.add_argument('--static', action='store_true', help='Show a single static version banner instead of an animated loop')
-    parser.add_argument('--version-font', default='nice-random', help='Font name to use for the version banner, or use \'random\'/\'nice-random\'')
+    parser.add_argument('--version-font', default='nice-random', help='Font name to use for the version banner, or use \'random\'/\'nice-random\'').completer = get_nice_fonts
     parser.add_argument('--version-color', default='nice-random', help='Color palette to use for the version banner, or use \'random\'/\'nice-random\'')
     parser.add_argument('-s', '--saves', action='store_true', help='Displays all saved projects')
     parser.add_argument('-c', '--config', action='store_true', help='Displays the saved configuration or packer settings')
@@ -189,6 +197,7 @@ def main():
         gui = Gui()
         gui.run()
     else:
+        exception_handler.update() # Set the exception handler for anything except the GUI
         if type(all_settings_status) == list and all_settings_status != []:
             print_colored_text(f'Missing some mandatory settings: {all_settings_status}', [255, 0, 0])
             print_colored_text('Defaulted to default values for missing settings for this session', [255, 255, 0])
