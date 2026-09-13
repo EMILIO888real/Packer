@@ -5,6 +5,7 @@
 - Documentation for various functions that were missing, most importantly the `Global_exception_handler` is also now documented. 
 - `trigger_exit` function in `ege.py` to handle clean GUI exit by triggering `pygame` quit event. 
 - `compatability` settings for the GUI users that are on Windows. 
+- Doctype for the `_smooth_output` function, so that all of those function have doctype and type notations, so when you inspect `print_and_log` the documentation remains the same. 
 
 ### Changed
 - Added a `no_index` parameter to the `main()` function in `change.py`, allowing to disable automatic full git indexation of the project (default is False). 
@@ -18,11 +19,15 @@
 - `_draw_output` to not allow accepting mouse inputs by clearing the `menu_buttons` list. 
 - `_send_queue_request` dictionary object strucure to not contain the expected output type, since it doesn't ever change based on the question. 
 - Output window in the GUI to have 2 buttons at the bottom a yes and no whenever a question pops up. 
+- `_log_and_output_queue` function doctype and type notations to match it's other similar functions, to be more readable. 
 
 ### Fixed
 - Made git still automatically index or stage the `CHANGELOG.md` file regardless of the `--no-index` flag. 
 - Documentation on the `bool_answer` function in the `etf.py` module. 
 - `Global_exception_handler` to use provided `IO queues`. 
+- Type notation for the `Packer` class variable IO queues, to show that they accept None as a value. 
+- Output for missing ollama client in the `Packer` class to not have a random comma after a line, accidental syntax mistake. 
+- Output for `GoFile` retrying message to correctly pass values to the function, the level argument was being passed to the color parameter. 
 
 ---
 

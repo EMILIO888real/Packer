@@ -166,10 +166,10 @@ class Packer():
                  github_repo_token: str, github_repo_url: str, 
                  gofile_user_token: str | None = None, gofile_folder_id: str | None = None,
                  pypi_api_token: str | None = None,
-                 input_queue: Queue = None, output_queue: Queue = None,
+                 input_queue: Queue | None = None, output_queue: Queue | None = None,
                  compile_command: Sequence[str] = Project.model_fields['compile_command'].default,
                  before_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['before_commands'].default, after_commands: tuple[tuple[str, ...] | Callable, ...] = Project.model_fields['after_commands'].default,
-                 model: str = Project.model_fields['model'].default, description_prompt: list[dict[str: str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str: str]] = Project.model_fields['title_prompt'].default,
+                 model: str = Project.model_fields['model'].default, description_prompt: list[dict[str, str]] = Project.model_fields['description_prompt'].default, title_prompt: list[dict[str, str]] = Project.model_fields['title_prompt'].default,
                  description_prompt_kwargs: dict[Any, Any] = Project.model_fields['description_prompt_kwargs'].default, title_prompt_kwargs: dict[Any, Any] = Project.model_fields['title_prompt_kwargs'].default,
                  release_notes_template_path: str = Project.model_fields['release_notes_template_path'].default, changelog_git_hash: bool = Project.model_fields['changelog_git_hash'].default,
                  check_todo: bool = Project.model_fields['check_todo'].default, todo_rel_path: str = Project.model_fields['todo_rel_path'].default,
@@ -251,7 +251,7 @@ class Packer():
 
         if (self.description_prompt or self.title_prompt) and not ollama_available:
             self.print_and_log('Couldn\'t find ollama on PATH', [255, 0, 0], 40, end=' ')
-            self.print_and_log('please add it if installed otherwise install it: https://ollama.com/download.', [0, 255, 0], end=' '),
+            self.print_and_log('please add it if installed otherwise install it: https://ollama.com/download.', [0, 255, 0], end=' ')
             self.print_and_log('Alternately you can also set both prompts to None.', [255, 255, 0], end=' ')
             self.print_and_log('Exiting...', [138, 43, 226])
             self._exit(1)
@@ -563,7 +563,7 @@ class Packer():
                         self.print_and_log(f'Encountered a problem while uploading to GoFile | Error: {e}', [255, 0, 0], 30)
 
                     if retry_gofile:
-                        self.print_and_log('retrying in 3 seconds...', 30)
+                        self.print_and_log('retrying in 3 seconds...', [255, 255, 0], 30)
                         sleep(3)
 
 
@@ -1114,7 +1114,20 @@ class Packer():
         print_colored_text(text, color, end=end)
         self._process_partial_output(text + end, level)
 
-    def _smooth_output(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
+    def _smooth_output(self, text: str, color: list[int, int, int] | None = None, level: int = 20, end: str = '\n'):
+        '''
+        Smoothly outputs the text to the console and logs it to the packer log file.
+
+        :param text: The text to output smoothly and log.
+        :type text: str
+        :param color: The color to use for the text, default is None (default terminal color).
+        :type color: list[int, int, int] | None
+        :param level: The logging level to use, default is 20 [INFO].
+        :type level: int
+        :param end: The string appended after the last value, default a newline.
+        :type end: str
+        '''
+
         self.buffer_queue.put({'text': text, 'color': color, 'end': end})
         self._process_partial_output(text + end, level)
 
@@ -1200,13 +1213,13 @@ class Packer():
         self.log_action(f'Requested user input to "{question}" | Answer = "{answer}"')
         return answer
 
-    def _log_and_output_queue(self, text: str, color: Optional[Sequence[int]] | None = None, level: int = 20, end: str = '\n'):
+    def _log_and_output_queue(self, text: str, color: list[int, int, int] | None = None, level: int = 20, end: str = '\n'):
         '''Puts the text in the output queue and logs it to the packer log file.
         
         :param text: The text to output to the queue and log.
         :type text: str
         :param color: The color to use for the text, default is None (default environment color).
-        :type color: Optional[Sequence[int]] | None
+        :type color: list[int, int, int] | None
         :param level: The logging level to use, default is 20 [INFO].
         :type level: int
         :param end: The string appended after the last value, default a newline.
