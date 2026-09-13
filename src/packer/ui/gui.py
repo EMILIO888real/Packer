@@ -1,35 +1,27 @@
-# TEMP
-
-from json import load
-from os import environ
-from pathlib import Path
-from warnings import filterwarnings
-
-filterwarnings(
-    "ignore",
-    message=r".*Your system is avx2 capable but pygame was not built with support for it.*",
-    category=RuntimeWarning,
-)
-
-environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # Turns off pygame hello message
-
-# TEMP ENDS
-
 from time import sleep
 import pygame
 import queue
-from multiprocessing import Event, Process, Queue
+from multiprocessing import Process, Queue
 import threading
 from functools import wraps
 from typing import Callable, Literal, ParamSpec, TypeVar
 from inspect import signature
+from json import load
+from pathlib import Path
+from sys import exit, platform
 
 from packer.config import Project, all_settings, all_settings_status, projects_configurations
 from packer.custom_modules.et import format_time, noop, normalize_settings_keys, resolve_version
 from packer.custom_modules.etf import clear_lines, print_colored_text
-from packer.custom_modules.ege import create_text_blit, format_size, Advanced_clock
+from packer.custom_modules.ege import create_text_blit, format_size, Advanced_clock, trigger_exit
 from packer import actions
 
+if all_settings.compatibility:
+    if platform == 'win32':
+        print_colored_text('You are running with compatibility settings enabled on Windows!', [255, 255, 0], end=' ')
+        print_colored_text('Some settings were automatically set to preset values for Windows.', [0, 255, 0], end=' ')
+        print_colored_text('For more info refer to documentation.', [138, 43, 226])
+        all_settings.slow_events = False
 
 P = ParamSpec('P')
 R = TypeVar('R')
@@ -74,6 +66,9 @@ class Gui():
         self.text_font = pygame.font.Font(all_settings.font_name, all_settings.font_size)
         self.projects_configurations = None
         self.full_output = []
+        self.answer = None
+        self.question = None
+        self.default_answer = None
 
         self.screen = pygame.display.set_mode(all_settings.window_resolution, pygame.RESIZABLE, vsync=1 if all_settings.vsync else 0)
         self.screen_size = self.screen.get_size()
@@ -105,64 +100,110 @@ class Gui():
 
     def _handle_output(self, input_queue: queue.Queue, output_queue: queue.Queue):
         while self.running.is_set():
-            output: dict = input_queue.get()
-            if 'text' in output:
-                output['text'] = output['text'] + output['end']
-                output.pop('end')
-                self.full_output.append(output)
-            elif 'question' in output:
-                answer = self._prompt(f'{output['question']} [{'Y/n' if output['default'] == 'y' else 'y/N'}]')
-                output_queue.put(int(answer) if answer.isdigit() else answer)
+            output: dict | int | None = input_queue.get()
+            if type(output) == dict:
+                if 'text' in output:
+                    output['text'] += output.pop('end', '')
+                    self.full_output.append(output)
+                elif 'question' in output:
+                    self.question = output['question']
+                    self.full_output.append({'text': self.question, 'color': None})
+                    self._refresh_screen()
+                    while self.answer is None:
+                        sleep(all_settings.gui_subsystem_speed)
+                    output_queue.put(self.answer)
+                    self.answer = None
+                    self.question = None
+                    self.menu_buttons.clear()
+                else:
+                    self.full_output.append({'text': output['chunk'], 'color': output['color']})
+                self._refresh_screen()
             else:
-                self.full_output.append({'text': output['chunk'], 'color': output['color']})
-            self._refresh_screen()
+                if all_settings.gui_exit_delay < float('inf'):
+                    for _ in range(10 * all_settings.gui_exit_delay):
+                        while self.running.is_set():
+                            sleep(all_settings.gui_subsystem_speed)
+                        else:
+                            break
+                    trigger_exit()
+                    break
+                else:
+                    while self.running.is_set():
+                        sleep(all_settings.gui_subsystem_speed)
 
+    def _create_button(self, text: str, pos: list[float, float], use_general_button_size: bool = True) -> tuple[pygame.Surface, pygame.Rect, pygame.Rect]:
+        '''
+        Creates a button with the given text and position.
+
+        :param text: The text to display on the button.
+        :type text: str
+        :param pos: The position of the button, as a list of two floats representing the x and y coordinates (normalized to the screen size).
+        :type pos: list[float, float]
+        :param use_general_button_size: Whether to use the general button size defined in settings or to size the button based on the text. Defaults to True.
+        :type use_general_button_size: bool, optional
+        :return: A tuple containing the button's text surface, rectangle, and text rectangle.
+        :rtype: tuple[pygame.Surface, pygame.Rect, pygame.Rect]
+        '''
+
+        if use_general_button_size:
+            rect = self.button_rect.copy()
+        else:
+            rect = pygame.Rect(0, 0, *self.text_font.size(text))
+        rect.center = format_size(pos, self.screen_size)
+        text_blit = create_text_blit(self._get_shrunk_text(text, rect), all_settings.text_color, self.text_font)
+        return (text_blit[0], rect, text_blit[0].get_rect(center=rect.center))
 
     def _refresh_output(self):
         self._refresh_buttons()
+
         self.output_rect = pygame.Rect(0, 0, self.screen_size[0] // 1.2, self.screen_size[1] // 1.2)
-        self.output_rect.center = (self.screen_size[0] // 2, self.screen_size[1] // 2)
-        self.output_lines = []
+        self.output_rect.center = (self.screen_size[0] * 0.5, self.screen_size[1] * 0.42)
+
+        if self.question:
+            self.menu_buttons = [self._create_button('Yes', [0.25, 0.92]), self._create_button('No', [0.75, 0.92])]
+
         line_height = self.button_rect.height
-        last_x_cords = {'blits': [0], 'word warping': [0]}
-        outputs = []
+        max_lines = max(1, self.output_rect.height // line_height)
+        output_rows: list[list[tuple[str, list[int]]]] = [[]]
 
-        for text_i, output in enumerate(self.full_output):
+        for output in self.full_output:
             color = output['color'] or all_settings.text_color
+            for character in output['text']:
+                if character == '\n':
+                    output_rows.append([])
+                    continue
 
-            word_warped_lines = []
+                row = output_rows[-1]
+                current_text = ''.join(fragment[0] for fragment in row)
+                if current_text and self.text_font.size(current_text + character)[0] > self.output_rect.width:
+                    output_rows.append([])
+                    row = output_rows[-1]
+                if row and row[-1][1] == color:
+                    row[-1] = (row[-1][0] + character, color)
+                else:
+                    row.append((character, color))
 
-            end_of_last_line_character = 0
-            while True:
-                i = -1
-                size = self.text_font.size(output['text'][end_of_last_line_character:])
-                while size[0] + (last_x_cords['word warping'][text_i] if type(last_x_cords['word warping'][text_i]) == int else 0) > self.output_rect.width:
-                    size = self.text_font.size(output['text'][end_of_last_line_character:i])
-                    i -= 1
-                word_warped_lines.append(output['text'][end_of_last_line_character:i])
-                last_x_cords['word warping'][text_i] = False
-                end_of_last_line_character = i
-                if i == -1:
-                    last_x_cords['blits'].append(size[0])
-                    last_x_cords['word warping'].append(size[0])
-                    break
-            outputs.append((word_warped_lines, color))
+        while len(output_rows) > 1 and not output_rows[-1]:
+            output_rows.pop()
 
-        for text_i, word_warped_lines in enumerate(outputs):
-            color = word_warped_lines[1]
-            for text in word_warped_lines[0]:
-                text_blit = create_text_blit(text, color, self.text_font)[0]
-                line_y = self.output_rect.y + line_height * (len(self.output_lines) - (text_i))
-                if line_y > self.output_rect.y + self.output_rect.height:
-                    return
-                self.output_lines.append((text_blit, (self.output_rect.x + (last_x_cords['blits'][text_i] if type(last_x_cords['blits'][text_i]) == int else 0), line_y)))
-                last_x_cords['blits'][text_i] = False
+        visible_rows = output_rows[-max_lines:]
+        self.output_lines = []
+        for line_i, row in enumerate(visible_rows):
+            x = self.output_rect.x
+            line_y = self.output_rect.y + line_height * line_i
+            for line, color in row:
+                text_blit = create_text_blit(line, color, self.text_font)[0]
+                self.output_lines.append((text_blit, (x, line_y)))
+                x += text_blit.get_width()
+        self.output_blits = self.output_lines
 
     
     def _draw_output(self):
         pygame.draw.rect(self.screen, all_settings.button_color, self.output_rect)
-        for blit, rect in self.output_lines:
+        for blit, rect in self.output_blits:
             self.screen.blit(blit, rect)
+
+        self._draw_menu()
 
 
     def _draw_menu(self):
@@ -186,11 +227,11 @@ class Gui():
         if not self.projects_configurations:
             self.projects_configurations = self._get_projects_configurations()
         self.projects = list(self.projects_configurations.keys())
-        self._change_menu('choose project menu', [Path(project).name for project in self.projects], [self._choose_project_action for _ in range(len(self.projects))])
+        self._change_menu('choose project menu', [self._choose_project_action for _ in range(len(self.projects))], [Path(project).name for project in self.projects])
 
     def _choose_project_action(self, i: int):
         self.chosen_project = self.projects[i]
-        self._change_menu('choose version menu', ['x', 'y', 'z', 'full'], [self._choose_version_bump_action for _ in range(3)] + [self._choose_version_full_action])
+        self._change_menu('choose version menu', [self._choose_version_bump_action for _ in range(3)] + [self._choose_version_full_action], ['x', 'y', 'z', 'full'])
 
     def _choose_version_bump_action(self, i: int):
         with open(f'{self.chosen_project}/src/{Path(self.chosen_project).name}/assets/version.json') as f:
@@ -201,8 +242,13 @@ class Gui():
         self.chosen_version = {['major', 'minor', 'patch'][i]: version_number for i, version_number in enumerate(self._prompt('Enter version (format: x.y.z): ').split('.'))}
         self._run_packer()
 
+    def _choose_answer(self, i: int):
+        self.answer = i
+    
     def _run_packer(self):
         self._refresh_screen = self._refresh_output
+        self.menu_buttons.clear()
+        self._change_menu('run packer menu', [self._choose_answer for _ in range(2)])
         self._refresh_screen()
         self._draw = self._draw_output
         input_queue = Queue()
@@ -210,8 +256,9 @@ class Gui():
         Process(target=actions.run, args=(self.chosen_version, self.chosen_project, Project(**normalize_settings_keys(self.projects_configurations[self.chosen_project])), input_queue, output_queue)).start()
         threading.Thread(target=self._handle_output, args=(output_queue, input_queue)).start()
 
-    def _change_menu(self, menu: str, menu_texts: str, actions: list[Callable]):
-        self.menu_button_texts[menu] = menu_texts
+    def _change_menu(self, menu: str, actions: list[Callable], menu_texts: str | None = None):
+        if menu_texts:
+            self.menu_button_texts[menu] = menu_texts
         self.menus_buttons_actions[menu] = actions
         self.user_position_menu = menu
         self._refresh_screen()
@@ -310,7 +357,6 @@ class Gui():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 self._exit()
-                self.running.clear()
 
             elif event.type == pygame.VIDEORESIZE:
                 self.screen_size = self.screen.get_size()
@@ -341,6 +387,9 @@ class Gui():
                 elif self.display_stats.is_set():
                     if event.key == pygame.K_F2:
                         self.input_user_text = True
+                    elif event.key == pygame.K_F1:
+                        self.full_output.append({'text': 'is this correct', 'color': None})
+                        self._refresh_screen()
 
 
 
@@ -393,6 +442,7 @@ class Gui():
         if self.display_stats.is_set():
             self.display_stats.clear()
             self.debug_menu_thread.join()
+        self.running.clear()
 
 
     def _stats_display(self):
@@ -412,12 +462,12 @@ class Gui():
             print_colored_text(str(self.screen_size), [0, 0, 255])
             print('Text input:', end=' ')
             print_colored_text(self.user_inputted_text)
-            sleep(0.1)
+            sleep(all_settings.gui_subsystem_speed)
             clear_lines(6)
 
 
 
-def main():
+def main(): 
     instance = Gui()
     instance.run()
 

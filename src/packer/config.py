@@ -161,6 +161,20 @@ class Settings(BaseModel):
         auto_clear_logs (bool): Automatically clear logs when threshold is exceeded (default: True).
         suggestions_prompt (list[dict]): Prompt template for generating release note style suggestions from git diffs.
         stream_background_color (list[int] | None): RGB background color for streamed output (default: [44, 44, 44]).
+        window_resolution (list[int]): Resolution of the GUI window in pixels (default: [800, 600]).
+        window_background_color (list[int]): RGB background color for the GUI window (default: [13, 17, 23]).
+        slow_events (bool): Whether to slow down event handling for smoother GUI performance (default: True).
+        event_handler_speed (float): Speed of event handling in seconds per update (default: 0.016, ~60 UPS).
+        gui_subsystem_speed (float): Speed of GUI subsystem updates in seconds per update (default: 0.1, 10 UPS).
+        window_fps (float): Target frames per second for the GUI window (default: 240).
+        button_color (list[int]): RGB color for GUI buttons (default: [30, 30, 30]).
+        button_size (list[int | float]): Size of GUI buttons as a fraction of window size (default: [0.4, 0.08]).
+        vsync (bool): Enable vertical synchronization for the GUI window (default: True).
+        text_color (list[int]): RGB color for text in the GUI (default: [115, 115, 115]).
+        font_name (str | None): Name of the font to use in the GUI (default: None, which uses system default).
+        font_size (int): Size of the font in the GUI (default: 45).
+        gui_exit_delay (float): Delay in seconds before the GUI exits after a close event (default: 3.0).
+        compatibility (bool): Enable compatibility mode for other systems (default: True).
     '''
 
     text_editor: str = 'code'
@@ -226,7 +240,7 @@ class Settings(BaseModel):
     window_resolution: list[int] = [800, 600]
     window_background_color: list[int] = [13, 17, 23]
     slow_events: bool = True
-    event_handler_speed: float = 0.016 # 60 UPS
+    event_handler_speed: float = 0.016 # ~60 UPS
     gui_subsystem_speed: float = 0.1 # 10 UPS
     window_fps: float = 240
     button_color: list[int] = [30, 30, 30]
@@ -235,6 +249,8 @@ class Settings(BaseModel):
     text_color: list[int, int, int] = [115, 115, 115]
     font_name: str | None = None
     font_size: int = 45
+    gui_exit_delay: float = 3.0
+    compatibility: bool = True
 
 
 if not Path(settings_file_path).exists():

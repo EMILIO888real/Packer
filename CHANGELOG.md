@@ -3,6 +3,8 @@
 ### Added
 - CLI completion function for settings `--version-font` fonts to give nice-random font selection. 
 - Documentation for various functions that were missing, most importantly the `Global_exception_handler` is also now documented. 
+- `trigger_exit` function in `ege.py` to handle clean GUI exit by triggering `pygame` quit event. 
+- `compatability` settings for the GUI users that are on Windows. 
 
 ### Changed
 - Added a `no_index` parameter to the `main()` function in `change.py`, allowing to disable automatic full git indexation of the project (default is False). 
@@ -10,6 +12,12 @@
 - `print_colored_text` function in the `etf.py` module to accept `None` as an option for color, in that case the function doesn't call the `change_color` function. 
 - Updated all use cases of `print_colored_text` function to not manually check if color is None, but now just simply pass it to the `print_colored_text` function without a seperate `print` function call. 
 - `Global_exception_handler` `update` method to allow accepting `IO queues`, making it easy to plug in an interface after creating the object. 
+- Removed temporary section in the GUI that mutes `Pygame` warnings. 
+- Reworked `_refresh_output` function in the GUI to correctly render text, lines are warped by character a new blit is created for each text they are aligned as close to each other as possible on the x axi, in the future font size will be dynamic for y axi alignment as well. 
+- `_handle_output` to correctly save the end characters if there are any and added an automatic GUI exit if an exit event is received from Packer after a delay. 
+- `_draw_output` to not allow accepting mouse inputs by clearing the `menu_buttons` list. 
+- `_send_queue_request` dictionary object strucure to not contain the expected output type, since it doesn't ever change based on the question. 
+- Output window in the GUI to have 2 buttons at the bottom a yes and no whenever a question pops up. 
 
 ### Fixed
 - Made git still automatically index or stage the `CHANGELOG.md` file regardless of the `--no-index` flag. 

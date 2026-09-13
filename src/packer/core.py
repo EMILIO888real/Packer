@@ -986,6 +986,8 @@ class Packer():
     def _exit(self, code: int = None, wait: bool = True):
         if wait:
             self._wait_smooth_output()
+        if self.output_queue:
+            self.output_queue.put(code)
         sys.exit(code)
 
     def _wait_smooth_output(self):
@@ -1145,7 +1147,7 @@ class Packer():
         :rtype: str | int
         '''
 
-        self.output_queue.put({'question': question, 'default': default, 'expected output type': str | int})
+        self.output_queue.put({'question': question, 'default': default})
         
     def _get_queue_input(self, question: str, default: str | int = 'y') -> bool | None:
         '''

@@ -188,3 +188,6 @@ def playlist(music_files: Sequence[str], music_mixer: pygame.mixer.music, played
             music_index = 0
 
         action_function()
+
+def trigger_exit():
+    pygame.event.post(pygame.event.Event(pygame.QUIT))
