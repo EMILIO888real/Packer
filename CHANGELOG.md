@@ -1,36 +1,34 @@
-## [%new_version] - %date
+## [0.27.0] - 2026-09-13
 
 ### Added
-- CLI completion function for settings `--version-font` fonts to give nice-random font selection. 
-- Documentation for various functions that were missing, most importantly the `Global_exception_handler` is also now documented. 
-- `trigger_exit` function in `ege.py` to handle clean GUI exit by triggering `pygame` quit event. 
-- `compatability` settings for the GUI users that are on Windows. 
-- Doctype for the `_smooth_output` function, so that all of those function have doctype and type notations, so when you inspect `print_and_log` the documentation remains the same. 
+- [0056648] CLI completion function for settings `--version-font` fonts to give nice-random font selection. 
+- [0056648] Documentation for various functions that were missing, most importantly the `Global_exception_handler` is also now documented. 
+- [689559d] `trigger_exit` function in `ege.py` to handle clean GUI exit by triggering `pygame` quit event. 
+- [689559d] `compatability` settings for the GUI users that are on Windows. 
+- [2c30382] Doctype for the `_smooth_output` function, so that all of those function have doctype and type notations, so when you inspect `print_and_log` the documentation remains the same.
 
 ### Changed
-- Added a `no_index` parameter to the `main()` function in `change.py`, allowing to disable automatic full git indexation of the project (default is False). 
-- Officially made Packer's `Global_exception_handler` only run in a terminal interface, not when Packer is imported. 
-- `print_colored_text` function in the `etf.py` module to accept `None` as an option for color, in that case the function doesn't call the `change_color` function. 
-- Updated all use cases of `print_colored_text` function to not manually check if color is None, but now just simply pass it to the `print_colored_text` function without a seperate `print` function call. 
-- `Global_exception_handler` `update` method to allow accepting `IO queues`, making it easy to plug in an interface after creating the object. 
-- Removed temporary section in the GUI that mutes `Pygame` warnings. 
-- Reworked `_refresh_output` function in the GUI to correctly render text, lines are warped by character a new blit is created for each text they are aligned as close to each other as possible on the x axi, in the future font size will be dynamic for y axi alignment as well. 
-- `_handle_output` to correctly save the end characters if there are any and added an automatic GUI exit if an exit event is received from Packer after a delay. 
-- `_draw_output` to not allow accepting mouse inputs by clearing the `menu_buttons` list. 
-- `_send_queue_request` dictionary object strucure to not contain the expected output type, since it doesn't ever change based on the question. 
-- Output window in the GUI to have 2 buttons at the bottom a yes and no whenever a question pops up. 
-- `_log_and_output_queue` function doctype and type notations to match it's other similar functions, to be more readable. 
-- Update `GoFile` Packer folder share code from the old `bsT5ix` to the new `KtA9pExt`, since `GoFile` had again updated their website and the folder was removed. 
+- [5f5e478] Added a `no_index` parameter to the `main()` function in `change.py`, allowing to disable automatic full git indexation of the project (default is False). 
+- [0056648] Officially made Packer's `Global_exception_handler` only run in a terminal interface, not when Packer is imported. 
+- [0056648] `print_colored_text` function in the `etf.py` module to accept `None` as an option for color, in that case the function doesn't call the `change_color` function. 
+- [0056648] Updated all use cases of `print_colored_text` function to not manually check if color is None, but now just simply pass it to the `print_colored_text` function without a seperate `print` function call. 
+- [0056648] `Global_exception_handler` `update` method to allow accepting `IO queues`, making it easy to plug in an interface after creating the object. 
+- [689559d] Removed temporary section in the GUI that mutes `Pygame` warnings. 
+- [689559d] Reworked `_refresh_output` function in the GUI to correctly render text, lines are warped by character a new blit is created for each text they are aligned as close to each other as possible on the x axi, in the future font size will be dynamic for y axi alignment as well. 
+- [689559d] `_handle_output` to correctly save the end characters if there are any and added an automatic GUI exit if an exit event is received from Packer after a delay. 
+- [689559d] `_draw_output` to not allow accepting mouse inputs by clearing the `menu_buttons` list. 
+- [689559d] `_send_queue_request` dictionary object strucure to not contain the expected output type, since it doesn't ever change based on the question. 
+- [689559d] Output window in the GUI to have 2 buttons at the bottom a yes and no whenever a question pops up. 
+- [2c30382] `_log_and_output_queue` function doctype and type notations to match it's other similar functions, to be more readable. 
+- [bb5a2c9] Update `GoFile` Packer folder share code from the old `bsT5ix` to the new `KtA9pExt`, since `GoFile` had again updated their website and the folder was removed.
 
 ### Fixed
-- Made git still automatically index or stage the `CHANGELOG.md` file regardless of the `--no-index` flag. 
-- Documentation on the `bool_answer` function in the `etf.py` module. 
-- `Global_exception_handler` to use provided `IO queues`. 
-- Type notation for the `Packer` class variable IO queues, to show that they accept None as a value. 
-- Output for missing ollama client in the `Packer` class to not have a random comma after a line, accidental syntax mistake. 
-- Output for `GoFile` retrying message to correctly pass values to the function, the level argument was being passed to the color parameter. 
-
----
+- [3e15e4b] Made git still automatically index or stage the `CHANGELOG.md` file regardless of the `--no-index` flag. 
+- [0056648] Documentation on the `bool_answer` function in the `etf.py` module. 
+- [0056648] `Global_exception_handler` to use provided `IO queues`. 
+- [2c30382] Type notation for the `Packer` class variable IO queues, to show that they accept None as a value. 
+- [2c30382] Output for missing ollama client in the `Packer` class to not have a random comma after a line, accidental syntax mistake. 
+- [2c30382] Output for `GoFile` retrying message to correctly pass values to the function, the level argument was being passed to the color parameter.---
 
 ## [0.26.0] - 2026-08-29
 
