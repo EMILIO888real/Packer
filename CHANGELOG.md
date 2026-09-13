@@ -20,6 +20,7 @@
 - `_send_queue_request` dictionary object strucure to not contain the expected output type, since it doesn't ever change based on the question. 
 - Output window in the GUI to have 2 buttons at the bottom a yes and no whenever a question pops up. 
 - `_log_and_output_queue` function doctype and type notations to match it's other similar functions, to be more readable. 
+- Update `GoFile` Packer folder share code from the old `bsT5ix` to the new `KtA9pExt`, since `GoFile` had again updated their website and the folder was removed. 
 
 ### Fixed
 - Made git still automatically index or stage the `CHANGELOG.md` file regardless of the `--no-index` flag. 

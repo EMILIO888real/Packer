@@ -165,7 +165,7 @@ def main():
 
     setup_command_parser.add_argument('-u', '--github-url', dest='setup_github_repo_url', help='GitHub repository URL')
     setup_command_parser.add_argument('-o', '--overwrite', action='store_true', dest='setup_overwrite', help='Overwrite existing project')
-    setup_command_parser.add_argument('-c', '--code', action='store_true', dest='setup_gofile_code', help='GoFile URL / code (eg. OktQl5)')
+    setup_command_parser.add_argument('-c', '--code', action='store_true', dest='setup_gofile_code', help='GoFile URL / code (eg. KtA9pExt)')
 
     setup_command_parser.add_argument('-l', '--license', dest='setup_license', help='License for the new project').completer = get_license_types
 

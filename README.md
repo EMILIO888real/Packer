@@ -80,7 +80,7 @@ pip install git+https://github.com/EMILIO888real/Packer.git
 
 ### From a source archive (GoFile)
 
-If you prefer to install from a downloaded source archive, download the archive from the [GoFile archive](https://gofile.io/d/bsT5ix) and install it with `pip`:
+If you prefer to install from a downloaded source archive, download the archive from the [GoFile archive](https://gofile.io/d/KtA9pExt) and install it with `pip`:
 
 ```bash
 pip install /path/to/packer-x.y.z.tar.gz

@@ -60,7 +60,7 @@ Commands
   - `-t, --pat`          : GitHub personal access token.
   - `-u, --github-url`   : GitHub repository URL.
   - `-o, --overwrite`    : Overwrite existing project files.
-  - `-c, --code`         : GoFile URL or code (for example `OktQl5`).
+  - `-c, --code`         : GoFile URL or code (for example `KtA9pExt`).
   - `-l, --license`      : License for the new project.
   - `--authenticate`     : Authenticate with GitHub using a PAT for pushing.
 
