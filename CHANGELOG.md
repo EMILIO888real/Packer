@@ -1,8 +1,10 @@
 ## [%new_version] - %date
 
 ### Added
+- Terminate any ongoing processes to the `Packer.revert_changes` method using the newly acquired handles to the processes by terminating them before cleaning up the environment. 
 
 ### Changed
+- `Packer._Popen` method to create and start the process outside the thread but at method call place and return not only the done event, but also the handle to that process. 
 
 ### Fixed
 

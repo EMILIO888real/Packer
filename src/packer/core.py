@@ -449,11 +449,11 @@ class Packer():
 
         self.print_and_log('Getting exclusions from .gitignore...')
         with open('.gitignore') as f:
-            exclusions = [entry for entry in f.read().splitlines() if '#' not in entry and entry != '']
-        exclusions.append('.git')
+            self.exclusions = [entry for entry in f.read().splitlines() if '#' not in entry and entry != '']
+        self.exclusions.append('.git')
 
         self.print_and_log('Generating the integrity file...')
-        new_cwd = tree(Path().cwd(), exclusions)
+        new_cwd = tree(Path().cwd(), self.exclusions)
         with open(f'{self.assets_dir}/integrity.json', 'w') as f:
             dump({'CWD': new_cwd}, f)
 
@@ -490,7 +490,7 @@ class Packer():
             metadata: dict = load(f)
         current_project_metadata = metadata.get(str(Path().absolute()), {})
         
-        project_size = get_folder_size(Path(), exclusions)
+        project_size = get_folder_size(Path(), self.exclusions)
         version_size = self.program_archive_path.stat().st_size
 
         if current_project_metadata:
@@ -518,19 +518,19 @@ class Packer():
             if self.compile_command:
                 self.print_and_log('Compiling the program using Nuitka...')
                 waiting_for_compile_command = threading.Event()
-                compile_command_done = self._Popen(self.compile_command, waiting_for_compile_command)
+                compile_command_done, self.compile_process_handle = self._Popen(self.compile_command, waiting_for_compile_command)
 
             self.print_and_log(f'Building a python package ({2 if self.pypi_api_token else 1} files)')
             waiting_for_building = threading.Event()
             building_cmd = [sys.executable, '-m', 'build', '--outdir', f'{self.cache_dir}/dist']
             if not self.pypi_api_token:
                 building_cmd.insert(3, '--wheel')
-            building_done = self._Popen(building_cmd, waiting_for_building)
+            building_done, self.building_process_handle = self._Popen(building_cmd, waiting_for_building)
             
             if self.run_pyinstaller:
                 self.print_and_log('Bundling the program using PyInstaller...')
                 waiting_for_pyinstaller_bundling = threading.Event()
-                pyinstaller_done = self._Popen([sys.executable,
+                pyinstaller_done, self.pyinstaller_process_handle = self._Popen([sys.executable,
                             '-m',
                             'PyInstaller', 'main.spec',
                             '--distpath', f'{self.cache_dir}/dist',
@@ -833,7 +833,7 @@ class Packer():
             with open(metadata_path, 'w') as f:
                 dump(metadata, f)
 
-            for pattern in exclusions:
+            for pattern in self.exclusions:
                 if Path('build').match(pattern):
                     break
             else:
@@ -855,6 +855,22 @@ class Packer():
 
         if wait:
             self._wait_smooth_output()
+
+        self.print_and_log('Terminating any ongoing processes...', [255, 255, 0], 30)
+
+        if hasattr(self, 'compile_process_handle'):
+            self.print_and_log('Terminating the compilation process...', [255, 255, 0], 30)
+            self.compile_process_handle.terminate()
+
+        if hasattr(self, 'building_process_handle'):
+            self.print_and_log('Terminating the building process...', [255, 255, 0], 30)
+            self.building_process_handle.terminate()
+
+        if hasattr(self, 'pyinstaller_process_handle'):
+            self.print_and_log('Terminating the PyInstaller process...', [255, 255, 0], 30)
+            self.pyinstaller_process_handle.terminate()
+
+
         self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
 
         if self.program_archive_path.exists():
@@ -1254,7 +1270,7 @@ class Packer():
         self.log_action(f'Ran command: {" ".join(args)}\nstdout: {result.stdout.decode("utf-8")}\nstderr: {result.stderr.decode("utf-8")}')
         return result
 
-    def _Popen(self, cmd: list[str], waiting: threading.Event) -> threading.Event:
+    def _Popen(self, cmd: list[str], waiting: threading.Event) -> tuple[threading.Event, Popen]:
         '''
         Runs a subprocess command in the git directory and prints the stdout in real time. Also logs the stdout to the packer log file.
         
@@ -1271,11 +1287,10 @@ class Packer():
             print_bg_colored_text(text, all_settings.stream_background_color, flush=flush)
         output_text = print_with_background if all_settings.stream_background_color else print
         done = threading.Event()
+        process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
 
 
-        def thread_function(done: threading.Event):
-            process = Popen(cmd, stdout=PIPE, stderr=STDOUT, text=True)
-
+        def thread_function(done: threading.Event, process):
             for text in process.stdout:
                 text = text.rstrip('\n')
                 self.log_action(text)
@@ -1289,6 +1304,6 @@ class Packer():
                 self.revert_changes()
             done.set()
 
-        threading.Thread(target=thread_function, args=[done], daemon=True).start()
+        threading.Thread(target=thread_function, args=(done, process), daemon=True).start()
 
-        return done
+        return (done, process)
