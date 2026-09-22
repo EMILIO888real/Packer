@@ -2,6 +2,8 @@
 
 If the automatic `revert_changes()` method fails, you can manually roll back the release by following these steps.
 
+When `revert_changes()` runs, it also terminates any ongoing compilation, package-building, or PyInstaller processes started by Packer. This is not strictly necessary: these are independent programs running in parallel with Packer, so they will not become stuck waiting for Packer input and will finish and exit on their own when they complete their assigned task. Terminating them simply prevents unnecessary work from continuing after the release has been reverted. Before manually resetting the Git directory to an earlier commit, it is recommended to wait for these processes to finish or terminate them first, so they do not continue working against the reverted files or produce artifacts in that directory.
+
 > **Note:** Values enclosed in `<...>` are placeholders. Replace them with the appropriate values and **do not** include the angle brackets (`<` and `>`) when running the commands.
 
 ## 1. Remove the generated archive
