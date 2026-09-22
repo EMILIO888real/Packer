@@ -730,7 +730,7 @@ class Packer():
                 self.git_repo.heads['development'].checkout()
 
             if not self.pypi_api_token and self.environment_name and self.workflow_filename:
-                publish_to_pypi = self.prompt_user('publish to PyPI')
+                publish_to_pypi = True if all_settings.skip_pypi_prompt else self.prompt_user('publish to PyPI')
                 self.print_and_log('getting workflow and run id...')
                 self.workflow = self.repo.get_workflow(self.workflow_filename)
                 self.run_id = next(iter(self.workflow.get_runs())).id

@@ -55,6 +55,7 @@ The following options are saved globally for all projects in `settings.json`.
 | `font_size` | `int` | `45` | Size of the font in the GUI. |
 | `gui_exit_delay` | `float` | `3.0` | Delay in seconds before the GUI exits after a close event. |
 | `compatibility` | `bool` | `true` | Enable GUI compatibility handling. On Windows, prints a compatibility notice and forces `slow_events` to `false`; currently has no effect on other systems. |
+| `skip_pypi_prompt` | `bool` | `false` | Skips Packer prompt before sending the green signal to publishing to PyPI through GitHub actions. |
 
 ### GUI compatibility mode
 

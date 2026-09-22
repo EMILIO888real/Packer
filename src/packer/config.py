@@ -175,6 +175,7 @@ class Settings(BaseModel):
         font_size (int): Size of the font in the GUI (default: 45).
         gui_exit_delay (float): Delay in seconds before the GUI exits after a close event (default: 3.0).
         compatibility (bool): Enable compatibility mode for other systems (default: True).
+        skip_pypi_prompt (bool): Skips Packer prompt before sending the green signal to publishing to PyPI through GitHub actions (default: False).
     '''
 
     text_editor: str = 'code'
@@ -251,6 +252,7 @@ class Settings(BaseModel):
     font_size: int = 45
     gui_exit_delay: float = 3.0
     compatibility: bool = True
+    skip_pypi_prompt: bool = False
 
 
 if not Path(settings_file_path).exists():
