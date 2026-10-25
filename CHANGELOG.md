@@ -7,6 +7,7 @@
 
 ### Changed
 - `Packer._Popen` method to create and start the process outside the thread but at method call place and return not only the done event, but also the handle to that process. 
+- `__init__.py` to the semi-new standart for lazy importing. 
 
 ### Fixed
 - Table of contents in the README by removing the "Config" and "Extra notes" sections, and adding a "Setup" section under "Configuration". 
