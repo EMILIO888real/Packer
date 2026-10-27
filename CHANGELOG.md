@@ -9,6 +9,7 @@
 - `initialization.py` a new module for the heavy boot-up actions that were previously in `config.py` to make accessing parts of the python package faster, like the CLI. 
 - `constants.py` a new module to organize and store various constant values, like colors, to make modifications easier in the future. 
 - `arguments.py` a new module to make the CLI faster containing the blueprint and all completer functions for a speedy CLI auto-complete response time. 
+- Cleanup of generated build directory (`build`) in the `revert_changes` method. 
 
 ### Changed
 - `Packer._Popen` method to create and start the process outside the thread but at method call place and return not only the done event, but also the handle to that process. 

@@ -876,6 +876,10 @@ class Packer():
             self.print_and_log('No commits to revert, resetting working tree to the last commit...', [255, 255, 0])
             self.git_repo.head.reset(working_tree=True)
 
+        if Path('build').exists():
+            self.print_and_log('Cleaning up, removing the generated build directory...', [255, 255, 0])
+            self.git_repo.git.clean('-fd', '--', 'build')
+
         if hasattr(self, 'git_release'):
             self.print_and_log('Deleting git release...', [255, 255, 0])
             self.git_release.delete_release()
