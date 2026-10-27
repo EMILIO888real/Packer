@@ -827,7 +827,7 @@ class Packer():
         if wait:
             self._wait_smooth_output()
 
-        self.print_and_log('Terminating any ongoing processes...', [255, 255, 0], 30)
+        self.print_and_log('Terminating any ongoing processes...', level=30)
 
         if hasattr(self, 'compile_process_handle'):
             self.print_and_log('Terminating the compilation process...', [255, 255, 0], 30)
@@ -842,7 +842,7 @@ class Packer():
             self.pyinstaller_process_handle.terminate()
 
 
-        self.print_and_log('Reverting back to previous version...', [255, 255, 0], 30)
+        self.print_and_log('Reverting back to previous version...', level=30)
 
         if self.program_archive_path.exists():
             self.print_and_log('Removing archive...', [255, 255, 0])
@@ -923,8 +923,8 @@ class Packer():
             self.git_repo.index.add(['pyproject.toml'])
             self.git_commit('Bumped version after failed release')
         else:
-            self.print_and_log('Rejecting the environment on GitHub Actions for building the package...', [255, 255, 0], 30)
             if hasattr(self, 'run_id'):
+                self.print_and_log('Rejecting the environment on GitHub Actions for building the package...', [255, 255, 0], 30)
                 self._process_environments('rejected', 'Rejected through Packer\'s revert changes method')
 
         if wait:

@@ -22,6 +22,7 @@
 - Moved `check_module_conflict` from `setup.py` to `utils.py`. 
 - Moved `inherits_signature` from `gui.py` to `et.py`. 
 - `revert_changes` method upgraded it's output to be more clear about what it's doing with cleaning up git environment. 
+- Rearranged and cleaned up the output of the `revert_changes` method (color and timing). 
 
 ### Fixed
 - Table of contents in the README by removing the "Config" and "Extra notes" sections, and adding a "Setup" section under "Configuration". 
