@@ -6,7 +6,7 @@
 - `skip_pypi_prompt` option to skip Packer prompt for publishing to PyPI through GitHub actions. 
 - All doctypes that were missing for simpler or less used modules. 
 - `__all__` to all modules that were missing them for an easier understandable public API. 
-- `initialization.py` a new module for the heavy boot-up actions that were previously in `config.py` to make accessing parts of the python package fater, like the CLI. 
+- `initialization.py` a new module for the heavy boot-up actions that were previously in `config.py` to make accessing parts of the python package faster, like the CLI. 
 - `constants.py` a new module to organize and store various constant values, like colors, to make modifications easier in the future. 
 - `arguments.py` a new module to make the CLI faster containing the blueprint and all completer functions for a speedy CLI auto-complete response time. 
 
@@ -24,6 +24,7 @@
 ### Fixed
 - Table of contents in the README by removing the "Config" and "Extra notes" sections, and adding a "Setup" section under "Configuration". 
 - Random small inaccuracies in the change module. 
+- Spelling mistakes in the changelog. 
 
 ---
 
@@ -33,20 +34,20 @@
 - [0056648] CLI completion function for settings `--version-font` fonts to give nice-random font selection. 
 - [0056648] Documentation for various functions that were missing, most importantly the `Global_exception_handler` is also now documented. 
 - [689559d] `trigger_exit` function in `ege.py` to handle clean GUI exit by triggering `pygame` quit event. 
-- [689559d] `compatability` settings for the GUI users that are on Windows. 
+- [689559d] `compatibility` settings for the GUI users that are on Windows. 
 - [2c30382] Doctype for the `_smooth_output` function, so that all of those function have doctype and type notations, so when you inspect `print_and_log` the documentation remains the same.
 
 ### Changed
 - [5f5e478] Added a `no_index` parameter to the `main()` function in `change.py`, allowing to disable automatic full git indexation of the project (default is False). 
 - [0056648] Officially made Packer's `Global_exception_handler` only run in a terminal interface, not when Packer is imported. 
 - [0056648] `print_colored_text` function in the `etf.py` module to accept `None` as an option for color, in that case the function doesn't call the `change_color` function. 
-- [0056648] Updated all use cases of `print_colored_text` function to not manually check if color is None, but now just simply pass it to the `print_colored_text` function without a seperate `print` function call. 
+- [0056648] Updated all use cases of `print_colored_text` function to not manually check if color is None, but now just simply pass it to the `print_colored_text` function without a separate `print` function call. 
 - [0056648] `Global_exception_handler` `update` method to allow accepting `IO queues`, making it easy to plug in an interface after creating the object. 
 - [689559d] Removed temporary section in the GUI that mutes `Pygame` warnings. 
 - [689559d] Reworked `_refresh_output` function in the GUI to correctly render text, lines are warped by character a new blit is created for each text they are aligned as close to each other as possible on the x axi, in the future font size will be dynamic for y axi alignment as well. 
 - [689559d] `_handle_output` to correctly save the end characters if there are any and added an automatic GUI exit if an exit event is received from Packer after a delay. 
 - [689559d] `_draw_output` to not allow accepting mouse inputs by clearing the `menu_buttons` list. 
-- [689559d] `_send_queue_request` dictionary object strucure to not contain the expected output type, since it doesn't ever change based on the question. 
+- [689559d] `_send_queue_request` dictionary object structure to not contain the expected output type, since it doesn't ever change based on the question. 
 - [689559d] Output window in the GUI to have 2 buttons at the bottom a yes and no whenever a question pops up. 
 - [2c30382] `_log_and_output_queue` function doctype and type notations to match it's other similar functions, to be more readable. 
 - [bb5a2c9] Update `GoFile` Packer folder share code from the old `bsT5ix` to the new `KtA9pExt`, since `GoFile` had again updated their website and the folder was removed.
