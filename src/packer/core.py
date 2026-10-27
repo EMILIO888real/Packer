@@ -1,3 +1,7 @@
+'''Core project packaging and release workflow. Just core code.'''
+
+__all__ = ['Packer']
+
 from pathlib import Path
 from datetime import datetime
 from multiprocessing import Queue
@@ -7,7 +11,7 @@ from os import chdir, listdir, makedirs, remove, path
 from json import dump, load
 from subprocess import PIPE, STDOUT, CompletedProcess, Popen, run
 from time import sleep
-from typing import Any, Literal, NoReturn, Optional
+from typing import Any, Literal, NoReturn
 from collections.abc import Callable, Sequence
 from github import Github, Auth, UnknownObjectException
 from ollama import chat
@@ -25,10 +29,10 @@ from tenacity import retry,stop_after_attempt, wait_exponential, retry_if_except
 
 from packer.custom_modules.et import format_size, format_version_text, get_folder_size, tree, delete_upload, init_logger
 from packer.custom_modules.etf import bool_answer, clear_lines, lines_used, simple_prompt_retries, print_bg_colored_text, print_colored_text, print_with_delay
-from packer.config import all_settings, Project, packer_version, send_notification, ollama_available, _input_via_text_editor
+from packer.config import all_settings, Project, packer_version, _input_via_text_editor
 from packer.paths import log_path, data_dir, cache_dir, metadata_path, log_dir
-from packer.utils import find_environments, process_deployed_environments, upload_package
-
+from packer.utils import find_environments, process_deployed_environments, upload_package, upload_gofile_file
+from packer.initialization import send_notification, ollama_available
 
 def _filter_empty_changelog_sections(changelog: str) -> str:
     '''Return a changelog with empty "###" sections removed.'''
@@ -80,39 +84,6 @@ def _filter_empty_changelog_sections(changelog: str) -> str:
     flush_current_section()
     return '\n'.join(filtered_lines).strip()
 
-
-def thread_excepthook(args):
-    sys.excepthook(args.exc_type, args.exc_value, args.exc_traceback)
-
-threading.excepthook = thread_excepthook # Also, so other threads access the same handler
-
-def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
-    '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
-    
-    :param file_path: The path to the file to be uploaded.
-    :type file_path: Path
-    :param token: The user token for the GoFile account.
-    :type token: str
-    :param folder_id: The ID of the folder where the file will be uploaded.
-    :type folder_id: str
-    :return: The response from the GoFile API as a dictionary.
-    :rtype: dict
-    '''
-
-    with open(file_path, 'rb') as f:
-        files = {
-            'file': f
-        }
-
-        data = {
-            'token': token,
-            'folderId': folder_id
-        }
-
-        response = post('https://upload.gofile.io/uploadfile', files=files, data=data, timeout=60)
-        response.raise_for_status()
-
-        return response.json()
 
 class Packer():
     '''

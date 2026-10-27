@@ -1,3 +1,7 @@
+'''Text-based interactive user interface for Packer.'''
+
+__all__ = ['main']
+
 from json import dump, dumps, loads, load
 from pathlib import Path
 from typing import Callable

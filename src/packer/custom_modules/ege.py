@@ -1,3 +1,10 @@
+'''Pygame helpers for rendering and interactive elements.'''
+
+__all__ = [
+    'noop', 'scale_position', 'format_size', 'create_text_blit', 'rect_to_tuple',
+    'tuple_to_rect', 'Advanced_clock', 'playlist', 'trigger_exit',
+]
+
 from random import randint
 import sys
 import threading

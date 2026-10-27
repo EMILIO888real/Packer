@@ -1,3 +1,11 @@
+'''Application storage paths and asset locations.'''
+
+__all__ = [
+    'root_dir', 'assets_dir', 'config_dir', 'projects_file_path', 'settings_file_path',
+    'log_dir', 'log_path', 'error_report_path', 'data_dir', 'cache_dir', 'download_dir',
+    'documents_dir', 'metadata_path',
+]
+
 from datetime import datetime
 from importlib import resources
 from pathlib import Path

@@ -1,10 +1,14 @@
+'''Release and update actions for Packer projects.'''
+
+__all__ = ['run']
+
 from pathlib import Path
 from queue import Queue
-
-from packer.config import Project, all_settings, send_notification, exception_handler
 import sys
 
 from packer.core import Packer
+from packer.initialization import send_notification, exception_handler
+from packer.config import Project, all_settings
 
 
 def run(new_version: dict, project_directory: Path, project_configuration: Project, input_queue: Queue | None = None, output_queue: Queue | None = None):

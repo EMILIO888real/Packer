@@ -1,3 +1,7 @@
+'''Global exception handling and error reporting for Packer and similar style programs.'''
+
+__all__ = ['Global_exception_handler']
+
 import sys
 from datetime import datetime
 from pathlib import Path

@@ -1,4 +1,15 @@
+'''Encryption, package publishing, and deployment utilities.'''
+
+__all__ = [
+    'pip_install', 'generate_key_from_password', 'is_file_encrypted',
+    'write_encrypted_file', 'read_encrypted_file', 'model_pull_progress',
+    'ProgressRenderer', 'TqdmProgressRenderer', 'track_model_pull', 'upload_package',
+    'find_environments', 'process_deployed_environments', 'upload_gofile_file',
+    'check_module_conflict',
+]
+
 from abc import ABC, abstractmethod
+from importlib import import_module
 from os import urandom
 from pathlib import Path
 from subprocess import run
@@ -123,6 +134,8 @@ def read_encrypted_file(file_path: str | Path, password: bytes) -> str:
 
     return decrypted_data.decode()
 
+
+
 def model_pull_progress(model_name: str):
     for progress in ollama.pull(model_name, stream=True):
         yield {
@@ -130,6 +143,7 @@ def model_pull_progress(model_name: str):
             'completed': progress.completed,
             'status': progress.status,
         }
+
 
 class ProgressRenderer(ABC):
     @abstractmethod
@@ -143,6 +157,7 @@ class ProgressRenderer(ABC):
     @abstractmethod
     def finish(self) -> None:
         pass
+
 
 class TqdmProgressRenderer(ProgressRenderer):
     def __init__(self):
@@ -165,6 +180,7 @@ class TqdmProgressRenderer(ProgressRenderer):
         clear_lines(self.lines)
         print_colored_text('Successfully installed!', [0, 255, 0])
 
+
 def track_model_pull(model_name: str, renderer: ProgressRenderer):
     stream = model_pull_progress(model_name)
 
@@ -183,6 +199,8 @@ def track_model_pull(model_name: str, renderer: ProgressRenderer):
                 renderer.start(total)
 
     renderer.finish()
+
+
 
 def upload_package(output_dir: str | Path = 'dist', repository: str = 'pypi', api_token: str | None = None) -> str | None:
     '''
@@ -262,6 +280,7 @@ def find_environments(github_repo_token: str, github_repo_url: str, run_id: int,
 
     return environment['environment']['id']
 
+
 def process_deployed_environments(github_repo_token: str, github_repo_url: str, run_id: int, environment_id: int, state: Literal['approved', 'rejected'] = 'approved', comment: str = 'Approved through Packer'):
     '''
     sends a request to the GitHub API to approve or reject a specific workflow run for a specific environment.
@@ -291,3 +310,49 @@ def process_deployed_environments(github_repo_token: str, github_repo_url: str, 
             'comment': comment,
         },
     ).raise_for_status()
+
+
+def upload_gofile_file(file_path: Path, token: str, folder_id: str) -> dict:
+    '''Uploads a file to a specified folder in the GoFile account and returns the response as a dictionary.
+    
+    :param file_path: The path to the file to be uploaded.
+    :type file_path: Path
+    :param token: The user token for the GoFile account.
+    :type token: str
+    :param folder_id: The ID of the folder where the file will be uploaded.
+    :type folder_id: str
+    :return: The response from the GoFile API as a dictionary.
+    :rtype: dict
+    '''
+
+    with open(file_path, 'rb') as f:
+        files = {
+            'file': f
+        }
+
+        data = {
+            'token': token,
+            'folderId': folder_id
+        }
+
+        response = post('https://upload.gofile.io/uploadfile', files=files, data=data, timeout=60)
+        response.raise_for_status()
+
+        return response.json()
+
+
+def check_module_conflict(program_name: str) -> bool:
+    '''
+    Check if a module name conflicts with Python built-in modules or keywords.
+
+    :param program_name: The name of the program/module to check
+    :type program_name: str
+    :return: True if there is a conflict, False otherwise
+    :rtype: bool
+    '''
+
+    try:
+        import_module(program_name)
+        return True
+    except ImportError:
+        return False

@@ -1,4 +1,4 @@
-"""Enhanced Terminal Formatting (ETF) Module.
+'''Enhanced Terminal Formatting (ETF) Module.
 
 A comprehensive module providing terminal manipulation utilities including:
 - Color and formatting controls (RGB color support, text styles)
@@ -14,7 +14,17 @@ advanced visual effects and user interaction capabilities.
 
 All functions use ANSI escape codes for cross-platform terminal support.
 Note: Some functions are Linux-specific.
-"""
+'''
+
+__all__ = [
+    'change_color', 'reset_formatting', 'print_list', 'flush_input_linux', 'hide_cursor',
+    'show_cursor', 'clear_terminal', 'clear_lines', 'Loading_animations', 'print_with_delay',
+    'dissolve_text', 'style_terminal', 'user_input', 'ask_user_repeatedly',
+    'print_colored_text', 'set_raw_mode', 'graph_drawer', 'generate_points',
+    'scrollable_text_display', 'set_background_color', 'lines_used',
+    'print_bg_colored_text', 'prompt_user', 'bool_answer', 'simple_prompt',
+    'simple_prompt_retries', 'stripped_input', 'fade_animation',
+]
 
 from collections.abc import Callable, Iterable
 from itertools import cycle

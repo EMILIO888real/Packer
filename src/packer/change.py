@@ -1,3 +1,7 @@
+'''Git change and AI-assisted commit workflows.'''
+
+__all__ = ['main', 'tui', 'generate_suggestions']
+
 from string import Template
 from pathlib import Path
 from git import GitCommandError, Repo
@@ -73,12 +77,13 @@ def main(git_directory: str | Path = '.', modification_types: list[str] = ['c'],
 
 
     repo = Repo(git_directory)
-    if no_index:
-        diff_text = repo.git.diff('--cached', unified=3)
-    else:
-        diff_text = repo.git.diff(unified=3)
 
     if ai_summary:
+        if no_index:
+            diff_text = repo.git.diff('--cached', unified=3)
+        else:
+            diff_text = repo.git.diff(unified=3)
+
         # Update prompts with runtime data
         summary_data = {
                 'diff': diff_text,
@@ -187,7 +192,7 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
     :type overall_description: str | None
     :param ai_suggestions: Whether to generate AI suggestions for the changes (default is True)
     :type ai_suggestions: bool
-    :return: A tuple containing the list of modification types, the overall description, whether AI suggestions were generated, and whether automatic full git indexation is disabled
+    :return: A tuple containing the list of modification types, the overall description, and whether automatic full git indexation is disabled
     :rtype: tuple[list[str], str | None, bool, bool]
     '''
 
@@ -212,7 +217,7 @@ def tui(changes: list[str] | None = None, overall_description: str | None = None
         else:
             overall_description = None
 
-    return (changes, overall_description, ai_suggestions, no_index)
+    return (changes, overall_description, no_index)
 
 def generate_suggestions(git_directory: str | Path = '.', suggestions_prompt = all_settings.suggestions_prompt, model: str = all_settings.model, verbose: bool = True, no_index: bool = False) -> str:
     '''
@@ -248,4 +253,4 @@ def generate_suggestions(git_directory: str | Path = '.', suggestions_prompt = a
 
 if __name__ == '__main__':
     output = tui()
-    main(modification_types=output[0], overall_description=output[1])
+    main(modification_types=output[0], overall_description=output[1], no_index=output[2])

@@ -1,3 +1,5 @@
+'''Public package-level exports for Packer.'''
+
 __all__ = [
     'load_config', 'Packer', 'setup', 'commit_change', 
     'simple_merge_settings', 'normalize_settings_keys', 

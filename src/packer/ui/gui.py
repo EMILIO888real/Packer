@@ -1,17 +1,20 @@
+'''Graphical user interface for Packer.'''
+
+__all__ = ['Gui', 'main']
+
 from time import sleep
 import pygame
 import queue
 from multiprocessing import Process, Queue
 import threading
-from functools import wraps
-from typing import Callable, Literal, ParamSpec, TypeVar
+from typing import Callable, Literal
 from inspect import signature
 from json import load
 from pathlib import Path
 from sys import exit, platform
 
-from packer.config import Project, all_settings, all_settings_status, projects_configurations
-from packer.custom_modules.et import format_time, noop, normalize_settings_keys, resolve_version
+from packer.config import Project, all_settings, projects_configurations
+from packer.custom_modules.et import format_time, inherits_signature, noop, normalize_settings_keys, resolve_version
 from packer.custom_modules.etf import clear_lines, print_colored_text
 from packer.custom_modules.ege import create_text_blit, format_size, Advanced_clock, trigger_exit
 from packer import actions
@@ -22,31 +25,6 @@ if all_settings.compatibility:
         print_colored_text('Some settings were automatically set to preset values for Windows.', [0, 255, 0], end=' ')
         print_colored_text('For more info refer to documentation.', [138, 43, 226])
         all_settings.slow_events = False
-
-P = ParamSpec('P')
-R = TypeVar('R')
-
-def inherits_signature(target: Callable[P, R]):
-    '''Copies parameter signature, type annotations, and docstring from target.'''
-
-    def decorator(func: Callable[P, R]) -> Callable[P, R]:
-        @wraps(target)
-        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
-            return func(*args, **kwargs)
-
-        return wrapper
-
-    return decorator
-
-
-def while_running(func: Callable[P, R]) -> Callable:
-    @wraps(func)
-    def wrapper(running: threading.Event, *args: P.args, **kwargs: P.kwargs) -> None:
-        while running.is_set():
-            func(*args, **kwargs)
-            sleep(0.01)
-
-    return wrapper
 
 
 

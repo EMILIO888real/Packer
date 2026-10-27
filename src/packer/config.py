@@ -10,26 +10,26 @@ For detailed documentation on project and user settings, see:
 - User Settings: https://github.com/EMILIO888real/Packer/blob/master/docs/SETTINGS.md
 
 Example usage:
-    from packer.config import all_settings, user_settings, default_settings, projects_configurations
+    from packer.config import all_settings, user_settings, projects_configurations
     project_config = projects_configurations.get_w_tui()['path/to/project']
     print(all_settings.text_editor)  # Access global user setting
 
 Attributes:
-    all_settings: A Settings object containing all merged configuration for the selected project.
-    user_settings: A dictionary containing user-defined configuration settings for all projects.
-    default_settings: A dictionary containing default configuration settings for packer projects.
-    default_config: A dictionary containing the default configuration structure.
-    projects_configurations: Optional dictionary of project-specific configurations from projects.json.
-    packer_version: The current version of the packer package.
-    _getpass: A function to securely prompt for passwords with echo_char option.
-    _input_via_text_editor: A function to prompt for input using a text editor.
-    find_user_project: A function to find a project by name in the projects.json file.
+    Project (BaseModel): Pydantic model for project-specific configuration.
+    Settings (BaseModel): Pydantic model for global user settings.
+    all_settings (Settings): Merged global settings from user configuration and defaults.
+    user_settings (dict): Raw user settings loaded from the settings file.
+    projects_configurations (_Projects_configurations_manager): Manager for project-specific configurations.
+    packer_version (str): Current version of the packer package, formatted for display.
+    _getpass (Callable): Function to securely prompt for passwords, respecting user settings.
+    _input_via_text_editor (Callable): Function to prompt for input using a text editor, respecting user settings.
+    find_user_project (Callable): Function to find a project path by its folder name, returning None if not found.
 '''
 
-__all__ = ['all_settings', 'user_settings', 'default_settings', 'default_config', 'projects_configurations', 'packer_version',
-           '_getpass', '_input_via_text_editor', 'find_user_project', 'send_notification']
+__all__ = ['Project', 'Settings', 'all_settings', 'all_settings_status', 'user_settings', 'projects_configurations', 'packer_version',
+           '_getpass', '_input_via_text_editor', 'find_user_project']
 
-from os import environ
+
 from warnings import filterwarnings
 
 filterwarnings(
@@ -38,7 +38,10 @@ filterwarnings(
     category=RuntimeWarning,
 )
 
+from os import environ
+
 environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1' # Turns off pygame hello message
+
 
 from collections.abc import Callable
 from pathlib import Path
@@ -47,21 +50,17 @@ from typing import Any, Sequence
 from pydantic import BaseModel, ValidationError
 from getpass import getpass
 from cryptography.fernet import InvalidToken
-from plyer import notification
 import json
-import pygame
-import ollama
 
 from packer.custom_modules.et import format_version_text, normalize_settings_keys, input_via_text_editor
-from packer.paths import assets_dir, log_path, error_report_path, projects_file_path
-from packer.exceptions import Global_exception_handler
+from packer.paths import assets_dir, projects_file_path, settings_file_path
 from packer.utils import is_file_encrypted, read_encrypted_file
-from packer.paths import settings_file_path
 
 
 with open(f'{assets_dir}/version.json') as f:
     packer_version = format_version_text(json.load(f))
 
+# Global and project settings models
 
 class Project(BaseModel):
     '''
@@ -254,6 +253,7 @@ class Settings(BaseModel):
     compatibility: bool = True
     skip_pypi_prompt: bool = False
 
+# Error handling for global settings
 
 if not Path(settings_file_path).exists():
     with open(settings_file_path, 'w') as f:
@@ -286,32 +286,7 @@ except ValidationError as e:
 all_settings.text_editor = which(all_settings.text_editor)
 
 
-# All other miscellaneous setup
-
-pygame.mixer.init()
-
-notification_sound = pygame.mixer.Sound(f'{assets_dir}/audio/sounds/new notification {all_settings.notification_sound_path}.wav'
-                                        if len(all_settings.notification_sound_path.strip()) == 1
-                                        else all_settings.notification_sound_path)
-notification_sound.set_volume(all_settings.notification_volume)
-
-
-exception_handler = Global_exception_handler(packer_version, log_path, error_report_path,
-                                             'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
-
-
-ollama_available = bool(which('ollama'))
-
-def _getpass(prompt: str) -> str:
-    '''
-    Prompt the user for a password with echo_char option using whatever is specified in settings.
-
-    :param prompt: The prompt to display to the user.
-    :type prompt: str
-    :return: The password entered by the user.
-    :rtype: str
-    '''
-    return getpass(prompt, echo_char=all_settings.getpass_echo_char)
+# Projects configuration manager (contains error handling, since it's UI specific!)
 
 class _Projects_configurations_manager():
     def __init__(self):
@@ -352,6 +327,19 @@ class _Projects_configurations_manager():
 
 projects_configurations = _Projects_configurations_manager()
 
+# Functions relying on pre-processed settings and configuration managers for default or internal functionality. (Can't move these 3 elsewhere!)
+
+def _getpass(prompt: str) -> str:
+    '''
+    Prompt the user for a password with echo_char option using whatever is specified in settings.
+
+    :param prompt: The prompt to display to the user.
+    :type prompt: str
+    :return: The password entered by the user.
+    :rtype: str
+    '''
+    return getpass(prompt, echo_char=all_settings.getpass_echo_char)
+
 def find_user_project(name: str) -> Path | None:
     '''
 
@@ -370,29 +358,6 @@ def find_user_project(name: str) -> Path | None:
     
     return None
 
-
-def send_notification(title: str, message: str, timeout: int = 5):
-    '''
-    Send a desktop notification.
-
-    :param title: the title of the notification
-    :type title: str
-    :param message: the message of the notification
-    :type message: str
-    :param timeout: the duration (in seconds) for which the notification should be displayed
-    :type timeout: int
-    '''
-
-    notification.notify(
-        title=title,
-        message=message,
-        app_name='Packer',
-        app_icon=f'{assets_dir}/images/Packer icon.png',
-        timeout=timeout
-    )
-
-    notification_sound.play()
-
 def _input_via_text_editor(text: str, file_path: str = None, text_editor: str = all_settings.text_editor, wait_flag: str = all_settings.wait_flag) -> str:
     '''
     Prompt the user for input using a text editor, as specified in the global settings.
@@ -410,78 +375,3 @@ def _input_via_text_editor(text: str, file_path: str = None, text_editor: str = 
     '''
 
     return input_via_text_editor(text, file_path, text_editor, wait_flag)
-
-color_pallets = [
-    # retro cyberpunk
-    [[10, 10, 26], [255, 0, 127], [0, 240, 255], [141, 0, 255], [255, 102, 0], [0, 255, 128], [255, 225, 0], [255, 30, 60], [20, 60, 220], [210, 180, 255]],
-
-    # dark_tones
-    [[43, 66, 54], [135, 150, 126], [191, 104, 76], [138, 64, 48], [61, 39, 34], [178, 191, 182], [242, 235, 223], [89, 106, 115], [112, 59, 74], [227, 169, 91]],
-
-    # pastel_ocean
-    [[212, 236, 242], [163, 210, 217], [130, 179, 199], [245, 235, 181], [242, 199, 203], [213, 194, 224], [245, 206, 181], [94, 137, 171], [40, 71, 102], [25, 38, 51]],
-
-    # rainbow
-    [[255, 127, 0], [255, 255, 0], [0, 255, 0], [0, 0, 255], [75, 0, 130], [148, 0, 211]],
-
-    # sunset_glow
-    [[255, 95, 109], [255, 154, 94], [255, 216, 117], [255, 240, 210], [255, 122, 89], [255, 184, 77], [242, 111, 156], [255, 199, 127], [253, 90, 90], [245, 214, 154]],
-
-    # forest_mist
-    [[26, 60, 56], [44, 93, 80], [88, 137, 109], [155, 187, 146], [202, 220, 184], [119, 160, 120], [79, 121, 98], [48, 97, 87], [19, 46, 40], [136, 176, 145]],
-
-    # lavender_haze
-    [[136, 114, 196], [185, 164, 232], [221, 208, 255], [91, 76, 149], [145, 120, 195], [201, 188, 249], [122, 95, 173], [238, 229, 255], [85, 63, 139], [177, 157, 238]],
-
-    # neon_pop
-    [[255, 0, 128], [0, 240, 255], [141, 0, 255], [255, 102, 0], [0, 255, 128], [255, 225, 0], [255, 30, 60], [20, 60, 220], [210, 180, 255], [255, 127, 80]],
-
-    # moody_bloom
-    [[70, 42, 86], [153, 90, 117], [221, 118, 103], [255, 181, 126], [255, 221, 190], [196, 158, 198], [147, 113, 180], [111, 81, 128], [91, 64, 100], [201, 177, 214]],
-
-    # citrus_burst
-    [[255, 196, 0], [255, 153, 51], [255, 102, 0], [255, 238, 153], [255, 245, 157], [255, 214, 10], [245, 166, 35], [255, 122, 0], [239, 71, 111], [255, 153, 102]],
-
-    # midnight_wave
-    [[7, 10, 25], [15, 28, 52], [29, 64, 109], [52, 105, 162], [90, 176, 214], [130, 214, 228], [63, 84, 122], [27, 46, 84], [8, 22, 37], [103, 160, 197]],
-
-    # monochrome
-    [[244, 244, 244], [200, 200, 200], [150, 150, 150], [96, 96, 96], [70, 70, 70], [42, 42, 42], [18, 18, 18], [255, 255, 255], [120, 120, 120], [230, 230, 230]],
-
-    # berry_sky
-    [[104, 29, 77], [172, 53, 114], [255, 109, 165], [255, 180, 204], [255, 223, 235], [66, 22, 59], [136, 66, 96], [226, 99, 146], [90, 43, 72], [204, 129, 170]],
-
-    # arctic_ice
-    [[174, 214, 245], [205, 232, 255], [127, 185, 242], [89, 147, 213], [223, 244, 255], [150, 202, 255], [197, 244, 255], [106, 173, 229], [75, 117, 175], [147, 207, 237]],
-
-    # ember
-    [[124, 17, 7], [186, 53, 19], [232, 102, 50], [247, 170, 80], [255, 218, 133], [255, 127, 80], [198, 82, 31], [143, 32, 15], [79, 12, 7], [241, 147, 52]],
-]
-
-nice_fonts = [
-    'small', 'slant', 'banner3', 'big',
-    'chunky', 'doom', 'epic',
-    'bubble', 'straight', 'speed', 'smslant', 'roman'
-]
-
-TEXT_EDITORS = [
-    ('Visual Studio Code', 'code', '--wait'),
-    ('Cursor', 'cursor', '--wait'),
-    ('VS Code Insiders', 'code-insiders', '--wait'),
-    ('Notepad++', 'notepad++', None),
-    ('Neovim', 'nvim', None),
-    ('Vim', 'vim', None),
-    ('Nano', 'nano', None),
-    ('Emacs', 'emacs', None),
-]
-
-available_text_editors = [
-    (name, exe, wait_flag)
-    for name, exe, wait_flag in TEXT_EDITORS
-    if which(exe)
-]
-
-default_text_editor = available_text_editors[0][1]
-
-available_models = [model.model for model in sorted([model for model in ollama.list().models if 'completion' in ollama.show(model.model).capabilities], key=lambda model:model.size)]
-default_model = ('mistral:latest' if 'mistral:latest' in available_models else available_models[0]) if available_models else None

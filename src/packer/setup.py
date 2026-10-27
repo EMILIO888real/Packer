@@ -1,13 +1,14 @@
+'''Project scaffolding and setup workflows.'''
+
+__all__ = ['main', 'tui']
 
 from datetime import datetime
 from getpass import getuser
-from importlib import import_module
 from os import chdir, listdir, mkdir
 from pathlib import Path
 from shutil import copy, rmtree
 from subprocess import PIPE, STDOUT, CalledProcessError, run, Popen
 from textwrap import dedent
-from typing import Sequence
 from json import dump
 from git import Repo
 from github import Auth, Github, GithubException
@@ -16,7 +17,7 @@ from sys import exit, platform, builtin_module_names
 from re import match
 from keyword import iskeyword
 
-from packer.utils import pip_install
+from packer.utils import pip_install, check_module_conflict
 from packer.custom_modules.et import init_logger, tree
 from packer.custom_modules.etf import print_colored_text, simple_prompt_retries, stripped_input
 from packer.config import packer_version, _getpass, all_settings
@@ -24,22 +25,6 @@ from packer.custom_modules.etf import print_list
 from packer.paths import download_dir, documents_dir
 
 logger = init_logger('packer setup', 'EMILIO')
-
-def check_module_conflict(program_name: str) -> bool:
-    '''
-    Check if a module name conflicts with Python built-in modules or keywords.
-
-    :param program_name: The name of the program/module to check
-    :type program_name: str
-    :return: True if there is a conflict, False otherwise
-    :rtype: bool
-    '''
-
-    try:
-        import_module(program_name)
-        return True
-    except ImportError:
-        return False
 
 def print_and_log(text: str, level: int = 20, color: list[int, int, int] | None = None, end: str = '\n') -> None:
     '''

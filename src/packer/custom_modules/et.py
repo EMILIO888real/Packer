@@ -16,7 +16,17 @@ This module is designed to provide common utility functions for system operation
 file management, configuration handling, and API interactions.
 '''
 
+__all__ = [
+    'import_modules', 'reboot_current_script', 'color_generator', 'copy_with_exceptions',
+    'noop', 'launch_in_new_terminal', 'format_time', 'safe_replace', 'delete_upload',
+    'tree', 'check_dicts', 'load_clean_decimal', 'RelativeTimeFormatter', 'log_file_path',
+    'init_logger', 'format_version_text', 'create_gofile_folder', 'load_config',
+    'normalize_settings_keys', 'merge_settings', 'simple_merge_settings', 'resolve_version',
+    'get_folder_size', 'format_size', 'input_via_text_editor', 'inherits_signature'
+]
+
 from decimal import Decimal
+from functools import wraps
 from hashlib import sha256
 from importlib.resources.abc import Traversable
 from importlib import import_module
@@ -24,7 +34,7 @@ import sys
 from collections.abc import Collection
 from os import execl, remove, replace, listdir, mkdir
 from tempfile import NamedTemporaryFile
-from typing import Any, Optional, Union
+from typing import Any, Callable, Optional, Union, ParamSpec, TypeVar
 from pathlib import Path
 from json import JSONDecodeError, load
 from datetime import datetime, timedelta
@@ -767,6 +777,21 @@ def format_time(time: float) -> str:
         return f'{time / 2419200:.2f} mo'
     else:
         return f'{time / 29030400:.2f} y'
+
+P = ParamSpec('P')
+R = TypeVar('R')
+
+def inherits_signature(target: Callable[P, R]):
+    '''Copies parameter signature, type annotations, and docstring from target.'''
+
+    def decorator(func: Callable[P, R]) -> Callable[P, R]:
+        @wraps(target)
+        def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+            return func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 if __name__ == '__main__':
     print('This module is not meant to be run directly')

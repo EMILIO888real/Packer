@@ -4,13 +4,26 @@
 - Terminate any ongoing processes to the `Packer.revert_changes` method using the newly acquired handles to the processes by terminating them before cleaning up the environment. 
 - Instructions on `revert_changes()` manual documentation for terminates ongoing compilation, package-building, or PyInstaller processes. 
 - `skip_pypi_prompt` option to skip Packer prompt for publishing to PyPI through GitHub actions. 
+- All doctypes that were missing for simpler or less used modules. 
+- `__all__` to all modules that were missing them for an easier understandable public API. 
+- `initialization.py` a new module for the heavy boot-up actions that were previously in `config.py` to make accessing parts of the python package fater, like the CLI. 
+- `constants.py` a new module to organize and store various constant values, like colors, to make modifications easier in the future. 
+- `arguments.py` a new module to make the CLI faster containing the blueprint and all completer functions for a speedy CLI auto-complete response time. 
 
 ### Changed
 - `Packer._Popen` method to create and start the process outside the thread but at method call place and return not only the done event, but also the handle to that process. 
 - `__init__.py` to the semi-new standart for lazy importing. 
+- Simplified `change` module's code to be more readable and do less unnecessary actions, including the `main`, `tui` and `generate_suggestions` functions. 
+- Existing doctype and `__all__` public API variables in existing modules to be more accurate to the current state of the project. 
+- Cleaned up imports across the project. 
+- Reorganized `config.py` to make it much easier to read. 
+- Finally moved the 2 basic functions that were stored in `core.py` to `utils.py` and `initialization.py`. 
+- Moved `check_module_conflict` from `setup.py` to `utils.py`. 
+- Moved `inherits_signature` from `gui.py` to `et.py`. 
 
 ### Fixed
 - Table of contents in the README by removing the "Config" and "Extra notes" sections, and adding a "Setup" section under "Configuration". 
+- Random small inaccuracies in the change module. 
 
 ---
 
