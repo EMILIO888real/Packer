@@ -861,16 +861,19 @@ class Packer():
         if hasattr(self, 'prep_committed') and self.prep_committed:
             commit_count += 1
 
+        self.print_and_log('Cleaning up git environment...')
         if commit_count > 0:
-            self.print_and_log('Cleaning up git environment...')
+            self.print_and_log(f'Reverting {commit_count} commit(s)...', [255, 255, 0])
             self._revert_git_head(commit_count)
-            if commit_count == 2:
+            if commit_count > 2:
                 self.print_and_log('Switching to master branch...')
                 self.git_repo.heads['master'].checkout()
+                self.print_and_log(f'Reverting {commit_count} commit(s)...', [255, 255, 0])
                 self._revert_git_head(commit_count)
                 self.print_and_log('Switching back to development branch...')
                 self.git_repo.heads['development'].checkout()
         else:
+            self.print_and_log('No commits to revert, resetting working tree to the last commit...', [255, 255, 0])
             self.git_repo.head.reset(working_tree=True)
 
         if hasattr(self, 'git_release'):
@@ -916,6 +919,7 @@ class Packer():
             self.git_repo.index.add(['pyproject.toml'])
             self.git_commit('Bumped version after failed release')
         else:
+            self.print_and_log('Rejecting the environment on GitHub Actions for building the package...', [255, 255, 0], 30)
             if hasattr(self, 'run_id'):
                 self._process_environments('rejected', 'Rejected through Packer\'s revert changes method')
 
