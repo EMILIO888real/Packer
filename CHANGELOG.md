@@ -1,36 +1,34 @@
-## [%new_version] - %date
+## [0.28.0] - 2026-10-27
 
 ### Added
-- Terminate any ongoing processes to the `Packer.revert_changes` method using the newly acquired handles to the processes by terminating them before cleaning up the environment. 
-- Instructions on `revert_changes()` manual documentation for terminates ongoing compilation, package-building, or PyInstaller processes. 
-- `skip_pypi_prompt` option to skip Packer prompt for publishing to PyPI through GitHub actions. 
-- All doctypes that were missing for simpler or less used modules. 
-- `__all__` to all modules that were missing them for an easier understandable public API. 
+- [9cbef2d] Terminate any ongoing processes to the `Packer.revert_changes` method using the newly acquired handles to the processes by terminating them before cleaning up the environment. 
+- [a913370] Instructions on `revert_changes()` manual documentation for terminates ongoing compilation, package-building, or PyInstaller processes. 
+- [e2c72e6] `skip_pypi_prompt` option to skip Packer prompt for publishing to PyPI through GitHub actions. 
+- [95831ff] All doctypes that were missing for simpler or less used modules. 
+- [95831ff] `__all__` to all modules that were missing them for an easier understandable public API. 
 - `initialization.py` a new module for the heavy boot-up actions that were previously in `config.py` to make accessing parts of the python package faster, like the CLI. 
-- `constants.py` a new module to organize and store various constant values, like colors, to make modifications easier in the future. 
-- `arguments.py` a new module to make the CLI faster containing the blueprint and all completer functions for a speedy CLI auto-complete response time. 
-- Cleanup of generated build directory (`build`) in the `revert_changes` method. 
+- [95831ff] `constants.py` a new module to organize and store various constant values, like colors, to make modifications easier in the future. 
+- [95831ff] `arguments.py` a new module to make the CLI faster containing the blueprint and all completer functions for a speedy CLI auto-complete response time. 
+- [8d27bba] Cleanup of generated build directory (`build`) in the `revert_changes` method.
 
 ### Changed
-- `Packer._Popen` method to create and start the process outside the thread but at method call place and return not only the done event, but also the handle to that process. 
-- `__init__.py` to the semi-new standart for lazy importing. 
-- Simplified `change` module's code to be more readable and do less unnecessary actions, including the `main`, `tui` and `generate_suggestions` functions. 
-- Existing doctype and `__all__` public API variables in existing modules to be more accurate to the current state of the project. 
-- Cleaned up imports across the project. 
-- Reorganized `config.py` to make it much easier to read. 
-- Finally moved the 2 basic functions that were stored in `core.py` to `utils.py` and `initialization.py`. 
-- Moved `check_module_conflict` from `setup.py` to `utils.py`. 
-- Moved `inherits_signature` from `gui.py` to `et.py`. 
-- `revert_changes` method upgraded it's output to be more clear about what it's doing with cleaning up git environment. 
-- Rearranged and cleaned up the output of the `revert_changes` method (color and timing). 
-- Update link to GoFile archive for source archive installation. 
+- [9cbef2d] `Packer._Popen` method to create and start the process outside the thread but at method call place and return not only the done event, but also the handle to that process. 
+- [3b74330] `__init__.py` to the semi-new standart for lazy importing. 
+- [95831ff] Simplified `change` module's code to be more readable and do less unnecessary actions, including the `main`, `tui` and `generate_suggestions` functions. 
+- [95831ff] Existing doctype and `__all__` public API variables in existing modules to be more accurate to the current state of the project. 
+- [95831ff] Cleaned up imports across the project. 
+- [95831ff] Reorganized `config.py` to make it much easier to read. 
+- [95831ff] Finally moved the 2 basic functions that were stored in `core.py` to `utils.py` and `initialization.py`. 
+- [95831ff] Moved `check_module_conflict` from `setup.py` to `utils.py`. 
+- [95831ff] Moved `inherits_signature` from `gui.py` to `et.py`. 
+- [ddf0cb6] `revert_changes` method upgraded it's output to be more clear about what it's doing with cleaning up git environment. 
+- [0f5d9b3] Rearranged and cleaned up the output of the `revert_changes` method (color and timing). 
+- [d5f77b9] Update link to GoFile archive for source archive installation.
 
 ### Fixed
-- Table of contents in the README by removing the "Config" and "Extra notes" sections, and adding a "Setup" section under "Configuration". 
-- Random small inaccuracies in the change module. 
-- Spelling mistakes in the changelog. 
-
----
+- [f0047d1] Table of contents in the README by removing the "Config" and "Extra notes" sections, and adding a "Setup" section under "Configuration". 
+- [95831ff] Random small inaccuracies in the change module. 
+- [3e34f71] Spelling mistakes in the changelog.---
 
 ## [0.27.0] - 2026-09-13
 
