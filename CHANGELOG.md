@@ -3,6 +3,7 @@
 ### Added
 
 ### Changed
+- Upgraded the ollama availability check from just a check if ollama is installed on PATH to a service online and available by introduced functions `get_ollama_host()` and `is_ollama_running(host: str)`. 
 
 ### Fixed
 

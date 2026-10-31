@@ -16,11 +16,13 @@ import sys
 import threading
 import ollama
 import pygame
+from httpx import HTTPError, get
+from os import environ
+
 from packer.constants import TEXT_EDITORS
 from packer.paths import assets_dir, log_path, error_report_path
 from shutil import which
 from plyer import notification
-
 from packer.exceptions import Global_exception_handler
 from packer.config import packer_version, all_settings
 
@@ -59,14 +61,35 @@ exception_handler = Global_exception_handler(packer_version, log_path, error_rep
                                              'https://formspree.io/f/xjgqgqbz' if all_settings.automatic_error_reporting else None, 'emilspro888@gmail.com', 'EMILIO888real/Packer')
 
 
-ollama_available = bool(which('ollama'))
+def get_ollama_host() -> str:
+    '''Resolve the server address the same way the ollama CLI does.'''
+    host = environ.get('OLLAMA_HOST', '127.0.0.1:11434').strip()
+    if '://' not in host:
+        host = f'http://{host}'
+    host = host.replace('0.0.0.0', '127.0.0.1') # bind address, not connectable
+    if host.count(':') == 1: # scheme only, no port given
+        host += ':11434'
+    return host.rstrip('/')
+
+def is_ollama_running(host: str) -> bool:
+    try:
+        return get(f'{host}/api/version').status_code == 200
+    except HTTPError: # covers ConnectError, timeouts, etc.
+        return False
+
+ollama_available = is_ollama_running(get_ollama_host())
 
 if ollama_available:
-    available_models = [model.model for model in sorted([model for model in ollama.list().models if 'completion' in ollama.show(model.model).capabilities], key=lambda model:model.size)]
-    default_model = ('mistral:latest' if 'mistral:latest' in available_models else available_models[0]) if available_models else None
+    available_models = [model.model for model in sorted(
+        [model for model in ollama.list().models
+         if 'completion' in (ollama.show(model.model).capabilities or [])],
+        key=lambda model: model.size)]
+    default_model = (('mistral:latest' if 'mistral:latest' in available_models
+                      else available_models[0]) if available_models else None)
 else:
     available_models = None
     default_model = None
+
 
 available_text_editors = [
     (name, exe, wait_flag)
